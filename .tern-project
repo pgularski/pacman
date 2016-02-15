@@ -1,0 +1,16 @@
+{
+  "ecmaVersion": 5,
+  "libs": [
+    "browser",
+    "underscore",
+    "jquery"
+  ],
+  "loadEagerly": [
+    "libs/*.js"
+  ],
+  "plugins":
+    {
+      "/usr/lib/node_modules/tern-phaser/phaser": {}
+    }
+
+}
