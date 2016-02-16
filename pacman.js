@@ -1,3 +1,4 @@
+// TODO: Once there's ghost and pacman walking around, separate the pacman and the ghost's code.
 var game = new Phaser.Game(28 * 32, 31 * 32, Phaser.AUTO, "");
 
 var PacmanGame = function() {
@@ -5,15 +6,20 @@ var PacmanGame = function() {
     self.map = null;
     self.layer = null;
     self.pacman = null;
+    self.ghost = null;
 
     self.safetile = 1;
     self.gridsize = 32;
 
     self.speed = 150;
-    self.threshold = 15;
+    self.threshold = 5;
+
+    self.ghostSpeed = 150;
 
     self.marker = new Phaser.Point();
     self.turnPoint = new Phaser.Point();
+
+    self.ghostMarker = new Phaser.Point();
 
     self.directions = [ null, null, null, null, null ];
     self.opposites = [ Phaser.NONE, Phaser.RIGHT, Phaser.LEFT, Phaser.DOWN, Phaser.UP ];
@@ -35,8 +41,8 @@ PacmanGame.prototype.preload = function () {
     var self = this;
     self.load.image("tiles", "assets/tiles.png");
     self.load.spritesheet("pacman", "assets/pacman.png", 32, 32);
+    self.load.spritesheet("ghost", "assets/ghost.png", 32, 32);
     self.load.tilemap("map", "assets/map.json", null, Phaser.Tilemap.TILED_JSON);
-
 }
 
 PacmanGame.prototype.create = function () {
@@ -50,11 +56,18 @@ PacmanGame.prototype.create = function () {
     self.pacman = self.add.sprite((2 * 32) + 16, (1 * 32) + 16, "pacman", 0);
     // Set the origin point of the sprite. Anchor 0.5 means the origins is in the middle.
     self.pacman.anchor.set(0.5);
-    self.pacman.animations.add("eat", [0, 1, 2], 10, true);
+    self.pacman.animations.add("eat", [0, 1, 2, 1], 10, true);
     self.pacman.play("eat");
 
+    self.ghost = self.add.sprite((1 * 32) + 16, (1 * 32) + 16, "ghost", 0);
+    self.ghost.anchor.set(0.5);
+    self.ghost.animations.add("walk", [0, 1, 2, 1], 10, true);
+    self.ghost.play("walk")
+
     self.physics.arcade.enable(self.pacman);
+    self.physics.arcade.enable(self.ghost);
     self.pacman.body.setSize(32, 32, 0, 0);
+    self.ghost.body.setSize(32, 32, 0, 0);
 
     self.cursors = game.input.keyboard.createCursorKeys();
 
@@ -64,10 +77,15 @@ PacmanGame.prototype.create = function () {
 PacmanGame.prototype.update = function () {
     var self = this;
     self.physics.arcade.collide(self.pacman, self.layer);
-    self.checkKeys();
+    self.physics.arcade.collide(self.ghost, self.layer);
 
+    // It's in the grid coordinates, not in pixels
     self.marker.x = self.math.snapToFloor(Math.floor(self.pacman.x), self.gridsize) / self.gridsize;
     self.marker.y = self.math.snapToFloor(Math.floor(self.pacman.y), self.gridsize) / self.gridsize;
+
+    // It's in the grid coordinates, not in pixels
+    self.ghostMarker.x = self.math.snapToFloor(Math.floor(self.ghost.x), self.gridsize) /self.gridsize;
+    self.ghostMarker.y = self.math.snapToFloor(Math.floor(self.ghost.y), self.gridsize) /self.gridsize;
 
     self.directions[Phaser.LEFT] = self.map.getTileLeft(self.layer.index, self.marker.x, self.marker.y);
     self.directions[Phaser.RIGHT] = self.map.getTileRight(self.layer.index, self.marker.x, self.marker.y);
@@ -80,6 +98,8 @@ PacmanGame.prototype.update = function () {
     {
         self.turn();
     }
+
+    self.moveGhost();
 
 }
 
@@ -150,7 +170,14 @@ PacmanGame.prototype.move = function (direction) {
     }
 
     self.current = direction;
+}
 
+PacmanGame.prototype.moveGhost = function () {
+    var self = this;
+
+    var speed = self.ghostSpeed;
+
+    self.ghost.body.velocity.y = speed;
 }
 
 PacmanGame.prototype.checkKeys = function () {
@@ -221,6 +248,11 @@ PacmanGame.prototype.turn = function () {
 
     return true;
 
+}
+
+PacmanGame.prototype.findPathToPacman = function () {
+    var self = this;
+    
 }
 
 
