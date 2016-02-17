@@ -14,9 +14,11 @@ QUnit.test( "Test PacmanGame is defined", function( assert ) {
     assert.ok( PacmanGame, "PacmanGame game should be defined" );
 });
 
+QUnit.test( "Test game is defined", function( assert ) {
+    assert.ok( game, "game should be defined" );
+});
+
 QUnit.test( "Test custom PacmanGame.map exists", function( assert ) {
-    var testGame = new PacmanGame();
-    testGame.preload();
-    testGame.create();
+    var testGame = game.state.states.Game
     assert.ok( testGame.map, "testGame.map should be defined" );
 });
