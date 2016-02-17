@@ -136,6 +136,11 @@ PacmanGame.prototype.create = function () {
     self.debugKey.isPressed = false;
 
     self.move(Phaser.RIGHT);
+
+    // Trigger gameCreated to start tests.
+    // TODO: There's definitely some better way of doing that.
+    var event = new CustomEvent('gameCreated');
+    window.dispatchEvent(event);
 }
 
 PacmanGame.prototype.update = function () {
