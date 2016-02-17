@@ -2,7 +2,7 @@
 
 "use strict";
 
-var game = new Phaser.Game(28 * 32, 31 * 32, Phaser.AUTO, "");
+var game = new Phaser.Game(28 * 32, 31 * 32, Phaser.AUTO, "game");
 
 var Grid = function (map) {
     var self = this;
