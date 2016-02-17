@@ -1,9 +1,69 @@
 // TODO: Once there's ghost and pacman walking around, separate the pacman and the ghost's code.
+
+"use strict";
+
 var game = new Phaser.Game(28 * 32, 31 * 32, Phaser.AUTO, "");
+
+var Grid = function (map) {
+    var self = this;
+    self.map = map;
+    // TODO: This should be rather passed in.
+    self.safetile = 1;
+    self.width = map.width;
+    self.height = map.height;
+    self.walls = new Set();
+    self._updateWallsData();
+}
+
+Grid.prototype.inBounds = function (xy) {
+    var self = this;
+    var xy_ints = xy.split(",").map(Number);
+    var x = xy_ints[0];
+    var y = xy_ints[1];
+    return x >= 0 && x < self.width && y >= 0 && y < self.height;
+}
+
+Grid.prototype.canPass = function (xy) {
+    var self = this;
+    return !self.walls.has(xy);
+}
+
+Grid.prototype.neighbors = function (xy) {
+    var self = this;
+    var xy_ints = xy.split(",").map(Number);
+    var x = xy_ints[0];
+    var y = xy_ints[1];
+    var result = [
+        [x + 1, y].toString(),
+        [x - 1, y].toString(),
+        [x, y - 1].toString(),
+        [x, y + 1].toString(),
+        ];
+    result = result.filter(self.inBounds.bind(self))
+    result = result.filter(self.canPass.bind(self))
+    return result
+}
+
+Grid.prototype._updateWallsData = function () {
+    var self = this;
+    var map_data = self.map.layer.data;
+    var tile = null;
+
+    for (var i = 0; i < map_data.length - 1; i++) {
+        for (var j = 0; j < map_data[i].length - 1; j++) {
+            tile = map_data[i][j];
+            if (tile.index !== self.safetile) {
+                self.walls.add([i, j].toString());
+            }
+        }
+    }
+}
+
 
 var PacmanGame = function() {
     var self = this;
     self.map = null;
+    self.grid = null;
     self.layer = null;
     self.pacman = null;
     self.ghost = null;
@@ -53,6 +113,8 @@ PacmanGame.prototype.create = function () {
     self.layer = self.map.createLayer("Tile Layer 1");
     self.map.setCollisionByExclusion([self.safetile], true, self.layer);
 
+    self.grid = new Grid(self.map);
+
     self.pacman = self.add.sprite((2 * 32) + 16, (1 * 32) + 16, "pacman", 0);
     // Set the origin point of the sprite. Anchor 0.5 means the origins is in the middle.
     self.pacman.anchor.set(0.5);
@@ -70,6 +132,8 @@ PacmanGame.prototype.create = function () {
     self.ghost.body.setSize(32, 32, 0, 0);
 
     self.cursors = game.input.keyboard.createCursorKeys();
+    self.debugKey = game.input.keyboard.addKey(Phaser.Keyboard.D);
+    self.debugKey.isPressed = false;
 
     self.move(Phaser.RIGHT);
 }
@@ -80,12 +144,12 @@ PacmanGame.prototype.update = function () {
     self.physics.arcade.collide(self.ghost, self.layer);
 
     // It's in the grid coordinates, not in pixels
-    self.marker.x = self.math.snapToFloor(Math.floor(self.pacman.x), self.gridsize) / self.gridsize;
-    self.marker.y = self.math.snapToFloor(Math.floor(self.pacman.y), self.gridsize) / self.gridsize;
+    self.marker.x = self.getObjectGridX(self.pacman);
+    self.marker.y = self.getObjectGridY(self.pacman);
 
     // It's in the grid coordinates, not in pixels
-    self.ghostMarker.x = self.math.snapToFloor(Math.floor(self.ghost.x), self.gridsize) /self.gridsize;
-    self.ghostMarker.y = self.math.snapToFloor(Math.floor(self.ghost.y), self.gridsize) /self.gridsize;
+    self.ghostMarker.x = self.getObjectGridX(self.ghost);
+    self.ghostMarker.y = self.getObjectGridY(self.ghost);
 
     self.directions[Phaser.LEFT] = self.map.getTileLeft(self.layer.index, self.marker.x, self.marker.y);
     self.directions[Phaser.RIGHT] = self.map.getTileRight(self.layer.index, self.marker.x, self.marker.y);
@@ -132,6 +196,16 @@ PacmanGame.prototype.update = function () {
  *
  *}
  */
+
+PacmanGame.prototype.getObjectGridX = function (obj) {
+    var self = this;
+    return self.math.snapToFloor(Math.floor(obj.x), self.gridsize) / self.gridsize;
+}
+
+PacmanGame.prototype.getObjectGridY = function (obj) {
+    var self = this;
+    return self.math.snapToFloor(Math.floor(obj.y), self.gridsize) / self.gridsize;
+}
 
 PacmanGame.prototype.move = function (direction) {
     var self = this;
@@ -201,6 +275,15 @@ PacmanGame.prototype.checkKeys = function () {
     {
         self.turning = Phaser.NONE;
     }
+
+    if (self.debugKey.isDown && !self.debugKey.isPressed) {
+        console.log("Debug key pressed");
+        self.debugKey.isPressed = true;
+        self.findPathToPacman();
+    }
+    else if (self.debugKey.isUp && self.debugKey.isPressed) {
+        self.debugKey.isPressed = false;
+    }
 }
 
 PacmanGame.prototype.checkDirection = function (turnTo) {
@@ -252,7 +335,32 @@ PacmanGame.prototype.turn = function () {
 
 PacmanGame.prototype.findPathToPacman = function () {
     var self = this;
-    
+    var graph = self.grid;
+    var start = [self.getObjectGridX(self.ghost), self.getObjectGridY(self.ghost)].toString();
+    var goal = [self.getObjectGridX(self.pacman), self.getObjectGridY(self.pacman)].toString();
+
+    var border = [];
+    var came_from = {};
+    var current;
+    var neighbors;
+    var node;
+    came_from.start = null;
+    border.push(start);
+    while (border.length > 0) {
+        current = border.shift();
+        if (current === goal) {
+            break;
+        }
+        neighbors = graph.neighbors(current);
+        for(var i = 0; i < neighbors.length; i++){
+            node = neighbors[i];
+            if (!came_from.hasOwnProperty(node)) {
+                border.push(node);
+                came_from.node = current
+            }
+        }
+    }
+    return came_from;
 }
 
 
