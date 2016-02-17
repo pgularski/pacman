@@ -19,6 +19,23 @@ QUnit.test( "Test game is defined", function( assert ) {
 });
 
 QUnit.test( "Test custom PacmanGame.map exists", function( assert ) {
-    var testGame = game.state.states.Game
+    var testGame = game.state.states.Game;
     assert.ok( testGame.map, "testGame.map should be defined" );
+});
+
+QUnit.test( "Test Grid is defined", function( assert ) {
+    var grid = game.state.states.Game.grid;
+    assert.ok( grid, "grid should be defined" );
+});
+
+QUnit.test( "Test Grid.inBounds", function( assert ) {
+    var str = function(arr){
+        return arr.toString();
+    };
+    var grid = game.state.states.Game.grid;
+    var point;
+    point = str([0, 0]);
+    assert.ok( grid.inBounds(point), point +" should be in inBounds");
+    point = str([-1, 0]);
+    assert.notOk( grid.inBounds(point), point +" should be in inBounds");
 });
