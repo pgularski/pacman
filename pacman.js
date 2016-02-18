@@ -167,9 +167,12 @@ PacmanGame.prototype.update = function () {
         self.turn();
     }
 
-    self.moveGhost();
+    var ghostDirection = self.checkGhostDirection();
+    self.moveGhost(ghostDirection);
 
 }
+
+
 
 /*
  *PacmanGame.prototype.render = function () {
@@ -250,12 +253,35 @@ PacmanGame.prototype.move = function (direction) {
     self.current = direction;
 }
 
-PacmanGame.prototype.moveGhost = function () {
+PacmanGame.prototype.checkGhostDirection = function () {
+    var x = self.ghostMarker.x;
+    var y = self.ghostMarker.y;
+
+    nextTile = getNextTileFromPathInTheReferenceToCurrentGhostPosition(pathToPacman, x, y);
+    direction = getDirectionTo(nextTile);
+    return direction;
+}
+
+PacmanGame.prototype.moveGhost = function (direction) {
+    // TODO: Duplicated "move()" code.
     var self = this;
 
     var speed = self.ghostSpeed;
 
-    self.ghost.body.velocity.y = speed;
+    if (direction === Phaser.LEFT || direction === Phaser.UP)
+    {
+        speed = -speed;
+    }
+
+    if (direction === Phaser.LEFT || direction === Phaser.RIGHT)
+    {
+        self.ghost.body.velocity.x = speed;
+    }
+    else
+    {
+        self.ghost.body.velocity.y = speed;
+    }
+
 }
 
 PacmanGame.prototype.checkKeys = function () {
