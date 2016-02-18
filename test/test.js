@@ -36,4 +36,23 @@ window.addEventListener("gameCreated", function(evt) {
         point = str([-1, 0]);
         assert.notOk( grid.inBounds(point), point +" should be in inBounds");
     });
+
+    QUnit.test( "Test Grid.neighbors", function( assert ) {
+        var str = function(arr){
+            return arr.toString();
+        };
+        var grid = game.state.states.Game.grid;
+        var point;
+        var result;
+
+        point = str([1, 1]);
+        expected = [ "2,1", "1,2" ];
+        result = grid.neighbors(point);
+        assert.deepEqual(result, expected);
+
+        point = str([1, 5]);
+        expected = [ "1,4", "2,5" ];
+        result = grid.neighbors(point);
+        assert.deepEqual(result, expected);
+    });
 });
