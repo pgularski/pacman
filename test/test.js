@@ -53,7 +53,7 @@ window.addEventListener("gameCreated", function(evt) {
         assert.deepEqual(result, expected);
 
         point = str([1, 5]);
-        expected = [ "1,4", "2,5" ];
+        expected = [ "2,5", "1,4" ];
         result = grid.neighbors(point);
         assert.deepEqual(result, expected);
     });
