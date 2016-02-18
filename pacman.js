@@ -344,11 +344,11 @@ PacmanGame.prototype.findPathToPacman = function () {
     var goal = [self.getObjectGridX(self.pacman), self.getObjectGridY(self.pacman)].toString();
 
     var border = [];
-    var came_from = {};
+    var cameFrom = {};
     var current;
     var neighbors;
     var node;
-    came_from.start = null;
+    cameFrom.start = null;
     border.push(start);
     while (border.length > 0) {
         current = border.shift();
@@ -358,14 +358,24 @@ PacmanGame.prototype.findPathToPacman = function () {
         neighbors = graph.neighbors(current);
         for(var i = 0; i < neighbors.length; i++){
             node = neighbors[i];
-            if (!came_from.hasOwnProperty(node)) {
+            if (!cameFrom.hasOwnProperty(node)) {
                 border.push(node);
-                came_from.node = current
+                cameFrom[node] = current
             }
         }
     }
-    return came_from;
+    console.log(self.reconstructPath(cameFrom, start, goal));
+    return self.reconstructPath(cameFrom, start, goal);
 }
 
+PacmanGame.prototype.reconstructPath = function (cameFrom, start, goal) {
+    var current = goal;
+    var path = [current];
+    while (current !== start){
+        current = cameFrom[current];
+        path.push(current);
+    }
+    return path;
+}
 
 game.state.add("Game", PacmanGame, true);
