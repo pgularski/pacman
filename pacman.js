@@ -46,14 +46,13 @@ Grid.prototype.neighbors = function (xy) {
 
 Grid.prototype._updateWallsData = function () {
     var self = this;
-    var map_data = self.map.layer.data;
     var tile = null;
 
-    for (var i = 0; i < map_data.length - 1; i++) {
-        for (var j = 0; j < map_data[i].length - 1; j++) {
-            tile = map_data[i][j];
+    for (var i = 0; i < self.map.width; i++) {
+        for (var j = 0; j < self.map.height; j++) {
+            tile = self.map.getTile(i, j);
             if (tile.index !== self.safetile) {
-                self.walls.add([i, j].toString());
+                self.walls.add([tile.x, tile.y].toString());
             }
         }
     }
