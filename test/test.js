@@ -20,9 +20,11 @@ window.addEventListener("gameCreated", function(evt) {
         assert.ok( testGame.map, "testGame.map should be defined" );
     });
 
-    QUnit.test( "Test Grid is defined", function( assert ) {
+    QUnit.test( "Test Grid", function( assert ) {
         var grid = game.state.states.Game.grid;
+        var point = [2, 5].toString();
         assert.ok( grid, "grid should be defined" );
+        assert.notOk(grid.walls.has(point), "The point " + point + " mustn't be in self.walls");
     });
 
     QUnit.test( "Test Grid.inBounds", function( assert ) {
