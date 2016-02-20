@@ -52,4 +52,46 @@ window.addEventListener("gameCreated", function(evt) {
         result = grid.neighbors(point);
         assert.deepEqual(result, expected);
     });
+
+    QUnit.test( "Test PacmanGame.isJunction", function( assert ) {
+        var testGame = game.state.states.Game;
+        var point;
+        var gridPoint;
+        var tile;
+        // [1, 1]
+        point = new Phaser.Point( testGame.map.tileWidth * 1,
+                                  testGame.map.tileHeight * 1)
+        tile = testGame.pointToTile(point);
+        assert.notOk(testGame.isJunction(tile), tile + "is not a junction");
+
+        // [5, 1]
+        point = new Phaser.Point( testGame.map.tileWidth * 5,
+                                  testGame.map.tileHeight * 1)
+        tile = testGame.pointToTile(point);
+        assert.notOk(testGame.isJunction(tile), tile + "is not a junction");
+
+        // [7, 1]
+        point = new Phaser.Point( testGame.map.tileWidth * 7,
+                                  testGame.map.tileHeight * 1)
+        tile = testGame.pointToTile(point);
+        assert.notOk(testGame.isJunction(tile), tile + "is not a junction");
+
+        // [6, 1]
+        point = new Phaser.Point( testGame.map.tileWidth * 6,
+                                  testGame.map.tileHeight * 1)
+        tile = testGame.pointToTile(point);
+        assert.ok(testGame.isJunction(tile), tile + "is a junction");
+
+        // [6, 3]
+        point = new Phaser.Point( testGame.map.tileWidth * 6,
+                                  testGame.map.tileHeight * 3)
+        tile = testGame.pointToTile(point);
+        assert.ok(testGame.isJunction(tile), tile + "is a junction");
+
+        // [6, 5]
+        point = new Phaser.Point( testGame.map.tileWidth * 6,
+                                  testGame.map.tileHeight * 5)
+        tile = testGame.pointToTile(point);
+        assert.ok(testGame.isJunction(tile), tile + "is a junction");
+    });
 });
