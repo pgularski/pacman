@@ -1,9 +1,6 @@
 // TODO: Once there's ghost and pacman walking around, separate the pacman and the ghost's code.
 // TODO: How to move a ghost:
-// TODO: Implement isJunction(Phaser.Point) -> Boolean
 // TODO: Implement getTurnPointsFromPath() -> Array
-// TODO: Implement tileToPoint() -> Phaser.Point
-// TODO: Implement alignToTile(useTweens=false) -> Boolean
 // TODO: Implement goToTile(tile) -> Boolean
 // TODO: Implement goToPoint(point) -> Boolean
 // TODO: Implement getObjectGridPoint(object) -> Phaser.Point
@@ -282,6 +279,19 @@ PacmanGame.prototype.isJunction = function (tile) {
     return result.length > 2;
 };
 
+
+PacmanGame.prototype.alignToTile = function (object) {
+    var self = this;
+    var gridPoint = self.getObjectGridPoint(object);
+    var turnPoint = new Phaser.Point();
+
+    turnPoint.x = (gridPoint.x * self.gridsize) + (self.gridsize / 2);
+    turnPoint.y = (gridPoint.y * self.gridsize) + (self.gridsize / 2);
+
+    object.position = turnPoint;
+    object.body.reset(turnPoint.x, turnPoint.y);
+};
+
 // TODO: Extract to external plugin
 PacmanGame.prototype.getGridX = function (x) {
     var self = this;
@@ -474,10 +484,7 @@ PacmanGame.prototype.turn = function () {
     }
 
     //  Grid align before turning
-    self.pacman.x = self.turnPoint.x;
-    self.pacman.y = self.turnPoint.y;
-
-    self.pacman.body.reset(self.turnPoint.x, self.turnPoint.y);
+    self.alignToTile(self.pacman);
 
     self.move(self.turning);
 
