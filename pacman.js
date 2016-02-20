@@ -283,13 +283,18 @@ PacmanGame.prototype.isJunction = function (tile) {
 PacmanGame.prototype.alignToTile = function (object) {
     var self = this;
     var gridPoint = self.getObjectGridPoint(object);
-    var turnPoint = new Phaser.Point();
+    var alignPoint = new Phaser.Point();
 
-    turnPoint.x = (gridPoint.x * self.gridsize) + (self.gridsize / 2);
-    turnPoint.y = (gridPoint.y * self.gridsize) + (self.gridsize / 2);
+    alignPoint.x = (gridPoint.x * self.gridsize) + (self.gridsize / 2);
+    alignPoint.y = (gridPoint.y * self.gridsize) + (self.gridsize / 2);
 
-    object.position = turnPoint;
-    object.body.reset(turnPoint.x, turnPoint.y);
+    object.position = alignPoint;
+    object.body.reset(alignPoint.x, alignPoint.y);
+
+    //var tile = self.getObjectTile(object);
+
+    //object.position = new Phaser.Point(tile.x ,tile.y);
+    //object.body.reset(tile.x, tile.y);
 };
 
 // TODO: Extract to external plugin
