@@ -93,5 +93,16 @@ window.addEventListener("gameCreated", function(evt) {
                                   testGame.map.tileHeight * 5)
         tile = testGame.pointToTile(point);
         assert.ok(testGame.isJunction(tile), tile + "is a junction");
+
+        point = new Phaser.Point( testGame.map.tileWidth * (testGame.map.width - 3),
+                                  testGame.map.tileHeight * (testGame.map.height - 3))
+        tile = testGame.pointToTile(point);
+        assert.ok(testGame.isJunction(tile), tile + "is a junction");
+
+        point = new Phaser.Point( testGame.map.tileWidth * (testGame.map.width - 1),
+                                  testGame.map.tileHeight * (testGame.map.height - 1))
+        tile = testGame.pointToTile(point);
+        assert.notOk(testGame.isJunction(tile), tile + "is not a junction");
+
     });
 });
