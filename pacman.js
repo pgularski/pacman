@@ -1,4 +1,19 @@
 // TODO: Once there's ghost and pacman walking around, separate the pacman and the ghost's code.
+// TODO: How to move a ghost:
+// TODO: Implement isJunction(Phaser.Point) -> Boolean
+// TODO: Implement getTurnPointsFromPath() -> Array
+// TODO: Implement tileToPoint() -> Phaser.Point
+// TODO: Implement alignToTile(useTweens=false) -> Boolean
+// TODO: Implement goToTile(tile) -> Boolean
+// TODO: Implement goToPoint(point) -> Boolean
+// TODO: Implement getObjectGridPoint(object) -> Phaser.Point
+// TODO: Implement getObjectTile(object) -> Phaser.Tile
+
+/*
+ * Variable name convention
+ * point - Actual Phaser.Point of an object. ie. Phaser.Point(self.pacman.x, self.pacman.y)
+ * gridPoint - Grid Phaser.Point of an object . ie. self.getCurrentGridPint(new Phaser.Point(self.pacman.x, self.pacman.y))
+ */
 
 "use strict";
 
@@ -83,6 +98,8 @@ var PacmanGame = function() {
     self.directions = [ null, null, null, null, null ];
     self.opposites = [ Phaser.NONE, Phaser.RIGHT, Phaser.LEFT, Phaser.DOWN, Phaser.UP ];
 
+    self.ghostPath = [];
+
     self.current = Phaser.NONE;
     self.turning = Phaser.NONE;
 }
@@ -148,12 +165,10 @@ PacmanGame.prototype.update = function () {
     self.physics.arcade.collide(self.ghost, self.layer);
 
     // It's in the grid coordinates, not in pixels
-    self.marker.x = self.getObjectGridX(self.pacman);
-    self.marker.y = self.getObjectGridY(self.pacman);
+    self.marker = self.getObjectGridPoint(self.pacman);
 
     // It's in the grid coordinates, not in pixels
-    self.ghostMarker.x = self.getObjectGridX(self.ghost);
-    self.ghostMarker.y = self.getObjectGridY(self.ghost);
+    self.ghostMarker = self.getObjectGridPoint(self.ghost);
 
     self.directions[Phaser.LEFT] = self.map.getTileLeft(self.layer.index, self.marker.x, self.marker.y);
     self.directions[Phaser.RIGHT] = self.map.getTileRight(self.layer.index, self.marker.x, self.marker.y);
@@ -167,8 +182,12 @@ PacmanGame.prototype.update = function () {
         self.turn();
     }
 
-    var ghostDirection = self.checkGhostDirection();
-    self.moveGhost(ghostDirection);
+    // TODO: update path only when pacman enters a new tile.
+    //self.findPathToPacman();
+
+
+    //var ghostDirection = self.checkGhostDirection();
+    self.moveGhost();
 
 }
 
@@ -204,15 +223,89 @@ PacmanGame.prototype.update = function () {
  *}
  */
 
+// TODO: Extract to external plugin
+PacmanGame.prototype.pointToTile = function (point) {
+    var self = this;
+    var gridPoint = self.gridPointFromPoint(point);
+    return self.map.getTile(gridPoint.x, gridPoint.y);
+};
+
+// TODO: Extract to external plugin
+PacmanGame.prototype.getObjectGridPoint = function (object) {
+    var self = this;
+    var gridPoint = new Phaser.Point(
+        self.getObjectGridX(object),
+        self.getObjectGridY(object)
+    );
+    return gridPoint;
+};
+
+// TODO: Extract to external plugin
+PacmanGame.prototype.getObjectTile = function (object) {
+    var self = this;
+    var tile = self.pointToTile(object.position);
+    return tile;
+};
+
+// TODO: Extract to external plugin
+PacmanGame.prototype.gridPointFromPoint = function (point) {
+    var self = this;
+    var gridPoint = new Phaser.Point(
+        self.getGridX(point.x),
+        self.getGridY(point.y)
+    );
+    return gridPoint;
+};
+
+// TODO: Extract to external plugin
+PacmanGame.prototype.isJunction = function (tile) {
+    var self = this;
+    var directions = [null, null, null, null, null];
+    var index = self.layer.index;
+    var x = tile.x;
+    var y = tile.y;
+
+    var result;
+    var isSafeTile = function (tile) {
+        if (!tile)
+            return false;
+        return tile.index === self.safetile;
+    };
+
+    directions[Phaser.LEFT] = self.map.getTileLeft(index, x, y);
+    directions[Phaser.RIGHT] = self.map.getTileRight(index, x, y);
+    directions[Phaser.UP] = self.map.getTileAbove(index, x, y);
+    directions[Phaser.DOWN] = self.map.getTileBelow(index, x, y);
+
+    //result = directions.filter(self.inBounds.bind(self))
+    result = directions.filter(isSafeTile.bind(self));
+    return result.length > 2;
+};
+
+// TODO: Extract to external plugin
+PacmanGame.prototype.getGridX = function (x) {
+    var self = this;
+    return self.math.snapToFloor(Math.floor(x), self.gridsize) / self.gridsize;
+};
+
+// TODO: Extract to external plugin
+PacmanGame.prototype.getGridY = function (y) {
+    var self = this;
+    return self.math.snapToFloor(Math.floor(y), self.gridsize) / self.gridsize;
+};
+
+// TODO: Extract to external plugin
 PacmanGame.prototype.getObjectGridX = function (obj) {
     var self = this;
     return self.math.snapToFloor(Math.floor(obj.x), self.gridsize) / self.gridsize;
-}
+};
 
+// TODO: Extract to external plugin
 PacmanGame.prototype.getObjectGridY = function (obj) {
     var self = this;
     return self.math.snapToFloor(Math.floor(obj.y), self.gridsize) / self.gridsize;
-}
+};
+
 
 PacmanGame.prototype.move = function (direction) {
     var self = this;
@@ -257,29 +350,60 @@ PacmanGame.prototype.checkGhostDirection = function () {
     var x = self.ghostMarker.x;
     var y = self.ghostMarker.y;
 
-    nextTile = getNextTileFromPathInTheReferenceToCurrentGhostPosition(pathToPacman, x, y);
-    direction = getDirectionTo(nextTile);
+    //nextTile = getNextTileFromPathInTheReferenceToCurrentGhostPosition(pathToPacman, x, y);
+    //direction = getDirectionTo(nextTile);
+    
     return direction;
 }
 
-PacmanGame.prototype.moveGhost = function (direction) {
+PacmanGame.prototype.moveGhost = function () {
     // TODO: Duplicated "move()" code.
     var self = this;
 
     var speed = self.ghostSpeed;
 
-    if (direction === Phaser.LEFT || direction === Phaser.UP)
-    {
-        speed = -speed;
-    }
+    var x = self.ghostMarker.x;
+    var y = self.ghostMarker.y;
+    var path = self.findPathToPacman();
 
-    if (direction === Phaser.LEFT || direction === Phaser.RIGHT)
-    {
-        self.ghost.body.velocity.x = speed;
-    }
-    else
-    {
-        self.ghost.body.velocity.y = speed;
+    if (path.length > 1) {
+        var nextPathPoint = path[path.length - 2].split(',');
+        nextPathPoint = {x: nextPathPoint[0], y: nextPathPoint[1]}
+
+        var velocityVector = new Phaser.Point(
+                nextPathPoint.x - x,
+                nextPathPoint.y - y);
+
+        velocityVector.normalize();
+
+        //var calculatedX = self.ghost.x / (self.map.tileWidth + self.map.tileWidth / 2)
+        //var calculatedY = self.ghost.y / (self.map.tileHeight + self.map.tileHeight / 2)
+        var cx = Math.floor(self.ghost.x);
+        var cy = Math.floor(self.ghost.y);
+
+        var turnPoint = new Phaser.Point();
+        turnPoint.x = (x * self.gridsize) + (self.gridsize / 2);
+        turnPoint.y = (y * self.gridsize) + (self.gridsize / 2);
+
+        //if (self.ghost.body.velocity.x === 0 && self.ghost.body.velocity.y === 0){
+            //self.ghost.body.velocity.x = velocityVector.x * speed;
+            //self.ghost.body.velocity.y = velocityVector.y * speed;
+        //}
+
+        if (!self.math.fuzzyEqual(cx, turnPoint.x, self.threshold) || !self.math.fuzzyEqual(cy, turnPoint.y, self.threshold))
+        {
+            return false;
+        }
+
+        if (self.ghost.body.deltaX === 0 || self.ghost.deltaY === 0) {
+            self.ghost.x = turnPoint.x;
+            self.ghost.y = turnPoint.y;
+
+            self.ghost.body.reset(turnPoint.x, turnPoint.y);
+
+            self.ghost.body.velocity.x = velocityVector.x * speed;
+            self.ghost.body.velocity.y = velocityVector.y * speed;
+        }
     }
 
 }
@@ -390,7 +514,7 @@ PacmanGame.prototype.findPathToPacman = function () {
             }
         }
     }
-    console.log(self.reconstructPath(cameFrom, start, goal));
+    //console.log(self.reconstructPath(cameFrom, start, goal));
     return self.reconstructPath(cameFrom, start, goal);
 }
 
