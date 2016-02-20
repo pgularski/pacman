@@ -58,49 +58,60 @@ window.addEventListener("gameCreated", function(evt) {
         var point;
         var gridPoint;
         var tile;
+        var x, y;
         // [1, 1]
-        point = new Phaser.Point( testGame.map.tileWidth * 1,
-                                  testGame.map.tileHeight * 1)
+        x = 1 * testGame.map.tileWidth;
+        y = 1 *testGame.map.tileHeight;
+        point = new Phaser.Point(x, y);
         tile = testGame.pointToTile(point);
         assert.notOk(testGame.isJunction(tile), tile + "is not a junction");
 
         // [5, 1]
-        point = new Phaser.Point( testGame.map.tileWidth * 5,
-                                  testGame.map.tileHeight * 1)
+        x = 5 * testGame.map.tileWidth;
+        y = 1 *testGame.map.tileHeight;
+        point = new Phaser.Point(x, y);
         tile = testGame.pointToTile(point);
         assert.notOk(testGame.isJunction(tile), tile + "is not a junction");
 
         // [7, 1]
-        point = new Phaser.Point( testGame.map.tileWidth * 7,
-                                  testGame.map.tileHeight * 1)
+        x = 7 * testGame.map.tileWidth;
+        y = 1 *testGame.map.tileHeight;
+        point = new Phaser.Point(x, y);
         tile = testGame.pointToTile(point);
         assert.notOk(testGame.isJunction(tile), tile + "is not a junction");
 
         // [6, 1]
-        point = new Phaser.Point( testGame.map.tileWidth * 6,
-                                  testGame.map.tileHeight * 1)
+        x = 6 * testGame.map.tileWidth;
+        y = 1 *testGame.map.tileHeight;
+        point = new Phaser.Point(x, y);
         tile = testGame.pointToTile(point);
         assert.ok(testGame.isJunction(tile), tile + "is a junction");
 
         // [6, 3]
-        point = new Phaser.Point( testGame.map.tileWidth * 6,
-                                  testGame.map.tileHeight * 3)
+        x = 6 * testGame.map.tileWidth;
+        y = 3 *testGame.map.tileHeight;
+        point = new Phaser.Point(x, y);
         tile = testGame.pointToTile(point);
         assert.ok(testGame.isJunction(tile), tile + "is a junction");
 
         // [6, 5]
-        point = new Phaser.Point( testGame.map.tileWidth * 6,
-                                  testGame.map.tileHeight * 5)
+        x = 6 * testGame.map.tileWidth;
+        y = 5 * testGame.map.tileHeight;
+        point = new Phaser.Point(x, y);
         tile = testGame.pointToTile(point);
         assert.ok(testGame.isJunction(tile), tile + "is a junction");
 
-        point = new Phaser.Point( testGame.map.tileWidth * (testGame.map.width - 3),
-                                  testGame.map.tileHeight * (testGame.map.height - 3))
+        // [25, 28]
+        x = testGame.map.tileWidth * (testGame.map.width - 3);
+        y = testGame.map.tileHeight * (testGame.map.height - 3);
+        point = new Phaser.Point(x, y);
         tile = testGame.pointToTile(point);
         assert.ok(testGame.isJunction(tile), tile + "is a junction");
 
-        point = new Phaser.Point( testGame.map.tileWidth * (testGame.map.width - 1),
-                                  testGame.map.tileHeight * (testGame.map.height - 1))
+        // [27, 30]
+        x = testGame.map.tileWidth * (testGame.map.width - 1);
+        y = testGame.map.tileHeight * (testGame.map.height - 1);
+        point = new Phaser.Point(x, y);
         tile = testGame.pointToTile(point);
         assert.notOk(testGame.isJunction(tile), tile + "is not a junction");
 
