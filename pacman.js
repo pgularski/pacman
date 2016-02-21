@@ -1,10 +1,7 @@
 // TODO: Once there's ghost and pacman walking around, separate the pacman and the ghost's code.
 // TODO: How to move a ghost:
-// TODO: Implement getTurnPointsFromPath() -> Array
 // TODO: Implement goToTile(tile) -> Boolean
 // TODO: Implement goToPoint(point) -> Boolean
-// TODO: Implement getObjectGridPoint(object) -> Phaser.Point
-// TODO: Implement getObjectTile(object) -> Phaser.Tile
 
 /*
  * Variable name convention
@@ -91,6 +88,7 @@ var PacmanGame = function() {
     self.turnPoint = new Phaser.Point();
 
     self.ghostMarker = new Phaser.Point();
+    self.ghostDestination = null;
 
     self.directions = [ null, null, null, null, null ];
     self.opposites = [ Phaser.NONE, Phaser.RIGHT, Phaser.LEFT, Phaser.DOWN, Phaser.UP ];
@@ -184,7 +182,7 @@ PacmanGame.prototype.update = function () {
 
 
     //var ghostDirection = self.checkGhostDirection();
-    self.moveGhost();
+    //self.moveGhost();
 
 }
 
@@ -280,7 +278,8 @@ PacmanGame.prototype.isJunction = function (tile) {
 };
 
 
-PacmanGame.prototype.alignToTile = function (object) {
+PacmanGame.prototype.alignToTile = function (object, tween=false) {
+    // TODO: Implement tween=true.
     var self = this;
     var gridPoint = self.getObjectGridPoint(object);
     var alignPoint = new Phaser.Point();
@@ -497,11 +496,51 @@ PacmanGame.prototype.turn = function () {
 
 }
 
-PacmanGame.prototype.findPathToPacman = function () {
+PacmanGame.prototype.moveGhost2 = function () {
     var self = this;
+
+
+}
+
+PacmanGame.prototype.goToTile = function (object, toTile) {
+    var self = this;
+    var objectTile = self.getObjectTile(object);
+    var path = self.findPathToTile(objectTile, toTile);
+    var turns = self.getTurnPointsFromPath(path);
+    var nextTurn;
+    var speed = self.speed;
+    // TODO: Below should be recursive with all turns in the path?
+    if (!self.ghostDestination) {
+        
+    }
+    if (turns.length <= 0) {
+        return;
+    }
+    nextTurn = turns.pop().split(',').map(Number);
+    nextTurn = new Phaser.Point(nextTurn[0], nextTurn[1]);
+
+    if (objectTile.x < nextTurn.x) {
+        object.body.velocity.x = speed;
+    }
+    else if (objectTile.x > nextTurn.x) {
+        object.body.velocity.x = -speed;
+    }
+    else if (objectTile.y < nextTurn.y) {
+        object.body.velocity.y = speed;
+    }
+    else if (objectTile.y > nextTurn.y) {
+        object.body.velocity.y = -speed;
+    }
+
+
+}
+
+PacmanGame.prototype.findPathToTile = function (fromTile, toTile) {
+    var self = this;
+
     var graph = self.grid;
-    var start = [self.getObjectGridX(self.ghost), self.getObjectGridY(self.ghost)].toString();
-    var goal = [self.getObjectGridX(self.pacman), self.getObjectGridY(self.pacman)].toString();
+    var start = [fromTile.x, fromTile.y].toString();
+    var goal = [toTile.x, toTile.y].toString();
 
     var border = [];
     var cameFrom = {};
@@ -537,6 +576,17 @@ PacmanGame.prototype.reconstructPath = function (cameFrom, start, goal) {
     }
     return path;
 }
+
+PacmanGame.prototype.findPathToPacman = function () {
+    var self = this;
+    var fromTile ;
+    var toTile;
+    return self.findPathToTile(
+            self.getObjectTile(self.ghost), 
+            self.getObjectTile(self.pacman)
+            );
+}
+
 
 PacmanGame.prototype.getTurnPointsFromPath = function (path) {
     // TODO: I feel in guts it may be more elegant.
