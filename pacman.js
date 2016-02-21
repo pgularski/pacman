@@ -367,7 +367,7 @@ PacmanGame.prototype.checkGhostDirection = function () {
 
     //nextTile = getNextTileFromPathInTheReferenceToCurrentGhostPosition(pathToPacman, x, y);
     //direction = getDirectionTo(nextTile);
-    
+
     return direction;
 }
 
@@ -380,6 +380,7 @@ PacmanGame.prototype.moveGhost = function () {
     var x = self.ghostMarker.x;
     var y = self.ghostMarker.y;
     var path = self.findPathToPacman();
+    var path = [];
 
     if (path.length > 1) {
         var nextPathPoint = path[path.length - 2].split(',');
@@ -411,10 +412,7 @@ PacmanGame.prototype.moveGhost = function () {
         }
 
         if (self.ghost.body.deltaX === 0 || self.ghost.deltaY === 0) {
-            self.ghost.x = turnPoint.x;
-            self.ghost.y = turnPoint.y;
-
-            self.ghost.body.reset(turnPoint.x, turnPoint.y);
+            self.alignToTile(self.ghost);
 
             self.ghost.body.velocity.x = velocityVector.x * speed;
             self.ghost.body.velocity.y = velocityVector.y * speed;
@@ -538,6 +536,47 @@ PacmanGame.prototype.reconstructPath = function (cameFrom, start, goal) {
         path.push(current);
     }
     return path;
+}
+
+PacmanGame.prototype.getTurnPointsFromPath = function (path) {
+    // TODO: I feel in guts it may be more elegant.
+    var turnPoints = [];
+    var x, y;
+    var prevX, prevY;
+    var currentDirection;
+    for (var i = path.length - 1; i >= 0; i--) {
+        x = path[i].split(',')[0];
+        y = path[i].split(',')[1];
+        if (!prevX && !prevY){
+            prevX = x;
+            prevY = y;
+            continue;
+        }
+        if (!currentDirection){
+            if (x === prevX) {
+                currentDirection = 'x';
+            }
+            else {
+                currentDirection = 'y';
+            }
+            continue;
+        }
+
+        if (x === prevX && currentDirection === 'y') {
+            currentDirection = 'x';
+            turnPoints.push([prevX, prevY].toString());
+        }
+        else if (y === prevY && currentDirection === 'x') {
+            currentDirection = 'y';
+            turnPoints.push([prevX, prevY].toString());
+        }
+
+        prevX = x;
+        prevY = y;
+
+    }
+
+    return turnPoints;
 }
 
 game.state.add("Game", PacmanGame, true);
