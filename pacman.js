@@ -126,7 +126,7 @@ PacmanGame.prototype.create = function () {
 
     self.grid = new Grid(self.map);
 
-    self.pacman = self.add.sprite((2 * 32) + 16, (1 * 32) + 16, "pacman", 0);
+    self.pacman = self.add.sprite((12 * 32) + 16, (7 * 32) + 16, "pacman", 0);
     // Set the origin point of the sprite. Anchor 0.5 means the origins is in the middle.
     self.pacman.anchor.set(0.5);
     self.pacman.animations.add("eat", [0, 1, 2, 1], 10, true);
@@ -183,6 +183,7 @@ PacmanGame.prototype.update = function () {
 
     //var ghostDirection = self.checkGhostDirection();
     //self.moveGhost();
+    self.moveGhost2();
 
 }
 
@@ -499,6 +500,13 @@ PacmanGame.prototype.turn = function () {
 PacmanGame.prototype.moveGhost2 = function () {
     var self = this;
 
+    
+    if (!self.ghostDestination || self.isJunction(self.getObjectTile(self.ghost))) {
+        self.goToTile(self.ghost, self.getObjectTile(self.pacman));
+    }
+    else {
+        self.continueGoingToTile(self.ghost);
+    }
 
 }
 
@@ -509,10 +517,10 @@ PacmanGame.prototype.goToTile = function (object, toTile) {
     var turns = self.getTurnPointsFromPath(path);
     var nextTurn;
     var speed = self.speed;
-    // TODO: Below should be recursive with all turns in the path?
-    if (!self.ghostDestination) {
-        
+    if (path.length > 1){
+        turns.unshift(path[0])
     }
+    self.ghostDestination = path[0];
     if (turns.length <= 0) {
         return;
     }
@@ -521,15 +529,19 @@ PacmanGame.prototype.goToTile = function (object, toTile) {
 
     if (objectTile.x < nextTurn.x) {
         object.body.velocity.x = speed;
+        //object.body.velocity.y = 0;
     }
     else if (objectTile.x > nextTurn.x) {
         object.body.velocity.x = -speed;
+        //object.body.velocity.y = 0;
     }
     else if (objectTile.y < nextTurn.y) {
         object.body.velocity.y = speed;
+        //object.body.velocity.x = 0;
     }
     else if (objectTile.y > nextTurn.y) {
         object.body.velocity.y = -speed;
+        //object.body.velocity.x = 0;
     }
 
 
