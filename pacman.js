@@ -517,12 +517,11 @@ PacmanGame.prototype.moveGhost2 = function () {
             self.alignToTile(self.ghost, true);
             self.justGotAligned = true;
         }
-        self.goToTile(self.ghost, self.getObjectTile(self.pacman));
     }
     else{
         self.justGotAligned = false;
-        self.goToTile(self.ghost, self.getObjectTile(self.pacman));
     }
+    self.goToTile(self.ghost, self.getObjectTile(self.pacman));
 }
 
 PacmanGame.prototype.goToTile = function (object, toTile) {
