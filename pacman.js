@@ -1,7 +1,4 @@
 // TODO: Once there's ghost and pacman walking around, separate the pacman and the ghost's code.
-// TODO: How to move a ghost:
-// TODO: Implement goToTile(tile) -> Boolean
-// TODO: Implement goToPoint(point) -> Boolean
 
 /*
  * Variable name convention
@@ -551,6 +548,18 @@ PacmanGame.prototype.turn_orig = function () {
 
 PacmanGame.prototype.moveGhost2 = function () {
     var self = this;
+
+/*
+ *    if is at the junction or has no destination designated whatsoever:
+ *        self.updateGhostPath();
+ *
+ *    if arrived to the currentDestination(next turn or pacman):
+ *        currentDestination = nextDestination
+ *        moveTowards current destination
+ */
+
+
+
     var nextTurnTile;
 
     if (!self.ghostDestination || (self.isJunction(self.getObjectTile(self.ghost)) && self.isInTurnPoint(self.ghost))) {
@@ -558,13 +567,14 @@ PacmanGame.prototype.moveGhost2 = function () {
             self.alignToTile(self.ghost, true);
             self.justGotAligned = true;
         }
+        // FIXME: Should be Update path
+        // self.updateGhostPath()
         self.goToTile(self.ghost, self.getObjectTile(self.pacman));
     }
     else if (self.ghostLastTurn) {
         nextTurnTile = self.map.getTile.apply(self.map, self.ghostLastTurn.split(','));
 
-        if ((self.getObjectTile(self.ghost) === nextTurnTile) &&
-                self.isInTurnPoint(self.ghost)) {
+        if ((self.getObjectTile(self.ghost) === nextTurnTile) && self.isInTurnPoint(self.ghost)) {
             self.alignToTile(self.ghost, true);
             self.justGotAligned = true;
             self.goToTile(self.ghost, self.getObjectTile(self.pacman));
@@ -573,6 +583,10 @@ PacmanGame.prototype.moveGhost2 = function () {
     else{
         self.justGotAligned = false;
     }
+}
+
+PacmanGame.prototype.updateGhostPath = function () {
+    var self = this;
 }
 
 PacmanGame.prototype.goToTile = function (object, toTile) {
