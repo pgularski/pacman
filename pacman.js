@@ -440,6 +440,20 @@ PacmanGame.prototype.isInTurnPoint  = function (object) {
     return false;
 }
 
+
+PacmanGame.prototype.isInTurnPointPacman  = function (object) {
+    var self = this;
+    var objectGridPoint = self.getObjectGridPoint(object);
+    var currentX = Math.floor(object.x);
+    var currentY = Math.floor(object.y);
+    if (self.math.fuzzyEqual(currentX, self.turnPoint.x, self.threshold) &&
+        self.math.fuzzyEqual(currentY, self.turnPoint.y, self.threshold)){
+        return true;
+    }
+    return false;
+}
+
+
 PacmanGame.prototype.checkKeys = function () {
     var self = this;
 
@@ -496,7 +510,7 @@ PacmanGame.prototype.checkDirection = function (turnTo) {
 PacmanGame.prototype.turn = function () {
     var self = this;
 
-    if (!self.isInTurnPoint(self.pacman)) {
+    if (!self.isInTurnPointPacman(self.pacman)) {
         return false;
     }
 
@@ -510,6 +524,30 @@ PacmanGame.prototype.turn = function () {
     return true;
 
 }
+
+PacmanGame.prototype.turn_orig = function () {
+    var self = this;
+
+    var cx = Math.floor(self.pacman.x);
+    var cy = Math.floor(self.pacman.y);
+
+    //  This needs a threshold, because at high speeds you can't turn because the coordinates skip past
+    if (!self.math.fuzzyEqual(cx, self.turnPoint.x, self.threshold) || !self.math.fuzzyEqual(cy, self.turnPoint.y, self.threshold))
+    {
+        return false;
+    }
+
+    //  Grid align before turning
+    self.alignToTile(self.pacman);
+
+    self.move(self.turning);
+
+    self.turning = Phaser.NONE;
+
+    return true;
+
+}
+
 
 PacmanGame.prototype.moveGhost2 = function () {
     var self = this;
@@ -528,7 +566,7 @@ PacmanGame.prototype.moveGhost2 = function () {
         if ((self.getObjectTile(self.ghost) === nextTurnTile) &&
                 self.isInTurnPoint(self.ghost)) {
             self.alignToTile(self.ghost, true);
-            //self.justGotAligned = true;
+            self.justGotAligned = true;
             self.goToTile(self.ghost, self.getObjectTile(self.pacman));
         }
     }
