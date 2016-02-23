@@ -433,11 +433,11 @@ PacmanGame.prototype.isInTurnPoint  = function (object) {
     var turnPoint = new Phaser.Point();
     turnPoint.x = (objectGridPoint.x * self.gridsize) + (self.gridsize / 2);
     turnPoint.y = (objectGridPoint.y * self.gridsize) + (self.gridsize / 2);
-    if (!self.math.fuzzyEqual(currentX, turnPoint.x, self.threshold) ||
-        !self.math.fuzzyEqual(currentY, turnPoint.y, self.threshold)){
-        return false;
+    if (self.math.fuzzyEqual(currentX, turnPoint.x, self.threshold) &&
+        self.math.fuzzyEqual(currentY, turnPoint.y, self.threshold)){
+        return true;
     }
-    return true;
+    return false;
 }
 
 PacmanGame.prototype.checkKeys = function () {
@@ -522,16 +522,17 @@ PacmanGame.prototype.moveGhost2 = function () {
         }
         self.goToTile(self.ghost, self.getObjectTile(self.pacman));
     }
-    else{
-        if (self.ghostLastTurn) {
-            nextTurnTile = self.map.getTile.apply(self.map, self.ghostLastTurn.split(','));
+    else if (self.ghostLastTurn) {
+        nextTurnTile = self.map.getTile.apply(self.map, self.ghostLastTurn.split(','));
 
-            if ((self.getObjectTile(self.ghost) === nextTurnTile) &&
-                    self.isInTurnPoint(self.ghost)) {
-                self.alignToTile(self.ghost, true);
-                self.goToTile(self.ghost, self.getObjectTile(self.pacman));
-            }
+        if ((self.getObjectTile(self.ghost) === nextTurnTile) &&
+                self.isInTurnPoint(self.ghost)) {
+            self.alignToTile(self.ghost, true);
+            //self.justGotAligned = true;
+            self.goToTile(self.ghost, self.getObjectTile(self.pacman));
         }
+    }
+    else{
         self.justGotAligned = false;
     }
 }
