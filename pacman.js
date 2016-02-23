@@ -82,19 +82,20 @@ var PacmanGame = function() {
     self.speed = 150;
     self.threshold = 5;
 
-    self.ghostSpeed = 150;
 
     self.marker = new Phaser.Point();
     self.turnPoint = new Phaser.Point();
 
     // Ghost properties
     // TODO: Move to external object.
+    self.ghostSpeed = 150;
     self.ghostMarker = new Phaser.Point();
     self.ghostDestination = null;
     self.ghostPath = [];
     self.justGotAligned = false;
     self.goingToTile = null;
     self.ghostTurns = [];
+    self.ghostLastTurn = null;
 
     self.directions = [ null, null, null, null, null ];
     self.opposites = [ Phaser.NONE, Phaser.RIGHT, Phaser.LEFT, Phaser.DOWN, Phaser.UP ];
@@ -512,16 +513,27 @@ PacmanGame.prototype.turn = function () {
 
 PacmanGame.prototype.moveGhost2 = function () {
     var self = this;
+    var nextTurnTile;
+
     if (!self.ghostDestination || (self.isJunction(self.getObjectTile(self.ghost)) && self.isInTurnPoint(self.ghost))) {
         if (!self.justGotAligned) {
             self.alignToTile(self.ghost, true);
             self.justGotAligned = true;
         }
+        self.goToTile(self.ghost, self.getObjectTile(self.pacman));
     }
     else{
+        if (self.ghostLastTurn) {
+            nextTurnTile = self.map.getTile.apply(self.map, self.ghostLastTurn.split(','));
+
+            if ((self.getObjectTile(self.ghost) === nextTurnTile) &&
+                    self.isInTurnPoint(self.ghost)) {
+                self.alignToTile(self.ghost, true);
+                self.goToTile(self.ghost, self.getObjectTile(self.pacman));
+            }
+        }
         self.justGotAligned = false;
     }
-    self.goToTile(self.ghost, self.getObjectTile(self.pacman));
 }
 
 PacmanGame.prototype.goToTile = function (object, toTile) {
@@ -541,6 +553,7 @@ PacmanGame.prototype.goToTile = function (object, toTile) {
     if (turns.length <= 0) {
         return;
     }
+    self.ghostLastTurn = turns[turns.length - 1];
     nextTurn = turns.pop().split(',').map(Number);
     nextTurn = new Phaser.Point(nextTurn[0], nextTurn[1]);
     self.goingToTile = self.pointToTile(nextTurn);
@@ -561,6 +574,42 @@ PacmanGame.prototype.goToTile = function (object, toTile) {
     else if (objectTile.y > nextTurn.y) {
         object.body.velocity.y = -speed;
         //object.body.velocity.x = 0;
+    }
+}
+
+
+PacmanGame.prototype.carryOnGhost = function () {
+    var self = this;
+    var object = self.ghost;
+    var objectTile = self.getObjectTile(object);
+    var path = self.ghostPath;
+    var turns = self.ghostTurns;
+    var nextTurn;
+    var speed = self.speed;
+
+    if (turns.length <= 0) {
+        return;
+    }
+    nextTurn = turns.pop().split(',').map(Number);
+    nextTurn = new Phaser.Point(nextTurn[0], nextTurn[1]);
+    self.goingToTile = self.pointToTile(nextTurn);
+    self.ghostTurns = turns;
+
+    if (objectTile.x < nextTurn.x) {
+        object.body.velocity.x = speed;
+        object.body.velocity.y = 0;
+    }
+    else if (objectTile.x > nextTurn.x) {
+        object.body.velocity.x = -speed;
+        object.body.velocity.y = 0;
+    }
+    else if (objectTile.y < nextTurn.y) {
+        object.body.velocity.y = speed;
+        object.body.velocity.x = 0;
+    }
+    else if (objectTile.y > nextTurn.y) {
+        object.body.velocity.y = -speed;
+        object.body.velocity.x = 0;
     }
 }
 
