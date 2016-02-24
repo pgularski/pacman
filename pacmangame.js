@@ -65,8 +65,9 @@ Grid.prototype._updateWallsData = function () {
 }
 
 
-var PacmanGame = function() {
+var PacmanGame = function(game) {
     var self = this;
+    self.game = game;
     self.map = null;
     self.grid = null;
     self.layer = null;
@@ -128,20 +129,14 @@ PacmanGame.prototype.create = function () {
 
     self.grid = new Grid(self.map);
 
-    self.pacman = self.add.sprite((12 * 32) + 16, (7 * 32) + 16, "pacman", 0);
-    // Set the origin point of the sprite. Anchor 0.5 means the origins is in the middle.
-    self.pacman.anchor.set(0.5);
-    self.pacman.animations.add("eat", [0, 1, 2, 1], 10, true);
-    self.pacman.play("eat");
+    self.pacman = new Pacman(self.game, (12 * 32) + 16, (7 * 32) + 16);
 
     self.ghost = self.add.sprite((1 * 32) + 16, (1 * 32) + 16, "ghost", 0);
     self.ghost.anchor.set(0.5);
     self.ghost.animations.add("walk", [0, 1, 2, 1], 10, true);
     self.ghost.play("walk")
 
-    self.physics.arcade.enable(self.pacman);
     self.physics.arcade.enable(self.ghost);
-    self.pacman.body.setSize(32, 32, 0, 0);
     self.ghost.body.setSize(32, 32, 0, 0);
 
     self.cursors = game.input.keyboard.createCursorKeys();
