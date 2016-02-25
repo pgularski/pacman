@@ -151,8 +151,6 @@ PacmanGame.prototype.update = function () {
     // It's in the grid coordinates, not in pixels
     self.ghostMarker = self.getObjectGridPoint(self.ghost);
 
-    self.pacman._update();
-
     self.checkKeys();
 
     if (self.pacman.turning !== Phaser.NONE)
