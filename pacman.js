@@ -38,6 +38,7 @@ Pacman = function (game, x, y) {
     // TODO: This should not be hardcoded.
     self.safetile = 1;
 
+    self.threshold = 5;
     self.opposites = [ Phaser.NONE, Phaser.RIGHT, Phaser.LEFT, Phaser.DOWN, Phaser.UP ];
 };
 
@@ -60,8 +61,8 @@ Pacman.prototype.checkDirection = function (turnTo) {
     {
         self.turning = turnTo;
 
-        self.turnPoint.x = (self.marker.x * self.gridsize) + (self.gridsize / 2);
-        self.turnPoint.y = (self.marker.y * self.gridsize) + (self.gridsize / 2);
+        self.turnPoint.x = (self.marker.x * self.map.tileWidth) + (self.map.tileWidth / 2);
+        self.turnPoint.y = (self.marker.y * self.map.tileHeight) + (self.map.tileHeight / 2);
     }
 };
 
@@ -81,11 +82,12 @@ Pacman.prototype.update = function () {
 
 Pacman.prototype.isInTurnPoint = function (object) {
     var self = this;
-    var objectGridPoint = self.getObjectGridPoint(object);
+    // FIXME: getObjectGridPoint is probably replacable by some native method.
+    var objectGridPoint = self.game.getObjectGridPoint(object);
     var currentX = Math.floor(object.x);
     var currentY = Math.floor(object.y);
-    if (self.math.fuzzyEqual(currentX, self.turnPoint.x, self.threshold) &&
-        self.math.fuzzyEqual(currentY, self.turnPoint.y, self.threshold)){
+    if (self.game.math.fuzzyEqual(currentX, self.turnPoint.x, self.threshold) &&
+        self.game.math.fuzzyEqual(currentY, self.turnPoint.y, self.threshold)){
         return true;
     }
     return false;
@@ -95,7 +97,7 @@ Pacman.prototype.isInTurnPoint = function (object) {
 Pacman.prototype.turn = function () {
     var self = this;
 
-    if (!self.game.isInTurnPoint(self)) {
+    if (!self.isInTurnPoint(self)) {
         return false;
     }
 
