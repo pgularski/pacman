@@ -66,7 +66,7 @@ Pacman.prototype.checkDirection = function (turnTo) {
 };
 
 
-Pacman.prototype._update = function () {
+Pacman.prototype.update = function () {
     var self = this;
 
     // It's in the grid coordinates, not in pixels
