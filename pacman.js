@@ -1,3 +1,6 @@
+// TODO: Make it work with use strict;
+//"use strict";
+
 Pacman = function (game, x, y) {
     var self = this;
     Phaser.Sprite.call(self, game, x, y, 'pacman');
@@ -11,6 +14,6 @@ Pacman = function (game, x, y) {
     self.body.setSize(32, 32, 0, 0);
 
     self.game.add.existing(self);
-}
+};
 Pacman.prototype = Object.create(Phaser.Sprite.prototype);
 Pacman.prototype.constructor = Pacman;

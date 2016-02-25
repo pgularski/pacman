@@ -189,38 +189,43 @@ PacmanGame.prototype.update = function () {
 /*
  *PacmanGame.prototype.render = function () {
  *    var self = this;
- *    for (var t = 1; t < 5; t++)
- *    {
- *        if (self.directions[t] === null)
- *        {
- *            continue;
- *        }
+ *    //for (var t = 1; t < 5; t++)
+ *    //{
+ *        //if (self.directions[t] === null)
+ *        //{
+ *            //continue;
+ *        //}
  *
- *        var color = 'rgba(0,255,0,0.3)';
+ *        //var color = 'rgba(0,255,0,0.3)';
  *
- *        if (self.directions[t].index !== self.safetile)
- *        {
- *            color = 'rgba(255,0,0,0.3)';
- *        }
+ *        //if (self.directions[t].index !== self.safetile)
+ *        //{
+ *            //color = 'rgba(255,0,0,0.3)';
+ *        //}
  *
- *        if (t === self.current)
- *        {
- *            color = 'rgba(255,255,255,0.3)';
- *        }
+ *        //if (t === self.current)
+ *        //{
+ *            //color = 'rgba(255,255,255,0.3)';
+ *        //}
  *
- *        self.game.debug.geom(new Phaser.Rectangle(self.directions[t].worldX, self.directions[t].worldY, 32, 32), color, true);
- *    }
+ *        //self.game.debug.geom(new Phaser.Rectangle(self.directions[t].worldX, self.directions[t].worldY, 32, 32), color, true);
+ *    //}
  *
- *    self.game.debug.geom(self.turnPoint, '#ffff00');
- *
+ *    //self.game.debug.geom(self.turnPoint, '#ffff00');
+ *    //self.game.debug.geom(self.ghostDestination, '#ffff00');
+ *    //self.game.debug.bodyInfo(self.pacman, 10, 20);
+ *    //self.game.debug.bodyInfo(self.ghost, 10, 20);
  *}
  */
 
 // TODO: Extract to external plugin
 PacmanGame.prototype.pointToTile = function (point) {
     var self = this;
-    var gridPoint = self.gridPointFromPoint(point);
-    return self.map.getTile(gridPoint.x, gridPoint.y);
+    //var gridPoint = self.gridPointFromPoint(point);
+    //return self.map.getTile(gridPoint.x, gridPoint.y);
+    return self.map.getTileWorldXY(point.x, point.y,
+                    self.map.tileWidth, self.map.tileHeight,
+                    self.layer);
 };
 
 // TODO: Extract to external plugin
@@ -606,6 +611,11 @@ PacmanGame.prototype.goToTile = function (object, toTile) {
     nextTurn = new Phaser.Point(nextTurn[0], nextTurn[1]);
     self.goingToTile = self.pointToTile(nextTurn);
     self.ghostTurns = turns;
+
+    var debugPoint = new Phaser.Point(
+            nextTurn.x * self.map.tileWidth + self.map.tileWidth / 2,
+            nextTurn.y * self.map.tileHeight + self.map.tileHeight / 2);
+    self.game.debug.geom(debugPoint, '#ffff00');
 
     if (objectTile.x < nextTurn.x) {
         object.body.velocity.x = speed;
