@@ -82,7 +82,6 @@ var PacmanGame = function(game) {
     self.ghost = null;
 
     self.safetile = 1;
-    self.gridsize = 32;
 
     self.speed = 150;
     self.threshold = 5;
@@ -278,8 +277,8 @@ PacmanGame.prototype.alignToTile = function (object, tween=false) {
     var gridPoint = self.getObjectGridPoint(object);
     var alignPoint = new Phaser.Point();
 
-    alignPoint.x = (gridPoint.x * self.gridsize) + (self.gridsize / 2);
-    alignPoint.y = (gridPoint.y * self.gridsize) + (self.gridsize / 2);
+    alignPoint.x = (gridPoint.x * self.map.tileWidth) + (self.map.tileWidth / 2);
+    alignPoint.y = (gridPoint.y * self.map.tileHeight) + (self.map.tileHeight / 2);
 
     object.position = alignPoint;
     object.body.reset(alignPoint.x, alignPoint.y);
@@ -293,25 +292,25 @@ PacmanGame.prototype.alignToTile = function (object, tween=false) {
 // TODO: Extract to external plugin
 PacmanGame.prototype.getGridX = function (x) {
     var self = this;
-    return self.math.snapToFloor(Math.floor(x), self.gridsize) / self.gridsize;
+    return self.math.snapToFloor(Math.floor(x), self.map.tileWidth) / self.map.tileWidth;
 };
 
 // TODO: Extract to external plugin
 PacmanGame.prototype.getGridY = function (y) {
     var self = this;
-    return self.math.snapToFloor(Math.floor(y), self.gridsize) / self.gridsize;
+    return self.math.snapToFloor(Math.floor(y), self.map.tileHeight) / self.map.tileHeight;
 };
 
 // TODO: Extract to external plugin
 PacmanGame.prototype.getObjectGridX = function (obj) {
     var self = this;
-    return self.math.snapToFloor(Math.floor(obj.x), self.gridsize) / self.gridsize;
+    return self.math.snapToFloor(Math.floor(obj.x), self.map.tileWidth) / self.map.tileWidth;
 };
 
 // TODO: Extract to external plugin
 PacmanGame.prototype.getObjectGridY = function (obj) {
     var self = this;
-    return self.math.snapToFloor(Math.floor(obj.y), self.gridsize) / self.gridsize;
+    return self.math.snapToFloor(Math.floor(obj.y), self.map.tileHeight) / self.map.tileHeight;
 };
 
 
@@ -352,8 +351,8 @@ PacmanGame.prototype.moveGhost = function () {
         var cy = Math.floor(self.ghost.y);
 
         var turnPoint = new Phaser.Point();
-        turnPoint.x = (x * self.gridsize) + (self.gridsize / 2);
-        turnPoint.y = (y * self.gridsize) + (self.gridsize / 2);
+        turnPoint.x = (x * self.map.tileWidth) + (self.map.tileWidth / 2);
+        turnPoint.y = (y * self.map.tileHeight) + (self.map.tileHeight / 2);
 
         //if (self.ghost.body.velocity.x === 0 && self.ghost.body.velocity.y === 0){
             //self.ghost.body.velocity.x = velocityVector.x * speed;
@@ -380,8 +379,8 @@ PacmanGame.prototype.isInTurnPoint  = function (object) {
     var currentX = Math.floor(object.x);
     var currentY = Math.floor(object.y);
     var turnPoint = new Phaser.Point();
-    turnPoint.x = (objectGridPoint.x * self.gridsize) + (self.gridsize / 2);
-    turnPoint.y = (objectGridPoint.y * self.gridsize) + (self.gridsize / 2);
+    turnPoint.x = (objectGridPoint.x * self.map.tileWidth) + (self.map.tileWidth / 2);
+    turnPoint.y = (objectGridPoint.y * self.map.tileHeight) + (self.map.tileHeight / 2);
     if (self.math.fuzzyEqual(currentX, turnPoint.x, self.threshold) &&
         self.math.fuzzyEqual(currentY, turnPoint.y, self.threshold)){
         return true;
