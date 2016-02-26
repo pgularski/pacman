@@ -137,6 +137,7 @@ PacmanGame.prototype.update = function () {
 
     self.checkKeys();
 
+    // TODO: This may go to Pacman object.
     if (self.pacman.turning !== Phaser.NONE)
     {
         self.pacman.turn();
@@ -196,7 +197,7 @@ PacmanGame.prototype.getObjectGridPoint = function (object) {
     return gridPoint;
 };
 
-// TODO: Extract to external plugin
+// TODO: Extract to external plugin and rename it.
 PacmanGame.prototype.getObjectTile = function (object) {
     var self = this;
     var tile = self.pointToTile(object.position);
