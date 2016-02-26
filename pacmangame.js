@@ -7,6 +7,7 @@
 // TODO: Add another ghost.
 // TODO: Update another ghost's algorithm.
 // TODO: What are world, state and stage anyway?
+// TODO: Rename ``object'' parameters to ``sprite''
 
 /*
  * Variable name convention
@@ -85,20 +86,7 @@ var PacmanGame = function(game) {
 
     self.speed = 150;
     self.threshold = 5;
-
-    // Ghost properties
-    // TODO: Move to external object.
-    self.ghostSpeed = 150;
-    self.ghostMarker = new Phaser.Point();
-    self.ghostDestination = null;
-    self.ghostPath = [];
-    self.justGotAligned = false;
-    self.goingToTile = null;
-    self.ghostTurns = [];
-    self.ghostLastTurn = null;
-
-
-}
+};
 
 PacmanGame.prototype.init = function () {
     var self = this;
@@ -147,26 +135,13 @@ PacmanGame.prototype.update = function () {
     self.physics.arcade.collide(self.pacman, self.layer);
     self.physics.arcade.collide(self.ghost, self.layer);
 
-    // It's in the grid coordinates, not in pixels
-    self.ghostMarker = self.getObjectGridPoint(self.ghost);
-
     self.checkKeys();
 
     if (self.pacman.turning !== Phaser.NONE)
     {
         self.pacman.turn();
     }
-
-    // TODO: update path only when pacman enters a new tile.
-    //self.findPathToPacman();
-
-
-    //var ghostDirection = self.checkGhostDirection();
-    //self.moveGhost();
-    self.moveGhost2();
-
 }
-
 
 
 /*
@@ -306,66 +281,6 @@ PacmanGame.prototype.getObjectGridY = function (obj) {
     return self.math.snapToFloor(Math.floor(obj.y), self.map.tileHeight) / self.map.tileHeight;
 };
 
-
-PacmanGame.prototype.checkGhostDirection = function () {
-    var x = self.ghostMarker.x;
-    var y = self.ghostMarker.y;
-
-    //nextTile = getNextTileFromPathInTheReferenceToCurrentGhostPosition(pathToPacman, x, y);
-    //direction = getDirectionTo(nextTile);
-
-    return direction;
-}
-
-PacmanGame.prototype.moveGhost = function () {
-    // TODO: Duplicated "move()" code.
-    var self = this;
-
-    var speed = self.ghostSpeed;
-
-    var x = self.ghostMarker.x;
-    var y = self.ghostMarker.y;
-    var path = self.findPathToPacman();
-    var path = [];
-
-    if (path.length > 1) {
-        var nextPathPoint = path[path.length - 2].split(',');
-        nextPathPoint = {x: nextPathPoint[0], y: nextPathPoint[1]}
-
-        var velocityVector = new Phaser.Point(
-                nextPathPoint.x - x,
-                nextPathPoint.y - y);
-
-        velocityVector.normalize();
-
-        //var calculatedX = self.ghost.x / (self.map.tileWidth + self.map.tileWidth / 2)
-        //var calculatedY = self.ghost.y / (self.map.tileHeight + self.map.tileHeight / 2)
-        var cx = Math.floor(self.ghost.x);
-        var cy = Math.floor(self.ghost.y);
-
-        var turnPoint = new Phaser.Point();
-        turnPoint.x = (x * self.map.tileWidth) + (self.map.tileWidth / 2);
-        turnPoint.y = (y * self.map.tileHeight) + (self.map.tileHeight / 2);
-
-        //if (self.ghost.body.velocity.x === 0 && self.ghost.body.velocity.y === 0){
-            //self.ghost.body.velocity.x = velocityVector.x * speed;
-            //self.ghost.body.velocity.y = velocityVector.y * speed;
-        //}
-
-        if (!self.math.fuzzyEqual(cx, turnPoint.x, self.threshold) || !self.math.fuzzyEqual(cy, turnPoint.y, self.threshold))
-        {
-            return false;
-        }
-
-        if (self.ghost.body.deltaX === 0 || self.ghost.deltaY === 0) {
-            self.alignToTile(self.ghost);
-
-            self.ghost.body.velocity.x = velocityVector.x * speed;
-            self.ghost.body.velocity.y = velocityVector.y * speed;
-        }
-    }
-}
-
 PacmanGame.prototype.isInTurnPoint  = function (object) {
     var self = this;
     var objectGridPoint = self.getObjectGridPoint(object);
@@ -379,9 +294,7 @@ PacmanGame.prototype.isInTurnPoint  = function (object) {
         return true;
     }
     return false;
-}
-
-
+};
 
 PacmanGame.prototype.checkKeys = function () {
     var self = this;
@@ -412,131 +325,6 @@ PacmanGame.prototype.checkKeys = function () {
     }
     else if (self.debugKey.isUp && self.debugKey.isPressed) {
         self.debugKey.isPressed = false;
-    }
-}
-
-PacmanGame.prototype.moveGhost2 = function () {
-    var self = this;
-
-/*
- *    if is at the junction or has no destination designated whatsoever:
- *        self.updateGhostPath();
- *
- *    if arrived to the currentDestination(next turn or pacman):
- *        currentDestination = nextDestination
- *        moveTowards current destination
- */
-
-
-
-    var nextTurnTile;
-
-    if (!self.ghostDestination || (self.isJunction(self.getObjectTile(self.ghost)) && self.isInTurnPoint(self.ghost))) {
-        if (!self.justGotAligned) {
-            self.alignToTile(self.ghost, true);
-            self.justGotAligned = true;
-        }
-        // FIXME: Should be Update path
-        // self.updateGhostPath()
-        self.goToTile(self.ghost, self.getObjectTile(self.pacman));
-    }
-    else if (self.ghostLastTurn) {
-        nextTurnTile = self.map.getTile.apply(self.map, self.ghostLastTurn.split(','));
-
-        if ((self.getObjectTile(self.ghost) === nextTurnTile) && self.isInTurnPoint(self.ghost)) {
-            self.alignToTile(self.ghost, true);
-            self.justGotAligned = true;
-            self.goToTile(self.ghost, self.getObjectTile(self.pacman));
-        }
-    }
-    else{
-        self.justGotAligned = false;
-    }
-}
-
-PacmanGame.prototype.updateGhostPath = function () {
-    var self = this;
-}
-
-PacmanGame.prototype.goToTile = function (object, toTile) {
-    var self = this;
-    var objectTile = self.getObjectTile(object);
-    var path = self.findPathToTile(objectTile, toTile);
-    var turns = self.getTurnPointsFromPath(path);
-    var nextTurn;
-    var speed = self.speed;
-
-    self.ghostPath = path;
-
-    if (path.length > 1){
-        turns.unshift(path[0])
-    }
-    self.ghostDestination = path[0];
-    if (turns.length <= 0) {
-        return;
-    }
-    self.ghostLastTurn = turns[turns.length - 1];
-    nextTurn = turns.pop().split(',').map(Number);
-    nextTurn = new Phaser.Point(nextTurn[0], nextTurn[1]);
-    self.goingToTile = self.pointToTile(nextTurn);
-    self.ghostTurns = turns;
-
-    var debugPoint = new Phaser.Point(
-            nextTurn.x * self.map.tileWidth + self.map.tileWidth / 2,
-            nextTurn.y * self.map.tileHeight + self.map.tileHeight / 2);
-    self.game.debug.geom(debugPoint, '#ffff00');
-
-    if (objectTile.x < nextTurn.x) {
-        object.body.velocity.x = speed;
-        //object.body.velocity.y = 0;
-    }
-    else if (objectTile.x > nextTurn.x) {
-        object.body.velocity.x = -speed;
-        //object.body.velocity.y = 0;
-    }
-    else if (objectTile.y < nextTurn.y) {
-        object.body.velocity.y = speed;
-        //object.body.velocity.x = 0;
-    }
-    else if (objectTile.y > nextTurn.y) {
-        object.body.velocity.y = -speed;
-        //object.body.velocity.x = 0;
-    }
-}
-
-
-PacmanGame.prototype.carryOnGhost = function () {
-    var self = this;
-    var object = self.ghost;
-    var objectTile = self.getObjectTile(object);
-    var path = self.ghostPath;
-    var turns = self.ghostTurns;
-    var nextTurn;
-    var speed = self.speed;
-
-    if (turns.length <= 0) {
-        return;
-    }
-    nextTurn = turns.pop().split(',').map(Number);
-    nextTurn = new Phaser.Point(nextTurn[0], nextTurn[1]);
-    self.goingToTile = self.pointToTile(nextTurn);
-    self.ghostTurns = turns;
-
-    if (objectTile.x < nextTurn.x) {
-        object.body.velocity.x = speed;
-        object.body.velocity.y = 0;
-    }
-    else if (objectTile.x > nextTurn.x) {
-        object.body.velocity.x = -speed;
-        object.body.velocity.y = 0;
-    }
-    else if (objectTile.y < nextTurn.y) {
-        object.body.velocity.y = speed;
-        object.body.velocity.x = 0;
-    }
-    else if (objectTile.y > nextTurn.y) {
-        object.body.velocity.y = -speed;
-        object.body.velocity.x = 0;
     }
 }
 
@@ -591,7 +379,6 @@ PacmanGame.prototype.findPathToPacman = function () {
             self.getObjectTile(self.pacman)
             );
 }
-
 
 PacmanGame.prototype.getTurnPointsFromPath = function (path) {
     // TODO: I feel in guts it may be more elegant.
