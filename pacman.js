@@ -1,19 +1,14 @@
 // TODO: Make it work with use strict;
 //"use strict";
 
-Pacman = function (game, x, y) {
+Pacman = function (pacmanGameState, game, x, y) {
     var self = this;
     Phaser.Sprite.call(self, game, x, y, 'pacman');
-    // FIXME: Why it doesn't work?
-    //self.game = game;
-    self.game = game.state.states.Game;
-    // FIXME: How to get the actual map object from the game object?
-    //self.map = self.game.map;
-    self.map = game.state.states.Game.map;
+    //self.game = game.state.states.Game;
+    self.game = pacmanGameState;;
+    self.map = self.game.map;
 
-    // FIXME: How to get the actual layer object from the game object?
-    //self.layer = self.game.layer;
-    self.layer = game.state.states.Game.layer;
+    self.layer = self.game.layer;
 
     self.anchor.set(0.5);
     self.animations.add("eat", [0, 1, 2, 1], 10, true);
