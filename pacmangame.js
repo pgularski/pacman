@@ -2,9 +2,10 @@
 // TODO: Save Grid code for later use.
 // TODO: Try to replace the Grid-related code with native methods.
 // TODO: Replace all possible methods with native methods.
-// TODO: Change ghost algoritm.
+// TODO: Fix current ghost's algoritm.
+// TODO: Change ghost's algoritm.
 // TODO: Add another ghost.
-// TODO: Update another ghost algorithm.
+// TODO: Update another ghost's algorithm.
 // TODO: What are world, state and stage anyway?
 
 /*
@@ -15,7 +16,6 @@
 
 "use strict";
 
-var game = new Phaser.Game(28 * 32, 31 * 32, Phaser.AUTO, "game");
 
 var Grid = function (map) {
     var self = this;
@@ -642,4 +642,5 @@ PacmanGame.prototype.getTurnPointsFromPath = function (path) {
     return turnPoints;
 }
 
+var game = new Phaser.Game(28 * 32, 31 * 32, Phaser.AUTO, "game");
 game.state.add("Game", PacmanGame, true);
