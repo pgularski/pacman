@@ -1,4 +1,11 @@
-// TODO: Once there's ghost and pacman walking around, separate the pacman and the ghost's code.
+// TODO: Extract ghost ocde to a separate file.
+// TODO: Save Grid code for later use.
+// TODO: Try to replace the Grid-related code with native methods.
+// TODO: Replace all possible methods with native methods.
+// TODO: Change ghost algoritm.
+// TODO: Add another ghost.
+// TODO: Update another ghost algorithm.
+// TODO: What are world, state and stage anyway?
 
 /*
  * Variable name convention
@@ -588,7 +595,7 @@ PacmanGame.prototype.findPathToPacman = function () {
     var fromTile ;
     var toTile;
     return self.findPathToTile(
-            self.getObjectTile(self.ghost), 
+            self.getObjectTile(self.ghost),
             self.getObjectTile(self.pacman)
             );
 }
