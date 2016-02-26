@@ -128,14 +128,7 @@ PacmanGame.prototype.create = function () {
     self.grid = new Grid(self.map);
 
     self.pacman = new Pacman(self, self.game, (12 * 32) + 16, (7 * 32) + 16);
-
-    self.ghost = self.add.sprite((1 * 32) + 16, (1 * 32) + 16, "ghost", 0);
-    self.ghost.anchor.set(0.5);
-    self.ghost.animations.add("walk", [0, 1, 2, 1], 10, true);
-    self.ghost.play("walk")
-
-    self.physics.arcade.enable(self.ghost);
-    self.ghost.body.setSize(32, 32, 0, 0);
+    self.ghost = new Ghost(self, self.game, (1 * 32) + 16, (1 * 32) + 16);
 
     self.cursors = self.game.input.keyboard.createCursorKeys();
     self.debugKey = self.game.input.keyboard.addKey(Phaser.Keyboard.D);
