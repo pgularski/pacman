@@ -88,7 +88,6 @@ Pacman.prototype.isInTurnPoint = function (object) {
     return false;
 }
 
-
 Pacman.prototype.turn = function () {
     var self = this;
 
