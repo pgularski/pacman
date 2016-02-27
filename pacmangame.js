@@ -1,5 +1,3 @@
-// TODO: Extract ghost ocde to a separate file.
-// TODO: Save Grid code for later use.
 // TODO: Try to replace the Grid-related code with native methods.
 // TODO: Replace all possible methods with native methods.
 // TODO: Fix current ghost's algoritm.
@@ -8,6 +6,7 @@
 // TODO: Update another ghost's algorithm.
 // TODO: What are world, state and stage anyway?
 // TODO: Rename ``object'' parameters to ``sprite''
+// TODO: Replace storing of array elements as strings.
 
 /*
  * Variable name convention
@@ -137,11 +136,6 @@ PacmanGame.prototype.update = function () {
 
     self.checkKeys();
 
-    // TODO: This may go to Pacman object.
-    if (self.pacman.turning !== Phaser.NONE)
-    {
-        self.pacman.turn();
-    }
 }
 
 
@@ -178,40 +172,30 @@ PacmanGame.prototype.update = function () {
  */
 
 // TODO: Extract to external plugin
-PacmanGame.prototype.pointToTile = function (point) {
+PacmanGame.prototype.getPointTile = function (point) {
     var self = this;
-    //var gridPoint = self.gridPointFromPoint(point);
-    //return self.map.getTile(gridPoint.x, gridPoint.y);
-    return self.map.getTileWorldXY(point.x, point.y,
-                    self.map.tileWidth, self.map.tileHeight,
-                    self.layer);
+    return self.map.getTileWorldXY(point.x, point.y);
 };
 
 // TODO: Extract to external plugin
-PacmanGame.prototype.getObjectGridPoint = function (object) {
+PacmanGame.prototype.getPointTileXY = function (point) {
     var self = this;
-    var gridPoint = new Phaser.Point(
-        self.getObjectGridX(object),
-        self.getObjectGridY(object)
-    );
-    return gridPoint;
+    var tilePoint = new Phaser.Point();
+    self.layer.getTileXY(point.x, point.y, tilePoint);
+    return tilePoint;
 };
 
 // TODO: Extract to external plugin and rename it.
 PacmanGame.prototype.getObjectTile = function (object) {
     var self = this;
-    var tile = self.pointToTile(object.position);
+    var tile = self.getPointTile(object.position);
     return tile;
 };
 
 // TODO: Extract to external plugin
-PacmanGame.prototype.gridPointFromPoint = function (point) {
+PacmanGame.prototype.getObjectTileXY = function (object) {
     var self = this;
-    var gridPoint = new Phaser.Point(
-        self.getGridX(point.x),
-        self.getGridY(point.y)
-    );
-    return gridPoint;
+    return self.getPointTileXY(object.position);
 };
 
 // TODO: Extract to external plugin
@@ -234,16 +218,14 @@ PacmanGame.prototype.isJunction = function (tile) {
     directions[Phaser.UP] = self.map.getTileAbove(index, x, y);
     directions[Phaser.DOWN] = self.map.getTileBelow(index, x, y);
 
-    //result = directions.filter(self.inBounds.bind(self))
-    result = directions.filter(isSafeTile.bind(self));
+    result = directions.filter(isSafeTile);
     return result.length > 2;
 };
-
 
 PacmanGame.prototype.alignToTile = function (object, tween=false) {
     // TODO: Implement tween=true.
     var self = this;
-    var gridPoint = self.getObjectGridPoint(object);
+    var gridPoint = self.getObjectTileXY(object);
     var alignPoint = new Phaser.Point();
 
     alignPoint.x = (gridPoint.x * self.map.tileWidth) + (self.map.tileWidth / 2);
@@ -251,40 +233,11 @@ PacmanGame.prototype.alignToTile = function (object, tween=false) {
 
     object.position = alignPoint;
     object.body.reset(alignPoint.x, alignPoint.y);
-
-    //var tile = self.getObjectTile(object);
-
-    //object.position = new Phaser.Point(tile.x ,tile.y);
-    //object.body.reset(tile.x, tile.y);
-};
-
-// TODO: Extract to external plugin
-PacmanGame.prototype.getGridX = function (x) {
-    var self = this;
-    return self.math.snapToFloor(Math.floor(x), self.map.tileWidth) / self.map.tileWidth;
-};
-
-// TODO: Extract to external plugin
-PacmanGame.prototype.getGridY = function (y) {
-    var self = this;
-    return self.math.snapToFloor(Math.floor(y), self.map.tileHeight) / self.map.tileHeight;
-};
-
-// TODO: Extract to external plugin
-PacmanGame.prototype.getObjectGridX = function (obj) {
-    var self = this;
-    return self.math.snapToFloor(Math.floor(obj.x), self.map.tileWidth) / self.map.tileWidth;
-};
-
-// TODO: Extract to external plugin
-PacmanGame.prototype.getObjectGridY = function (obj) {
-    var self = this;
-    return self.math.snapToFloor(Math.floor(obj.y), self.map.tileHeight) / self.map.tileHeight;
 };
 
 PacmanGame.prototype.isInTurnPoint  = function (object) {
     var self = this;
-    var objectGridPoint = self.getObjectGridPoint(object);
+    var objectGridPoint = self.getObjectTileXY(object);
     var currentX = Math.floor(object.x);
     var currentY = Math.floor(object.y);
     var turnPoint = new Phaser.Point();

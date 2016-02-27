@@ -3,7 +3,7 @@ Ghost = function (pacmanGameState, game, x, y) {
     Phaser.Sprite.call(self, game, x, y, 'ghost');
 
     // FIXME: make game a game and state a state becaus it's hard to get to a state when it's needed.
-    self.game = pacmanGameState;;
+    self.game = pacmanGameState;
     self.map = self.game.map;
     self.layer = self.game.layer;
 
@@ -34,7 +34,7 @@ Ghost.prototype.constructor = Ghost;
 Ghost.prototype.update = function () {
     var self = this;
     // It's in the grid coordinates, not in pixels
-    self.marker = self.game.getObjectGridPoint(self);
+    self.marker = self.game.getObjectTileXY(self);
 
     //var ghostDirection = self.checkDirection();
     self.move();
@@ -109,7 +109,7 @@ Ghost.prototype.goToTile = function (object, toTile) {
     self.lastTurn = turns[turns.length - 1];
     nextTurn = turns.pop().split(',').map(Number);
     nextTurn = new Phaser.Point(nextTurn[0], nextTurn[1]);
-    self.goingToTile = self.game.pointToTile(nextTurn);
+    self.goingToTile = self.game.getPointTile(nextTurn);
     self.turns = turns;
 
     var debugPoint = new Phaser.Point(

@@ -67,18 +67,22 @@ Pacman.prototype.update = function () {
 
     // It's in the grid coordinates, not in pixels
     // TODO: Use some built-in methods.
-    self.marker = self.game.getObjectGridPoint(self);
+    self.marker = self.game.getObjectTileXY(self);
 
     self.directions[Phaser.LEFT] = self.map.getTileLeft(self.layer.index, self.marker.x, self.marker.y);
     self.directions[Phaser.RIGHT] = self.map.getTileRight(self.layer.index, self.marker.x, self.marker.y);
     self.directions[Phaser.UP] = self.map.getTileAbove(self.layer.index, self.marker.x, self.marker.y);
     self.directions[Phaser.DOWN] = self.map.getTileBelow(self.layer.index, self.marker.x, self.marker.y);
+
+    if (self.turning !== Phaser.NONE)
+    {
+        self.turn();
+    }
 };
 
 Pacman.prototype.isInTurnPoint = function (object) {
     var self = this;
-    // FIXME: getObjectGridPoint is probably replacable by some native method.
-    var objectGridPoint = self.game.getObjectGridPoint(object);
+    var objectGridPoint = self.game.getObjectTileXY(object);
     var currentX = Math.floor(object.x);
     var currentY = Math.floor(object.y);
     if (self.game.math.fuzzyEqual(currentX, self.turnPoint.x, self.threshold) &&
