@@ -26,6 +26,8 @@ Ghost = function (pacmanGameState, game, x, y) {
     self.turns = [];
     self.lastTurn = null;
 
+    self.threshold = 5;
+
 
 }
 Ghost.prototype = Object.create(Phaser.Sprite.prototype);
@@ -65,7 +67,7 @@ Ghost.prototype.move = function () {
 
     var nextTurnTile;
 
-    if (!self.destination || (self.game.isJunction(self.game.getObjectTile(self)) && self.game.isInTurnPoint(self))) {
+    if (!self.destination || (self.game.isJunction(self.game.getObjectTile(self)) && self.isInTurnPoint(self))) {
         if (!self.justGotAligned) {
             self.game.alignToTile(self, true);
             self.justGotAligned = true;
@@ -78,7 +80,7 @@ Ghost.prototype.move = function () {
     else if (self.lastTurn) {
         nextTurnTile = self.map.getTile.apply(self.map, self.lastTurn);
 
-        if ((self.game.getObjectTile(self) === nextTurnTile) && self.game.isInTurnPoint(self)) {
+        if ((self.game.getObjectTile(self) === nextTurnTile) && self.isInTurnPoint(self)) {
             self.game.alignToTile(self, true);
             self.justGotAligned = true;
             self.goToTile(self, self.game.getObjectTile(self.game.pacman));
@@ -88,6 +90,22 @@ Ghost.prototype.move = function () {
         self.justGotAligned = false;
     }
 }
+
+// TODO: Pacman has the same method with similar implementation - can be extracted?
+Ghost.prototype.isInTurnPoint = function (object) {
+    var self = this;
+    var objectGridPoint = self.game.getObjectTileXY(object);
+    var currentX = Math.floor(object.x);
+    var currentY = Math.floor(object.y);
+    var turnPoint = new Phaser.Point();
+    turnPoint.x = (objectGridPoint.x * self.map.tileWidth) + (self.map.tileWidth / 2);
+    turnPoint.y = (objectGridPoint.y * self.map.tileHeight) + (self.map.tileHeight / 2);
+    if (self.game.math.fuzzyEqual(currentX, turnPoint.x, self.threshold) &&
+        self.game.math.fuzzyEqual(currentY, turnPoint.y, self.threshold)){
+        return true;
+    }
+    return false;
+};
 
 Ghost.prototype.goToTile = function (object, toTile) {
     var self = this;
