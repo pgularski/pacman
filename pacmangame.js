@@ -1,4 +1,3 @@
-// TODO: Replace all possible methods with native methods.
 // TODO: Fix current ghost's algoritm.
 // TODO: Change ghost's algoritm.
 // TODO: Add another ghost.
