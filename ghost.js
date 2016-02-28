@@ -76,7 +76,7 @@ Ghost.prototype.move = function () {
         self.goToTile(self, self.game.getObjectTile(self.game.pacman));
     }
     else if (self.lastTurn) {
-        nextTurnTile = self.map.getTile.apply(self.map, self.lastTurn.split(','));
+        nextTurnTile = self.map.getTile.apply(self.map, self.lastTurn);
 
         if ((self.game.getObjectTile(self) === nextTurnTile) && self.game.isInTurnPoint(self)) {
             self.game.alignToTile(self, true);
@@ -100,13 +100,14 @@ Ghost.prototype.goToTile = function (object, toTile) {
     self.path = path;
 
     if (path.length > 1){
-        turns.unshift(path[0])
+        // FIXME: There should be no need for toString.
+        turns.unshift(path[0].toString());
     }
     self.destination = path[0];
     if (turns.length <= 0) {
         return;
     }
-    self.lastTurn = turns[turns.length - 1];
+    self.lastTurn = turns[turns.length - 1].split(',').map(Number);
     nextTurn = turns.pop().split(',').map(Number);
     nextTurn = new Phaser.Point(nextTurn[0], nextTurn[1]);
     self.goingToTile = self.game.getPointTile(nextTurn);
