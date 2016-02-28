@@ -23,6 +23,7 @@ var PacmanGame = function(game) {
     self.layer = null;
     self.pacman = null;
     self.ghost = null;
+    //self.ghost2 = null;
 
     self.safetile = 1;
 
@@ -57,6 +58,7 @@ PacmanGame.prototype.create = function () {
 
     self.pacman = new Pacman(self, self.game, (12 * 32) + 16, (7 * 32) + 16);
     self.ghost = new Ghost(self, self.game, (1 * 32) + 16, (1 * 32) + 16);
+    //self.ghost2 = new Ghost(self, self.game, (1 * 32) + 16, (20 * 32) + 16);
 
     self.cursors = self.game.input.keyboard.createCursorKeys();
     self.debugKey = self.game.input.keyboard.addKey(Phaser.Keyboard.D);
@@ -74,6 +76,7 @@ PacmanGame.prototype.update = function () {
     var self = this;
     self.physics.arcade.collide(self.pacman, self.layer);
     self.physics.arcade.collide(self.ghost, self.layer);
+    //self.physics.arcade.collide(self.ghost2, self.layer);
 
     self.checkKeys();
 
@@ -242,7 +245,7 @@ PacmanGame.prototype.findPathToTile = function (fromTile, toTile) {
     border.push(start);
     while (border.length > 0) {
         current = border.shift();
-        if (current === goal) {
+        if (JSON.stringify(current) === JSON.stringify(goal)) {
             break;
         }
         neighbors = self.getTileNeighbors(arrToTile(current), true).map(toArray);
@@ -261,7 +264,7 @@ PacmanGame.prototype.reconstructPath = function (cameFrom, start, goal) {
     var self = this;
     var current = goal;
     var path = [current];
-    while (current !== start){
+    while (JSON.stringify(current) !== JSON.stringify(start)){
         current = cameFrom[current];
         path.push(current);
     }
