@@ -65,14 +65,8 @@ Pacman.prototype.checkDirection = function (turnTo) {
 Pacman.prototype.update = function () {
     var self = this;
 
-    // It's in the grid coordinates, not in pixels
-    // TODO: Use some built-in methods.
     self.marker = self.game.getObjectTileXY(self);
-
-    self.directions[Phaser.LEFT] = self.map.getTileLeft(self.layer.index, self.marker.x, self.marker.y);
-    self.directions[Phaser.RIGHT] = self.map.getTileRight(self.layer.index, self.marker.x, self.marker.y);
-    self.directions[Phaser.UP] = self.map.getTileAbove(self.layer.index, self.marker.x, self.marker.y);
-    self.directions[Phaser.DOWN] = self.map.getTileBelow(self.layer.index, self.marker.x, self.marker.y);
+    self.directions = self.game.getTileNeighbors(self.game.getObjectTile(self));
 
     if (self.turning !== Phaser.NONE)
     {
