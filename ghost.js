@@ -43,6 +43,7 @@ Ghost.prototype.update = function () {
 }
 
 Ghost.prototype.checkDirection = function () {
+    var self = this;
     var x = self.marker.x;
     var y = self.marker.y;
 
