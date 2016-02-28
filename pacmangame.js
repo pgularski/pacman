@@ -213,10 +213,7 @@ PacmanGame.prototype.isJunction = function (tile) {
         return tile.index === self.safetile;
     };
 
-    directions[Phaser.LEFT] = self.map.getTileLeft(index, x, y);
-    directions[Phaser.RIGHT] = self.map.getTileRight(index, x, y);
-    directions[Phaser.UP] = self.map.getTileAbove(index, x, y);
-    directions[Phaser.DOWN] = self.map.getTileBelow(index, x, y);
+    directions = self.getTileNeighbors(tile);
 
     result = directions.filter(isSafeTile);
     return result.length > 2;
@@ -282,12 +279,35 @@ PacmanGame.prototype.checkKeys = function () {
     }
 }
 
+PacmanGame.prototype.getTileNeighbors = function (tile, passableOnly=false) {
+    var self = this;
+    var neighbors = [null, null, null, null, null]
+    var passableNeighbors = [];
+    var index = self.layer.index;
+
+    neighbors[Phaser.LEFT] = self.map.getTileLeft(index,   tile.x, tile.y);
+    neighbors[Phaser.RIGHT] = self.map.getTileRight(index, tile.x, tile.y);
+    neighbors[Phaser.UP] = self.map.getTileAbove(index,    tile.x, tile.y);
+    neighbors[Phaser.DOWN] = self.map.getTileBelow(index,  tile.x, tile.y);
+
+    if (passableOnly) {
+        passableNeighbors = neighbors.filter(
+                (function(elem){
+                    return elem !== null && elem.index === self.safetile;
+                })
+        );
+        return passableNeighbors;
+    }
+    return neighbors;
+};
+
 PacmanGame.prototype.findPathToTile = function (fromTile, toTile) {
     var self = this;
+    var toArray = function(elem){return [elem.x, elem.y];};
+    var arrToTile = function(elem){return self.map.getTile(elem[0], elem[1])};
 
-    var graph = self.grid;
-    var start = [fromTile.x, fromTile.y].toString();
-    var goal = [toTile.x, toTile.y].toString();
+    var start = toArray(fromTile);
+    var goal = toArray(toTile);
 
     var border = [];
     var cameFrom = {};
@@ -301,7 +321,7 @@ PacmanGame.prototype.findPathToTile = function (fromTile, toTile) {
         if (current === goal) {
             break;
         }
-        neighbors = graph.neighbors(current);
+        neighbors = self.getTileNeighbors(arrToTile(current), true).map(toArray);
         for(var i = 0; i < neighbors.length; i++){
             node = neighbors[i];
             if (!cameFrom.hasOwnProperty(node)) {
@@ -335,14 +355,15 @@ PacmanGame.prototype.findPathToPacman = function () {
 }
 
 PacmanGame.prototype.getTurnPointsFromPath = function (path) {
+    // FIXME: Make it return an array or arrays.
     // TODO: I feel in guts it may be more elegant.
     var turnPoints = [];
     var x, y;
     var prevX, prevY;
     var currentDirection;
     for (var i = 0 ; i < path.length; i++) {
-        x = path[i].split(',')[0];
-        y = path[i].split(',')[1];
+        x = path[i][0];
+        y = path[i][1];
         if (!prevX && !prevY){
             prevX = x;
             prevY = y;
