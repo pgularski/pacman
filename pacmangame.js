@@ -1,4 +1,3 @@
-// TODO: Try to replace the Grid-related code with native methods.
 // TODO: Replace all possible methods with native methods.
 // TODO: Fix current ghost's algoritm.
 // TODO: Change ghost's algoritm.
@@ -15,61 +14,6 @@
  */
 
 "use strict";
-
-
-var Grid = function (map) {
-    var self = this;
-    self.map = map;
-    // TODO: This should be rather passed in.
-    self.safetile = 1;
-    self.width = map.width;
-    self.height = map.height;
-    self.walls = new Set();
-    self._updateWallsData();
-}
-
-Grid.prototype.inBounds = function (xy) {
-    var self = this;
-    var xy_ints = xy.split(",").map(Number);
-    var x = xy_ints[0];
-    var y = xy_ints[1];
-    return x >= 0 && x < self.width && y >= 0 && y < self.height;
-}
-
-Grid.prototype.canPass = function (xy) {
-    var self = this;
-    return !self.walls.has(xy);
-}
-
-Grid.prototype.neighbors = function (xy) {
-    var self = this;
-    var xy_ints = xy.split(",").map(Number);
-    var x = xy_ints[0];
-    var y = xy_ints[1];
-    var result = [
-        [x + 1, y].toString(),
-        [x - 1, y].toString(),
-        [x, y - 1].toString(),
-        [x, y + 1].toString(),
-        ];
-    result = result.filter(self.inBounds.bind(self))
-    result = result.filter(self.canPass.bind(self))
-    return result
-}
-
-Grid.prototype._updateWallsData = function () {
-    var self = this;
-    var tile = null;
-
-    for (var i = 0; i < self.map.width; i++) {
-        for (var j = 0; j < self.map.height; j++) {
-            tile = self.map.getTile(i, j);
-            if (tile.index !== self.safetile) {
-                self.walls.add([tile.x, tile.y].toString());
-            }
-        }
-    }
-}
 
 
 var PacmanGame = function(game) {
@@ -111,8 +55,6 @@ PacmanGame.prototype.create = function () {
     // Display the layer from the map.json file. The name as in the json file.
     self.layer = self.map.createLayer("Tile Layer 1");
     self.map.setCollisionByExclusion([self.safetile], true, self.layer);
-
-    self.grid = new Grid(self.map);
 
     self.pacman = new Pacman(self, self.game, (12 * 32) + 16, (7 * 32) + 16);
     self.ghost = new Ghost(self, self.game, (1 * 32) + 16, (1 * 32) + 16);
