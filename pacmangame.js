@@ -140,6 +140,15 @@ PacmanGame.prototype.getObjectTileXY = function (object) {
     return self.getPointTileXY(object.position);
 };
 
+PacmanGame.prototype.isSafeTile = function (tile) {
+    var self = this;
+    //if (!tile)
+        //return false;
+    //return tile.index === self.safetile;
+    return tile !== null && tile.index === self.safetile;
+};
+
+
 // TODO: Extract to external plugin
 PacmanGame.prototype.isJunction = function (tile) {
     var self = this;
@@ -149,15 +158,9 @@ PacmanGame.prototype.isJunction = function (tile) {
     var y = tile.y;
 
     var result;
-    var isSafeTile = function (tile) {
-        if (!tile)
-            return false;
-        return tile.index === self.safetile;
-    };
-
     directions = self.getTileNeighbors(tile);
 
-    result = directions.filter(isSafeTile);
+    result = directions.filter(self.isSafeTile.bind(self));
     return result.length > 2;
 };
 
@@ -214,7 +217,6 @@ PacmanGame.prototype.checkKeys = function () {
     if (self.debugKey.isDown && !self.debugKey.isPressed) {
         console.log("Debug key pressed");
         self.debugKey.isPressed = true;
-        self.findPathToPacman();
     }
     else if (self.debugKey.isUp && self.debugKey.isPressed) {
         self.debugKey.isPressed = false;
@@ -233,11 +235,7 @@ PacmanGame.prototype.getTileNeighbors = function (tile, passableOnly=false) {
     neighbors[Phaser.DOWN] = self.map.getTileBelow(index,  tile.x, tile.y);
 
     if (passableOnly) {
-        passableNeighbors = neighbors.filter(
-                (function(elem){
-                    return elem !== null && elem.index === self.safetile;
-                })
-        );
+        passableNeighbors = neighbors.filter(self.isSafeTile.bind(self));
         return passableNeighbors;
     }
     return neighbors;
@@ -272,7 +270,6 @@ PacmanGame.prototype.findPathToTile = function (fromTile, toTile) {
             }
         }
     }
-    //console.log(self.reconstructPath(cameFrom, start, goal));
     return self.reconstructPath(cameFrom, start, goal);
 }
 
@@ -286,18 +283,7 @@ PacmanGame.prototype.reconstructPath = function (cameFrom, start, goal) {
     return path;
 }
 
-PacmanGame.prototype.findPathToPacman = function () {
-    var self = this;
-    var fromTile ;
-    var toTile;
-    return self.findPathToTile(
-            self.getObjectTile(self.ghost),
-            self.getObjectTile(self.pacman)
-            );
-}
-
 PacmanGame.prototype.getTurnPointsFromPath = function (path) {
-    // FIXME: Make it return an array or arrays.
     // TODO: I feel in guts it may be more elegant.
     var turnPoints = [];
     var x, y;
