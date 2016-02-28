@@ -15,44 +15,6 @@ window.addEventListener("gameCreated", function(evt) {
         assert.ok( testGame.map, "testGame.map should be defined" );
     });
 
-    QUnit.test( "Test Grid", function( assert ) {
-        var grid = game.state.states.Game.grid;
-        var point = [2, 5].toString();
-        assert.ok( grid, "grid should be defined" );
-        assert.notOk(grid.walls.has(point), "The point " + point + " mustn't be in self.walls");
-    });
-
-    QUnit.test( "Test Grid.inBounds", function( assert ) {
-        var str = function(arr){
-            return arr.toString();
-        };
-        var grid = game.state.states.Game.grid;
-        var point;
-        point = str([0, 0]);
-        assert.ok( grid.inBounds(point), point +" should be in inBounds");
-        point = str([-1, 0]);
-        assert.notOk( grid.inBounds(point), point +" should be in inBounds");
-    });
-
-    QUnit.test( "Test Grid.neighbors", function( assert ) {
-        var str = function(arr){
-            return arr.toString();
-        };
-        var grid = game.state.states.Game.grid;
-        var point;
-        var result;
-
-        point = str([1, 1]);
-        expected = [ "2,1", "1,2" ];
-        result = grid.neighbors(point);
-        assert.deepEqual(result, expected);
-
-        point = str([1, 5]);
-        expected = [ "2,5", "1,4" ];
-        result = grid.neighbors(point);
-        assert.deepEqual(result, expected);
-    });
-
     QUnit.test( "Test PacmanGame.isJunction", function( assert ) {
         var testGame = game.state.states.Game;
         var point;
