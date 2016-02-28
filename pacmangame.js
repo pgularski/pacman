@@ -323,11 +323,11 @@ PacmanGame.prototype.getTurnPointsFromPath = function (path) {
 
         if (x === prevX && currentDirection === 'y') {
             currentDirection = 'x';
-            turnPoints.push([prevX, prevY].toString());
+            turnPoints.push([prevX, prevY]);
         }
         else if (y === prevY && currentDirection === 'x') {
             currentDirection = 'y';
-            turnPoints.push([prevX, prevY].toString());
+            turnPoints.push([prevX, prevY]);
         }
 
         prevX = x;
