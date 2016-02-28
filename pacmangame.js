@@ -177,21 +177,6 @@ PacmanGame.prototype.alignToTile = function (object, tween=false) {
     object.body.reset(alignPoint.x, alignPoint.y);
 };
 
-PacmanGame.prototype.isInTurnPoint  = function (object) {
-    var self = this;
-    var objectGridPoint = self.getObjectTileXY(object);
-    var currentX = Math.floor(object.x);
-    var currentY = Math.floor(object.y);
-    var turnPoint = new Phaser.Point();
-    turnPoint.x = (objectGridPoint.x * self.map.tileWidth) + (self.map.tileWidth / 2);
-    turnPoint.y = (objectGridPoint.y * self.map.tileHeight) + (self.map.tileHeight / 2);
-    if (self.math.fuzzyEqual(currentX, turnPoint.x, self.threshold) &&
-        self.math.fuzzyEqual(currentY, turnPoint.y, self.threshold)){
-        return true;
-    }
-    return false;
-};
-
 PacmanGame.prototype.checkKeys = function () {
     var self = this;
 
