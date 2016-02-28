@@ -164,8 +164,8 @@ PacmanGame.prototype.isJunction = function (tile) {
     return result.length > 2;
 };
 
+// TODO: Implement tween=true.
 PacmanGame.prototype.alignToTile = function (object, tween=false) {
-    // TODO: Implement tween=true.
     var self = this;
     var gridPoint = self.getObjectTileXY(object);
     var alignPoint = new Phaser.Point();
@@ -259,6 +259,7 @@ PacmanGame.prototype.findPathToTile = function (fromTile, toTile) {
 }
 
 PacmanGame.prototype.reconstructPath = function (cameFrom, start, goal) {
+    var self = this;
     var current = goal;
     var path = [current];
     while (current !== start){
@@ -269,6 +270,7 @@ PacmanGame.prototype.reconstructPath = function (cameFrom, start, goal) {
 }
 
 PacmanGame.prototype.getTurnPointsFromPath = function (path) {
+    var self = this;
     // TODO: I feel in guts it may be more elegant.
     var turnPoints = [];
     var x, y;
