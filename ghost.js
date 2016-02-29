@@ -25,9 +25,10 @@ Ghost = function (pacmanGameState, game, x, y) {
     self.turns = [];
     self.lastTurn = null;
     self.checkpoints = [];
+    self.currentCheckpoint = new Phaser.Point();
 
     self.threshold = 5;
-    self.MAX_DISTANCE = 0;
+    self.MAX_DISTANCE = 3;
 
 
 }
@@ -37,20 +38,64 @@ Ghost.prototype.constructor = Ghost;
 Ghost.prototype.update = function () {
     var self = this;
 
-    self.move();
+    //self.move();
+    self.chase(self.game.pacman);
 }
 
 Ghost.prototype.chase = function (target) {
     var self = this;
-    var distance = self.game.math.distance(self.x, self.y, target.x, target.y);
+
+    if (self.checkpoints.length === 0 || self.game.isJunction(self.game.getObjectTile(self)) ) {
+        self.updateCheckPoints(target);
+        self.currentCheckpoint = self.checkpoints.pop();
+    }
+    var currentCheckpointTile = self.map.getTile(
+            self.currentCheckpoint.x, self.currentCheckpoint.y)
+    //var currentCheckpointPoint = new Phaser.Point(
+            //currentCheckpointTile.worldX, currentCheckpointTile.worldY);
+
+    var x = self.x - (self.body.width * self.anchor.x);
+    var y = self.y - (self.body.height * self.anchor.y);
+
+    //game.debug.geom(currentCheckpointPoint, '#ffff00');
+
+    var distance = self.game.math.distance(
+            x, y,
+            currentCheckpointTile.worldX, currentCheckpointTile.worldY);
 
     if (distance > self.MAX_DISTANCE) {
-        ;
+        self.setDirection();
     }
     else {
-        self.body.velocity.setTo(0, 0);
+        self.currentCheckpoint = self.checkpoints.pop();
+        self.setDirection();
+    }
+}
+
+Ghost.prototype.setDirection = function () {
+    var self = this;
+    var speed = self.speed;
+    var selfTileXY = self.game.getObjectTileXY(self)
+    if (!self.currentCheckpoint) {
+        return;
     }
 
+    if (selfTileXY.x < self.currentCheckpoint.x) {
+        self.body.velocity.x = speed;
+        //object.body.velocity.y = 0;
+    }
+    else if (selfTileXY.x > self.currentCheckpoint.x) {
+        self.body.velocity.x = -speed;
+        //object.body.velocity.y = 0;
+    }
+    else if (selfTileXY.y < self.currentCheckpoint.y) {
+        self.body.velocity.y = speed;
+        //object.body.velocity.x = 0;
+    }
+    else if (selfTileXY.y > self.currentCheckpoint.y) {
+        self.body.velocity.y = -speed;
+        //object.body.velocity.x = 0;
+    }
 }
 
 Ghost.prototype.updateCheckPoints = function (target) {
@@ -64,7 +109,7 @@ Ghost.prototype.updateCheckPoints = function (target) {
             return new Phaser.Point(point_array[0], point_array[1]);
         })
     );
-    checkpoints.unshift(target.position);
+    checkpoints.unshift(self.game.getPointTileXY(target.position));
     self.checkpoints = checkpoints;
 }
 
