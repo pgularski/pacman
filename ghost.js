@@ -18,15 +18,16 @@ Ghost = function (pacmanGameState, game, x, y) {
 
     self.speed = 150;
 
-    self.marker = new Phaser.Point();
     self.destination = null;
     self.path = [];
     self.justGotAligned = false;
     self.goingToTile = null;
     self.turns = [];
     self.lastTurn = null;
+    self.checkpoints = [];
 
     self.threshold = 5;
+    self.MAX_DISTANCE = 0;
 
 
 }
@@ -35,24 +36,37 @@ Ghost.prototype.constructor = Ghost;
 
 Ghost.prototype.update = function () {
     var self = this;
-    // It's in the grid coordinates, not in pixels
-    self.marker = self.game.getObjectTileXY(self);
 
-    //var ghostDirection = self.checkDirection();
     self.move();
 }
 
-Ghost.prototype.checkDirection = function () {
+Ghost.prototype.chase = function (target) {
     var self = this;
-    var x = self.marker.x;
-    var y = self.marker.y;
+    var distance = self.game.math.distance(self.x, self.y, target.x, target.y);
 
-    //nextTile = getNextTileFromPathInTheReferenceToCurrentGhostPosition(pathToPacman, x, y);
-    //direction = getDirectionTo(nextTile);
+    if (distance > self.MAX_DISTANCE) {
+        ;
+    }
+    else {
+        self.body.velocity.setTo(0, 0);
+    }
 
-    return direction;
 }
 
+Ghost.prototype.updateCheckPoints = function (target) {
+    var self = this;
+    var path = self.game.findPathToTile(
+            self.game.getObjectTile(self),
+            self.game.getObjectTile(target));
+    var checkpoints = self.game.getTurnPointsFromPath(path);
+    checkpoints = checkpoints.map(
+        (function (point_array) {
+            return new Phaser.Point(point_array[0], point_array[1]);
+        })
+    );
+    checkpoints.unshift(target.position);
+    self.checkpoints = checkpoints;
+}
 
 Ghost.prototype.move = function () {
     var self = this;
