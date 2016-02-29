@@ -26,6 +26,7 @@ Ghost = function (pacmanGameState, game, x, y) {
     self.lastTurn = null;
     self.checkpoints = [];
     self.currentCheckpoint = new Phaser.Point();
+    self.currentCheckpointTile = null;
 
     self.threshold = 5;
     self.MAX_DISTANCE = 3;
@@ -48,25 +49,22 @@ Ghost.prototype.chase = function (target) {
     if (self.checkpoints.length === 0 || self.game.isJunction(self.game.getObjectTile(self)) ) {
         self.updateCheckPoints(target);
         self.currentCheckpoint = self.checkpoints.pop();
-    }
-    var currentCheckpointTile = self.map.getTile(
+        self.currentCheckpointTile = self.map.getTile(
             self.currentCheckpoint.x, self.currentCheckpoint.y)
-    //var currentCheckpointPoint = new Phaser.Point(
-            //currentCheckpointTile.worldX, currentCheckpointTile.worldY);
-
+        self.setDirection();
+    }
     var x = self.x - (self.body.width * self.anchor.x);
     var y = self.y - (self.body.height * self.anchor.y);
 
+    //var currentCheckpointPoint = new Phaser.Point(
+            //currentCheckpointTile.worldX, currentCheckpointTile.worldY);
     //game.debug.geom(currentCheckpointPoint, '#ffff00');
 
     var distance = self.game.math.distance(
             x, y,
-            currentCheckpointTile.worldX, currentCheckpointTile.worldY);
+            self.currentCheckpointTile.worldX, self.currentCheckpointTile.worldY);
 
-    if (distance > self.MAX_DISTANCE) {
-        self.setDirection();
-    }
-    else {
+    if (distance <= self.MAX_DISTANCE) {
         self.currentCheckpoint = self.checkpoints.pop();
         self.setDirection();
     }
@@ -82,19 +80,15 @@ Ghost.prototype.setDirection = function () {
 
     if (selfTileXY.x < self.currentCheckpoint.x) {
         self.body.velocity.x = speed;
-        //object.body.velocity.y = 0;
     }
     else if (selfTileXY.x > self.currentCheckpoint.x) {
         self.body.velocity.x = -speed;
-        //object.body.velocity.y = 0;
     }
     else if (selfTileXY.y < self.currentCheckpoint.y) {
         self.body.velocity.y = speed;
-        //object.body.velocity.x = 0;
     }
     else if (selfTileXY.y > self.currentCheckpoint.y) {
         self.body.velocity.y = -speed;
-        //object.body.velocity.x = 0;
     }
 }
 
