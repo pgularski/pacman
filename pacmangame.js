@@ -1,7 +1,10 @@
-// TODO: Update another ghost's algorithm.
 // TODO: What are world, state and stage anyway?
 // TODO: Rename ``object'' parameters to ``sprite''
 // TODO: Replace storing of array elements as strings.
+// TODO: Dots to eat
+// TODO: Ghost walking randomly/chasing in turns.
+// TODO: Teleport
+// TODO: Graphics
 
 /*
  * Variable name convention
