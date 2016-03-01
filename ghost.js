@@ -1,3 +1,12 @@
+var randomize = function(number, range) {
+    return (function(number){
+        number -= Math.floor(Math.random() * range);
+        number += Math.floor(Math.random() * range);
+        return number;
+    })(number);
+};
+
+
 Ghost = function (pacmanGameState, game, x, y) {
     var self = this;
     Phaser.Sprite.call(self, game, x, y, 'ghost');
@@ -40,14 +49,14 @@ Ghost.prototype.update = function () {
     var self = this;
 
     //self.move();
-    self.chase(self.game.pacman);
+    self.chase2(self.game.pacman);
 }
 
 Ghost.prototype.chase = function (target) {
     var self = this;
 
     if (self.checkpoints.length === 0 || self.game.isJunction(self.game.getObjectTile(self)) ) {
-        self.updateCheckPoints(target);
+        self.updateCheckPoints(self.game.getObjectTile(target));
         self.currentCheckpoint = self.checkpoints.pop();
         self.currentCheckpointTile = self.map.getTile(
             self.currentCheckpoint.x, self.currentCheckpoint.y)
@@ -69,6 +78,49 @@ Ghost.prototype.chase = function (target) {
         self.setDirection();
     }
 }
+
+Ghost.prototype.getRandomizedTargetTile = function (target) {
+    var self = this;
+    var point = new Phaser.Point(
+            randomize(target.x, self.width * 10),
+            randomize(target.y, self.width * 10)
+    );
+    var virtualTarget = self.game.getPointTile(point);
+    if (virtualTarget && self.game.isSafeTile(virtualTarget)) {
+        return virtualTarget;
+    }
+    return self.game.getObjectTile(target);
+}
+
+Ghost.prototype.chase2 = function (target) {
+    var self = this;
+    var virtualTarget = self.getRandomizedTargetTile(target);
+
+    if (self.checkpoints.length === 0 || self.game.isJunction(self.game.getObjectTile(self))
+        || (self.body.deltaX() === 0 && self.body.deltaY() ===0)) {
+        self.updateCheckPoints(virtualTarget);
+        self.currentCheckpoint = self.checkpoints.pop();
+        self.currentCheckpointTile = self.map.getTile(
+            self.currentCheckpoint.x, self.currentCheckpoint.y)
+        self.setDirection();
+    }
+    var x = self.x - (self.body.width * self.anchor.x);
+    var y = self.y - (self.body.height * self.anchor.y);
+
+    //var currentCheckpointPoint = new Phaser.Point(
+            //currentCheckpointTile.worldX, currentCheckpointTile.worldY);
+    //game.debug.geom(currentCheckpointPoint, '#ffff00');
+
+    var distance = self.game.math.distance(
+            x, y,
+            self.currentCheckpointTile.worldX, self.currentCheckpointTile.worldY);
+
+    if (distance <= self.MAX_DISTANCE) {
+        self.currentCheckpoint = self.checkpoints.pop();
+        self.setDirection();
+    }
+}
+
 
 Ghost.prototype.setDirection = function () {
     var self = this;
@@ -92,17 +144,18 @@ Ghost.prototype.setDirection = function () {
     }
 }
 
-Ghost.prototype.updateCheckPoints = function (target) {
+Ghost.prototype.updateCheckPoints = function (targetTile) {
     var self = this;
     var path = self.game.findPathToTile(
             self.game.getObjectTile(self),
-            self.game.getObjectTile(target));
+            targetTile);
     var checkpoints = self.game.getTurnPointsFromPath(path);
     checkpoints = checkpoints.map(
         (function (point_array) {
             return new Phaser.Point(point_array[0], point_array[1]);
         })
     );
-    checkpoints.unshift(self.game.getPointTileXY(target.position));
+    //checkpoints.unshift(self.game.getPointTileXY(target.position));
+    checkpoints.unshift(new Phaser.Point(targetTile.x, targetTile.y));
     self.checkpoints = checkpoints;
 }
