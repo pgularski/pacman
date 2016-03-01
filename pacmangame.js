@@ -164,7 +164,7 @@ PacmanGame.prototype.isJunction = function (tile) {
 };
 
 // TODO: Implement tween=true.
-PacmanGame.prototype.alignToTile = function (object, tween=false) {
+PacmanGame.prototype.alignToTile = function (object, tween) {
     var self = this;
     var gridPoint = self.getObjectTileXY(object);
     var alignPoint = new Phaser.Point();
@@ -207,7 +207,7 @@ PacmanGame.prototype.checkKeys = function () {
     }
 }
 
-PacmanGame.prototype.getTileNeighbors = function (tile, passableOnly=false) {
+PacmanGame.prototype.getTileNeighbors = function (tile, passableOnly) {
     var self = this;
     var neighbors = [null, null, null, null, null]
     var passableNeighbors = [];
