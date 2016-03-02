@@ -1,4 +1,6 @@
 // TODO: What are world, state and stage anyway?
+// TODO: Add explosions
+// TODO: Implement states => prepare for game/ game/ game over
 // TODO: Rename ``object'' parameters to ``sprite''
 // TODO: Replace storing of array elements as strings.
 // TODO: Dots to eat
