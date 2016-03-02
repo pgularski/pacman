@@ -142,5 +142,11 @@ Pacman.prototype.move = function (direction) {
     }
 
     self.current = direction;
-}
+};
+
+
+Pacman.prototype.die = function () {
+    var self = this;
+    console.log('Pacman dies!');
+};
 
