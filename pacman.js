@@ -148,5 +148,6 @@ Pacman.prototype.move = function (direction) {
 Pacman.prototype.die = function () {
     var self = this;
     console.log('Pacman dies!');
+    self.kill();
 };
 
