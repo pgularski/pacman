@@ -24,7 +24,8 @@ var PacmanGame = function(game) {
     self.grid = null;
     self.layer = null;
     self.pacman = null;
-    // TODO: Make it a group.
+
+    self.ghosts = null;
     self.ghost = null;
     self.ghost2 = null;
     self.ghost3 = null;
@@ -50,6 +51,7 @@ PacmanGame.prototype.preload = function () {
     self.load.image("tiles", "assets/tiles.png");
     self.load.spritesheet("pacman", "assets/pacman.png", 32, 32);
     self.load.spritesheet("ghost", "assets/ghost.png", 32, 32);
+    self.load.spritesheet("boom", "assets/boom.png", 128, 128);
     self.load.tilemap("map", "assets/map.json", null, Phaser.Tilemap.TILED_JSON);
 }
 
@@ -63,11 +65,6 @@ PacmanGame.prototype.create = function () {
 
     self.pacman = new Pacman(self, self.game, (12 * 32) + 16, (7 * 32) + 16);
     self.ghosts = self.add.group()
-
-    //self.ghost = new Ghost(self, self.game, (1 * 32) + 16, (1 * 32) + 16, StraightToThePointChasing);
-    //self.ghost2 = new Ghost(self, self.game, (1 * 32) + 16, (20 * 32) + 16, SlightlyRandomizedChasing);
-    //self.ghost3 = new Ghost(self, self.game, (20 * 32) + 16, (1 * 32) + 16, RandomizedChasing);
-    //self.ghost4 = new Ghost(self, self.game, (20 * 32) + 16, (29 * 32) + 16, RandomizedChasing);
 
     self.ghosts.add(new Ghost(self, self.game, (1 * 32) + 16, (1 * 32) + 16, StraightToThePointChasing));
     self.ghosts.add(new Ghost(self, self.game, (1 * 32) + 16, (20 * 32) + 16, SlightlyRandomizedChasing));
@@ -100,9 +97,22 @@ PacmanGame.prototype.update = function () {
 PacmanGame.prototype.onPacmanTouched = function () {
     var self = this;
     self.pacman.die();
-    self.game.state.start('Game');
+
+    var explosion = this.game.add.sprite(0, 0, 'boom');
+    explosion.anchor.setTo(0.5, 0.5);
+    explosion.x = self.pacman.x;
+    explosion.y = self.pacman.y;
+
+    var animation = explosion.animations.add('boom', [0,1,2,3,4], 10, false);
+    explosion.animations.play('boom');
+    animation.killOnComplete = true;
+    animation.onComplete.add(self.restart, self);
 }
 
+PacmanGame.prototype.restart = function () {
+    var self = this;
+    self.game.state.start('Game');
+}
 
 /*
  *PacmanGame.prototype.render = function () {
