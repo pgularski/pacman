@@ -22,8 +22,11 @@ var PacmanGame = function(game) {
     self.grid = null;
     self.layer = null;
     self.pacman = null;
+    // TODO: Make it a group.
     self.ghost = null;
     self.ghost2 = null;
+    self.ghost3 = null;
+    self.ghost4 = null;
 
     self.safetile = 1;
 
@@ -57,8 +60,10 @@ PacmanGame.prototype.create = function () {
     self.map.setCollisionByExclusion([self.safetile], true, self.layer);
 
     self.pacman = new Pacman(self, self.game, (12 * 32) + 16, (7 * 32) + 16);
-    self.ghost = new Ghost(self, self.game, (1 * 32) + 16, (1 * 32) + 16);
-    self.ghost2 = new Ghost(self, self.game, (1 * 32) + 16, (20 * 32) + 16);
+    self.ghost = new Ghost(self, self.game, (1 * 32) + 16, (1 * 32) + 16, StraightToThePointChasing);
+    self.ghost2 = new Ghost(self, self.game, (1 * 32) + 16, (20 * 32) + 16, SlightlyRandomizedChasing);
+    self.ghost3 = new Ghost(self, self.game, (20 * 32) + 16, (1 * 32) + 16, RandomizedChasing);
+    self.ghost4 = new Ghost(self, self.game, (20 * 32) + 16, (29 * 32) + 16, RandomizedChasing);
 
     self.cursors = self.game.input.keyboard.createCursorKeys();
     self.debugKey = self.game.input.keyboard.addKey(Phaser.Keyboard.D);
@@ -77,6 +82,8 @@ PacmanGame.prototype.update = function () {
     self.physics.arcade.collide(self.pacman, self.layer);
     self.physics.arcade.collide(self.ghost, self.layer);
     self.physics.arcade.collide(self.ghost2, self.layer);
+    self.physics.arcade.collide(self.ghost3, self.layer);
+    self.physics.arcade.collide(self.ghost4, self.layer);
 
     self.checkKeys();
 
