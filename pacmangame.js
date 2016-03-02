@@ -1,5 +1,4 @@
 // TODO: What are world, state and stage anyway?
-// TODO: Add explosions
 // TODO: Implement states => prepare for game/ game/ game over
 // TODO: Rename ``object'' parameters to ``sprite''
 // TODO: Replace storing of array elements as strings.
@@ -52,6 +51,7 @@ PacmanGame.prototype.preload = function () {
     self.load.spritesheet("pacman", "assets/pacman.png", 32, 32);
     self.load.spritesheet("ghost", "assets/ghost.png", 32, 32);
     self.load.spritesheet("boom", "assets/boom.png", 128, 128);
+    self.load.spritesheet("dot", "assets/dot.png", 8, 8);
     self.load.tilemap("map", "assets/map.json", null, Phaser.Tilemap.TILED_JSON);
 }
 
@@ -63,8 +63,23 @@ PacmanGame.prototype.create = function () {
     self.layer = self.map.createLayer("Tile Layer 1");
     self.map.setCollisionByExclusion([self.safetile], true, self.layer);
 
+    self.dots = self.add.group();
+    self.dots.enableBody = true;
+    for (var i = 0; i < self.map.width; i++) {
+        for (var j = 0; j < self.map.height; j++) {
+            var tile = self.map.getTile(i, j);
+            if (tile.index === self.safetile) {
+                self.dots.create(
+                        tile.x * tile.width + tile.width / 2 - 4,
+                        tile.y * tile.height + tile.height / 2 - 4,
+                        'dot');
+            }
+        }
+    }
+
+
     self.pacman = new Pacman(self, self.game, (12 * 32) + 16, (7 * 32) + 16);
-    self.ghosts = self.add.group()
+    self.ghosts = self.add.group();
 
     self.ghosts.add(new Ghost(self, self.game, (1 * 32) + 16, (1 * 32) + 16, StraightToThePointChasing));
     self.ghosts.add(new Ghost(self, self.game, (1 * 32) + 16, (20 * 32) + 16, SlightlyRandomizedChasing));
@@ -88,10 +103,15 @@ PacmanGame.prototype.update = function () {
     self.physics.arcade.collide(self.pacman, self.layer);
     //self.physics.arcade.collide(self.pacman, self.ghosts);
     self.physics.arcade.collide(self.ghosts, self.layer);
-    //self.game.physics.arcade.overlap(self.pacman, self.ghosts, self.pacman.die, null, this);
     self.game.physics.arcade.overlap(self.pacman, self.ghosts, self.onPacmanTouched, null, this);
+    self.game.physics.arcade.overlap(self.pacman, self.dots, self.onEat, null, this);
 
     self.checkKeys();
+};
+
+PacmanGame.prototype.onEat = function (pacman, dot) {
+    var self = this;
+    dot.kill();
 };
 
 PacmanGame.prototype.onPacmanTouched = function () {
