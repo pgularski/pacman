@@ -102,7 +102,7 @@ RandomizedChasing.prototype.chase = function (target) {
     var self = this;
     var ghost = self.ghost;
 
-    var virtualTarget = getRandomizedTargetTile(ghost, target, 20);
+    var virtualTarget = getRandomizedTargetTile(ghost, target, 30);
 
     if (ghost.checkpoints.length === 0 || ghost.game.isJunction(ghost.game.getObjectTile(ghost))
         || (ghost.body.deltaX() === 0 && ghost.body.deltaY() ===0)) {
