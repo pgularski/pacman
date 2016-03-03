@@ -35,6 +35,7 @@ Pacman = function (pacmanGameState, game, x, y) {
 
     self.threshold = 5;
     self.opposites = [ Phaser.NONE, Phaser.RIGHT, Phaser.LEFT, Phaser.DOWN, Phaser.UP ];
+
 };
 
 Pacman.prototype = Object.create(Phaser.Sprite.prototype);
