@@ -25,7 +25,7 @@ var PacmanGame = function(game) {
     self.pacman = null;
 
     self.ghosts = null;
-    self.ghost = null;
+    self.ghost1 = null;
     self.ghost2 = null;
     self.ghost3 = null;
     self.ghost4 = null;
@@ -82,18 +82,23 @@ PacmanGame.prototype.create = function () {
     self.pacman = new Pacman(self, self.game, (14 * 32) + 16, (23 * 32) + 16);
     self.ghosts = self.add.group();
 
-    self.ghosts.add(new Ghost(self, self.game, (1 * 32) + 16, (1 * 32) + 16, StraightToThePointChasing));
-    self.ghosts.add(new Ghost(self, self.game, (26 * 32) + 16, (1 * 32) + 16, SlightlyRandomizedChasing));
-    self.ghosts.add(new Ghost(self, self.game, (1 * 32) + 16, (29 * 32) + 16, RandomizedChasing));
-    self.ghosts.add(new Ghost(self, self.game, (26 * 32) + 16, (29 * 32) + 16, RandomizedChasing));
+    self.ghost1 = new Ghost(self, self.game, (1 * 32) + 16, (1 * 32) + 16, StraightToThePointChasing);
+    self.ghost2 = new Ghost(self, self.game, (26 * 32) + 16, (1 * 32) + 16, SlightlyRandomizedChasing);
+    self.ghost3 = new Ghost(self, self.game, (1 * 32) + 16, (29 * 32) + 16, RandomizedChasing);
+    self.ghost4 = new Ghost(self, self.game, (26 * 32) + 16, (29 * 32) + 16, RandomizedChasing);
+
+    self.ghosts.add(self.ghost1);
+    self.ghosts.add(self.ghost2);
+    self.ghosts.add(self.ghost3);
+    self.ghosts.add(self.ghost4);
 
     self.cursors = self.game.input.keyboard.createCursorKeys();
     self.debugKey = self.game.input.keyboard.addKey(Phaser.Keyboard.D);
     self.debugKey.isPressed = false;
 
-    //self.pacman.scale = 2;
-    //self.pacman.body.setSize(32, 32, (14 * 32) + 16, (23 * 32) + 16);
-    //self.pacman.body.reset(self.pacman.x, self.pacman.y);
+    //self.pacman.scale.x = 2;
+    //self.pacman.scale.y = 2;
+    //self.pacman.body.setSize(16, 16, 0, 0);
     self.pacman.move(Phaser.LEFT);
 
     // Trigger gameCreated to start tests.
@@ -107,10 +112,15 @@ PacmanGame.prototype.update = function () {
     self.physics.arcade.collide(self.pacman, self.layer);
     //self.physics.arcade.collide(self.pacman, self.ghosts);
     self.physics.arcade.collide(self.ghosts, self.layer);
-    self.game.physics.arcade.overlap(self.pacman, self.ghosts, self.onPacmanTouched, null, this);
+    //self.game.physics.arcade.overlap(self.pacman, self.ghosts, self.onPacmanTouched, null, this);
     self.game.physics.arcade.overlap(self.pacman, self.dots, self.onEat, null, this);
 
     self.game.world.wrap(self.pacman, 0);
+    // TODO: Fix it - I want to add groups to the wrap method.
+    self.game.world.wrap(self.ghost1, 0);
+    self.game.world.wrap(self.ghost2, 0);
+    self.game.world.wrap(self.ghost3, 0);
+    self.game.world.wrap(self.ghost4, 0);
 
     self.checkKeys();
 };
@@ -143,6 +153,9 @@ PacmanGame.prototype.restart = function () {
 /*
  *PacmanGame.prototype.render = function () {
  *    var self = this;
+ *    game.debug.bodyInfo(self.pacman, 32, 32);
+ *    game.debug.body(self.pacman);
+ *
  *    //for (var t = 1; t < 5; t++)
  *    //{
  *        //if (self.directions[t] === null)
@@ -170,8 +183,8 @@ PacmanGame.prototype.restart = function () {
  *    //self.game.debug.bodyInfo(self.pacman, 10, 20);
  *    //self.game.debug.bodyInfo(self.ghost, 10, 20);
  *}
+ *
  */
-
 // TODO: Extract to external plugin
 PacmanGame.prototype.getPointTile = function (point, nonNull) {
     var self = this;
@@ -180,7 +193,11 @@ PacmanGame.prototype.getPointTile = function (point, nonNull) {
     if (_point.x / self.map.tileWidth === self.map.width) {
         _point.x--;
     }
-    return self.map.getTileWorldXY(_point.x, _point.y, undefined, undefined, self.layer, nonNull);
+    var tile = self.map.getTileWorldXY(_point.x, _point.y, undefined, undefined, self.layer, nonNull);
+    if (!tile) {
+        console.log();
+    }
+    return tile
 };
 
 // TODO: Extract to external plugin
@@ -215,6 +232,9 @@ PacmanGame.prototype.isSafeTile = function (tile) {
 // TODO: Extract to external plugin
 PacmanGame.prototype.isJunction = function (tile) {
     var self = this;
+    if (!tile) {
+        return false;
+    }
     var directions = [null, null, null, null, null];
     var index = self.layer.index;
     var x = tile.x;
