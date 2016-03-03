@@ -34,6 +34,7 @@ var PacmanGame = function(game) {
 
     self.speed = 150;
     self.threshold = 5;
+    self.justTeleported = false;
 };
 
 PacmanGame.prototype.init = function () {
@@ -106,6 +107,8 @@ PacmanGame.prototype.update = function () {
     self.game.physics.arcade.overlap(self.pacman, self.ghosts, self.onPacmanTouched, null, this);
     self.game.physics.arcade.overlap(self.pacman, self.dots, self.onEat, null, this);
 
+    self.game.world.wrap(self.pacman, 0);
+
     self.checkKeys();
 };
 
@@ -167,9 +170,14 @@ PacmanGame.prototype.restart = function () {
  */
 
 // TODO: Extract to external plugin
-PacmanGame.prototype.getPointTile = function (point) {
+PacmanGame.prototype.getPointTile = function (point, nonNull) {
     var self = this;
-    return self.map.getTileWorldXY(point.x, point.y);
+    var _point = point;
+    // IF is needed because nonNull doesn't seem to work properly.
+    if (_point.x / self.map.tileWidth === self.map.width) {
+        _point.x--;
+    }
+    return self.map.getTileWorldXY(_point.x, _point.y, undefined, undefined, self.layer, nonNull);
 };
 
 // TODO: Extract to external plugin
@@ -181,10 +189,9 @@ PacmanGame.prototype.getPointTileXY = function (point) {
 };
 
 // TODO: Extract to external plugin and rename it.
-PacmanGame.prototype.getObjectTile = function (object) {
+PacmanGame.prototype.getObjectTile = function (object, nonNull) {
     var self = this;
-    var tile = self.getPointTile(object.position);
-    return tile;
+    return self.getPointTile(object.position, nonNull);
 };
 
 // TODO: Extract to external plugin
@@ -267,8 +274,8 @@ PacmanGame.prototype.getTileNeighbors = function (tile, passableOnly) {
     var passableNeighbors = [];
     var index = self.layer.index;
 
-    neighbors[Phaser.LEFT] = self.map.getTileLeft(index,   tile.x, tile.y);
-    neighbors[Phaser.RIGHT] = self.map.getTileRight(index, tile.x, tile.y);
+    neighbors[Phaser.LEFT] = self.map.getTileLeft(index,   tile.x, tile.y, true);
+    neighbors[Phaser.RIGHT] = self.map.getTileRight(index, tile.x, tile.y, true);
     neighbors[Phaser.UP] = self.map.getTileAbove(index,    tile.x, tile.y);
     neighbors[Phaser.DOWN] = self.map.getTileBelow(index,  tile.x, tile.y);
 

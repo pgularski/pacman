@@ -66,7 +66,7 @@ Pacman.prototype.update = function () {
     var self = this;
 
     self.marker = self.game.getObjectTileXY(self);
-    self.directions = self.game.getTileNeighbors(self.game.getObjectTile(self));
+    self.directions = self.game.getTileNeighbors(self.game.getObjectTile(self, true));
 
     if (self.turning !== Phaser.NONE)
     {
