@@ -201,9 +201,8 @@ Ghost.prototype.setDirection = function () {
 
 Ghost.prototype.updateCheckPoints = function (targetTile) {
     var self = this;
-    var path = self.game.findPathToTile(
-            self.game.getObjectTile(self, true),
-            targetTile);
+    var objectTile = self.game.getObjectTile(self, true);
+    var path = self.game.findPathToTile(objectTile, targetTile);
     var checkpoints = self.game.getTurnPointsFromPath(path);
     checkpoints = checkpoints.map(
         (function (point_array) {
