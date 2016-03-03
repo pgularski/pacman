@@ -79,19 +79,22 @@ PacmanGame.prototype.create = function () {
     }
 
 
-    self.pacman = new Pacman(self, self.game, (12 * 32) + 16, (7 * 32) + 16);
+    self.pacman = new Pacman(self, self.game, (14 * 32) + 16, (23 * 32) + 16);
     self.ghosts = self.add.group();
 
     self.ghosts.add(new Ghost(self, self.game, (1 * 32) + 16, (1 * 32) + 16, StraightToThePointChasing));
-    self.ghosts.add(new Ghost(self, self.game, (1 * 32) + 16, (20 * 32) + 16, SlightlyRandomizedChasing));
-    self.ghosts.add(new Ghost(self, self.game, (20 * 32) + 16, (1 * 32) + 16, RandomizedChasing));
-    self.ghosts.add(new Ghost(self, self.game, (20 * 32) + 16, (29 * 32) + 16, RandomizedChasing));
+    self.ghosts.add(new Ghost(self, self.game, (26 * 32) + 16, (1 * 32) + 16, SlightlyRandomizedChasing));
+    self.ghosts.add(new Ghost(self, self.game, (1 * 32) + 16, (29 * 32) + 16, RandomizedChasing));
+    self.ghosts.add(new Ghost(self, self.game, (26 * 32) + 16, (29 * 32) + 16, RandomizedChasing));
 
     self.cursors = self.game.input.keyboard.createCursorKeys();
     self.debugKey = self.game.input.keyboard.addKey(Phaser.Keyboard.D);
     self.debugKey.isPressed = false;
 
-    self.pacman.move(Phaser.RIGHT);
+    //self.pacman.scale = 2;
+    //self.pacman.body.setSize(32, 32, (14 * 32) + 16, (23 * 32) + 16);
+    //self.pacman.body.reset(self.pacman.x, self.pacman.y);
+    self.pacman.move(Phaser.LEFT);
 
     // Trigger gameCreated to start tests.
     // TODO: There's definitely some better way of doing that.

@@ -16,7 +16,7 @@ var getRandomizedTargetTile = function (ghost, target, factor) {
     if (virtualTarget && ghost.game.isSafeTile(virtualTarget)) {
         return virtualTarget;
     }
-    return ghost.game.getObjectTile(target);
+    return ghost.game.getObjectTile(target, true);
 };
 
 
@@ -29,9 +29,9 @@ StraightToThePointChasing.prototype.chase = function (target) {
     var self = this;
     var ghost = self.ghost;
 
-    if (ghost.checkpoints.length === 0 || ghost.game.isJunction(ghost.game.getObjectTile(ghost))
+    if (ghost.checkpoints.length === 0 || ghost.game.isJunction(ghost.game.getObjectTile(ghost, true))
         || (ghost.body.deltaX() === 0 && ghost.body.deltaY() ===0)) {
-        ghost.updateCheckPoints(ghost.game.getObjectTile(target));
+        ghost.updateCheckPoints(ghost.game.getObjectTile(target, true));
         ghost.currentCheckpoint = ghost.checkpoints.pop();
         ghost.currentCheckpointTile = ghost.map.getTile(
             ghost.currentCheckpoint.x, ghost.currentCheckpoint.y)
@@ -67,7 +67,7 @@ SlightlyRandomizedChasing.prototype.chase = function (target) {
 
     var virtualTarget = getRandomizedTargetTile(ghost, target, 10);
 
-    if (ghost.checkpoints.length === 0 || ghost.game.isJunction(ghost.game.getObjectTile(ghost))
+    if (ghost.checkpoints.length === 0 || ghost.game.isJunction(ghost.game.getObjectTile(ghost, true))
         || (ghost.body.deltaX() === 0 && ghost.body.deltaY() ===0)) {
         ghost.updateCheckPoints(virtualTarget);
         ghost.currentCheckpoint = ghost.checkpoints.pop();
@@ -105,7 +105,7 @@ RandomizedChasing.prototype.chase = function (target) {
 
     var virtualTarget = getRandomizedTargetTile(ghost, target, 30);
 
-    if (ghost.checkpoints.length === 0 || ghost.game.isJunction(ghost.game.getObjectTile(ghost))
+    if (ghost.checkpoints.length === 0 || ghost.game.isJunction(ghost.game.getObjectTile(ghost, true))
         || (ghost.body.deltaX() === 0 && ghost.body.deltaY() ===0)) {
         ghost.updateCheckPoints(virtualTarget);
         ghost.currentCheckpoint = ghost.checkpoints.pop();
@@ -202,7 +202,7 @@ Ghost.prototype.setDirection = function () {
 Ghost.prototype.updateCheckPoints = function (targetTile) {
     var self = this;
     var path = self.game.findPathToTile(
-            self.game.getObjectTile(self),
+            self.game.getObjectTile(self, true),
             targetTile);
     var checkpoints = self.game.getTurnPointsFromPath(path);
     checkpoints = checkpoints.map(
