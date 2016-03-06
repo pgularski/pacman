@@ -116,7 +116,7 @@ RandomizedChasing.prototype.chase = function (target) {
 
     if (distance <= ghost.MAX_DISTANCE) {
         ghost.currentCheckpoint = ghost.checkpoints.pop();
-        ghost.checkpoints.unshift(ghost.ghost.currentCheckpoint);
+        ghost.checkpoints.unshift(ghost.currentCheckpoint);
         ghost.setDirection();
     }
 };
@@ -152,6 +152,8 @@ Ghost = function (pacmanGameState, game, x, y, chasingStrategy, corner) {
     self.currentCheckpoint = new Phaser.Point();
     self.currentCheckpointTile = null;
     self.pathIterator = null;
+    self.goToTileCalled = false;
+    self.goToTileFinished = false;
 
     self.threshold = 5;
     self.MAX_DISTANCE = 3;
@@ -175,6 +177,10 @@ Ghost = function (pacmanGameState, game, x, y, chasingStrategy, corner) {
             self.cornerPath = [[1, 1], [6, 1], [6, 5], [1, 5]]
     }
 
+    //self.state = 'goToTile';
+    self.state = 'cruise';
+    self.counter = 0;
+
 };
 Ghost.prototype = Object.create(Phaser.Sprite.prototype);
 Ghost.prototype.constructor = Ghost;
@@ -191,13 +197,39 @@ Ghost.prototype.worldY = function () {
 
 Ghost.prototype.update = function () {
     var self = this;
+    self.counter++;
 
     /* Below depends on the state. Implement 'self.state.update();' */
     //self.chasingStrategy.chase(self.game.pacman);
     //self.cruise();
     //self.goHome();
     //self.flee();
-    self.goToTile(self.game.getPointXYTile(makePoint([2, 1])));
+    //self.goToTile(self.game.getPointXYTile(makePoint(self.cornerPath[0])));
+
+    switch (self.state) {
+        case 'goToTile':
+            self.goToTileCalled = false;
+            self.goToTile(self.game.getPointXYTile(makePoint(self.cornerPath[0])));
+            if (self.goToTileFinished) {
+                self.state = 'cruise';
+                self.counter = 0;
+            }
+            break;
+        case 'cruise':
+            self.cruise();
+            if (self.counter > 2e2) {
+                self.state = 'chase';
+                self.counter = 0;
+            }
+            break;
+        case 'chase':
+            self.chasingStrategy.chase(self.game.pacman);
+            if (self.counter > 6e2) {
+                self.state = 'goToTile';
+                self.counter = 0;
+            }
+            break;
+    }
 };
 
 
@@ -270,19 +302,30 @@ Ghost.prototype.isMoving = function () {
 Ghost.prototype.goToTile = function (targetTile) {
     var self = this;
 
-    if (self.checkpoints.length === 0 || self.game.isJunction(self.game.getObjectTile(self, true)) || !self.isMoving()) {
+    // TODO: Hooks methods?
+    // onStart
+    if (!self.goToTileCalled || !self.isMoving()) {
+        self.goToTileFinished = false;
+        self.goToTileCalled = true;
         self.updateCheckPoints(targetTile);
         self.currentCheckpoint = self.checkpoints.pop();
         self.currentCheckpointTile = self.map.getTile(
             self.currentCheckpoint.x, self.currentCheckpoint.y)
         self.setDirection();
     }
+
+    // in the middle
     var distance = self.game.math.distance(
             self.worldX(), self.worldY(),
             self.currentCheckpointTile.worldX, self.currentCheckpointTile.worldY);
 
     if (distance <= self.MAX_DISTANCE) {
         self.currentCheckpoint = self.checkpoints.pop();
+        // on finished
+        if (!self.currentCheckpoint) {
+            self.goToTileFinished = true;
+            console.log('Arrived to tile');
+        }
         self.setDirection();
     }
 };
