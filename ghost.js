@@ -324,7 +324,6 @@ Ghost.prototype.goToTile = function (targetTile) {
         // on finished
         if (!self.currentCheckpoint) {
             self.goToTileFinished = true;
-            console.log('Arrived to tile');
         }
         self.setDirection();
     }

@@ -109,7 +109,7 @@ PacmanGame.prototype.update = function () {
     self.physics.arcade.collide(self.pacman, self.layer);
     //self.physics.arcade.collide(self.pacman, self.ghosts);
     self.physics.arcade.collide(self.ghosts, self.layer);
-    //self.game.physics.arcade.overlap(self.pacman, self.ghosts, self.onPacmanTouched, null, this);
+    self.game.physics.arcade.overlap(self.pacman, self.ghosts, self.onPacmanTouched, null, this);
     self.game.physics.arcade.overlap(self.pacman, self.dots, self.onEat, null, this);
 
     self.game.world.wrap(self.pacman, 0);
@@ -191,9 +191,6 @@ PacmanGame.prototype.getPointTile = function (point, nonNull) {
         _point.x--;
     }
     var tile = self.map.getTileWorldXY(_point.x, _point.y, undefined, undefined, self.layer, nonNull);
-    if (!tile) {
-        console.log();
-    }
     return tile
 };
 
