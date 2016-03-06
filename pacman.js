@@ -14,7 +14,7 @@ Pacman = function (pacmanGameState, game, x, y) {
     self.animations.add("eat", [0, 1, 2, 1], 10, true);
     self.play("eat");
 
-    self.speed = 150;
+    self.speed = 180;
 
     self.game.physics.arcade.enable(self);
     self.body.setSize(32, 32, 0, 0);

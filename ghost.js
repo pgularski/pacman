@@ -140,7 +140,7 @@ Ghost = function (pacmanGameState, game, x, y, chasingStrategy, corner) {
 
     self.game.add.existing(self);
 
-    self.speed = 150;
+    self.speed = 180;
 
     self.destination = null;
     self.path = [];
