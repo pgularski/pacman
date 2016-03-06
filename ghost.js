@@ -37,19 +37,11 @@ StraightToThePointChasing.prototype.chase = function (target) {
         || (ghost.body.deltaX() === 0 && ghost.body.deltaY() ===0)) {
         ghost.updateCheckPoints(ghost.game.getObjectTile(target, true));
         ghost.currentCheckpoint = ghost.checkpoints.pop();
-        ghost.currentCheckpointTile = ghost.map.getTile(
-            ghost.currentCheckpoint.x, ghost.currentCheckpoint.y)
+        ghost.currentCheckpointTile = ghost.game.getPointXYTile(ghost.currentCheckpoint);
         ghost.setDirection();
     }
-    var x = ghost.x - (ghost.body.width * ghost.anchor.x);
-    var y = ghost.y - (ghost.body.height * ghost.anchor.y);
-
-    //var currentCheckpointPoint = new Phaser.Point(
-            //currentCheckpointTile.worldX, currentCheckpointTile.worldY);
-    //game.debug.geom(currentCheckpointPoint, '#ffff00');
-
     var distance = ghost.game.math.distance(
-            x, y,
+            ghost.worldX(), ghost.worldY(),
             ghost.currentCheckpointTile.worldX, ghost.currentCheckpointTile.worldY);
 
     if (distance <= ghost.MAX_DISTANCE) {
@@ -79,15 +71,8 @@ SlightlyRandomizedChasing.prototype.chase = function (target) {
             ghost.currentCheckpoint.x, ghost.currentCheckpoint.y)
         ghost.setDirection();
     }
-    var x = ghost.x - (ghost.body.width * ghost.anchor.x);
-    var y = ghost.y - (ghost.body.height * ghost.anchor.y);
-
-    //var currentCheckpointPoint = new Phaser.Point(
-            //currentCheckpointTile.worldX, currentCheckpointTile.worldY);
-    //game.debug.geom(currentCheckpointPoint, '#ffff00');
-
     var distance = ghost.game.math.distance(
-            x, y,
+            ghost.worldX(), ghost.worldY(),
             ghost.currentCheckpointTile.worldX, ghost.currentCheckpointTile.worldY);
 
     if (distance <= ghost.MAX_DISTANCE) {
@@ -137,7 +122,7 @@ RandomizedChasing.prototype.chase = function (target) {
 };
 
 
-Ghost = function (pacmanGameState, game, x, y, chasingStrategy) {
+Ghost = function (pacmanGameState, game, x, y, chasingStrategy, corner) {
     var self = this;
     Phaser.Sprite.call(self, game, x, y, 'ghost');
 
@@ -172,6 +157,24 @@ Ghost = function (pacmanGameState, game, x, y, chasingStrategy) {
     self.MAX_DISTANCE = 3;
 
     self.chasingStrategy = new chasingStrategy(self);
+
+    switch (corner) {
+        case 1:
+            self.cornerPath = [[1, 1], [6, 1], [6, 5], [1, 5]]
+            break;
+        case 2:
+            self.cornerPath = [[26, 1], [26, 5], [21, 5], [21, 1]]
+            break;
+        case 3:
+            self.cornerPath = [[1, 29], [1, 26], [6, 26], [6, 23], [9, 23], [9, 26], [12, 26], [12, 29]]
+            break;
+        case 4:
+            self.cornerPath = [[26, 29], [15, 29], [15, 26], [18, 26], [18, 23], [21, 23], [21, 26], [26, 26]]
+            break;
+        default:
+            self.cornerPath = [[1, 1], [6, 1], [6, 5], [1, 5]]
+    }
+
 };
 Ghost.prototype = Object.create(Phaser.Sprite.prototype);
 Ghost.prototype.constructor = Ghost;
@@ -191,10 +194,10 @@ Ghost.prototype.update = function () {
 
     /* Below depends on the state. Implement 'self.state.update();' */
     //self.chasingStrategy.chase(self.game.pacman);
-    var corner = 1;
-    self.cruise(corner);
+    //self.cruise();
     //self.goHome();
     //self.flee();
+    self.goToTile(self.game.getPointXYTile(makePoint([2, 1])));
 };
 
 
@@ -228,19 +231,16 @@ Ghost.prototype.updateCheckPoints = function (targetTile) {
     var checkpoints = self.game.getTurnPointsFromPath(path);
     checkpoints = checkpoints.map(makePoint);
     //checkpoints.unshift(self.game.getPointTileXY(target.position));
-    checkpoints.unshift(new Phaser.Point(targetTile.x, targetTile.y));
+    checkpoints.unshift(makePoint([targetTile.x, targetTile.y]));
     self.checkpoints = checkpoints;
 };
 
 // TODO: corner - Integer. Should be a property.
-Ghost.prototype.cruise = function (corner) {
+Ghost.prototype.cruise = function () {
     var self = this;
 
     if (!self.currentCheckpoint || !self.currentCheckpointTile){
-
-        // Set self.checkPoints depending on the corner.
-        // Points in corner 1.
-        var cornerPath = [[1, 1], [6, 1], [6, 5], [1, 5]]
+        var cornerPath = self.cornerPath;
         cornerPath = cornerPath.map(makePoint);
         self.pathIterator = itertools.cycle(cornerPath);
         self.currentCheckpoint = self.pathIterator.next();
@@ -252,10 +252,10 @@ Ghost.prototype.cruise = function (corner) {
             self.currentCheckpointTile.worldX, self.currentCheckpointTile.worldY);
 
     if (distance <= self.MAX_DISTANCE) {
-        self.game.alignToTile(self);
         self.currentCheckpoint = self.pathIterator.next();
         self.currentCheckpointTile = self.game.getPointXYTile(self.currentCheckpoint);
         self.updateCheckPoints(self.currentCheckpointTile);
+        self.game.alignToTile(self);
         self.setDirection();
     }
 };
@@ -265,3 +265,24 @@ Ghost.prototype.isMoving = function () {
     var self = this;
     return !(self.body.deltaX() === 0 && self.body.deltaY() === 0)
 }
+
+
+Ghost.prototype.goToTile = function (targetTile) {
+    var self = this;
+
+    if (self.checkpoints.length === 0 || self.game.isJunction(self.game.getObjectTile(self, true)) || !self.isMoving()) {
+        self.updateCheckPoints(targetTile);
+        self.currentCheckpoint = self.checkpoints.pop();
+        self.currentCheckpointTile = self.map.getTile(
+            self.currentCheckpoint.x, self.currentCheckpoint.y)
+        self.setDirection();
+    }
+    var distance = self.game.math.distance(
+            self.worldX(), self.worldY(),
+            self.currentCheckpointTile.worldX, self.currentCheckpointTile.worldY);
+
+    if (distance <= self.MAX_DISTANCE) {
+        self.currentCheckpoint = self.checkpoints.pop();
+        self.setDirection();
+    }
+};
