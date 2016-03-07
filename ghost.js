@@ -36,21 +36,11 @@ StraightToThePointChasing = function (ghost) {
 StraightToThePointChasing.prototype.chase = function (target) {
     var self = this;
     var ghost = self.ghost;
+    var currentTile = self.game.getObjectTile(ghost, true);
 
-    if (ghost.checkpoints.length === 0 || ghost.game.isJunction(ghost.game.getObjectTile(ghost, true))
-        || (ghost.body.deltaX() === 0 && ghost.body.deltaY() ===0)) {
-        ghost.updateCheckPoints(ghost.game.getObjectTile(target, true));
-        ghost.currentCheckpoint = ghost.checkpoints.pop();
-        ghost.currentCheckpointTile = ghost.game.getPointXYTile(ghost.currentCheckpoint);
-        ghost.setDirection();
-    }
-    var distance = ghost.game.math.distance(
-            ghost.worldX(), ghost.worldY(),
-            ghost.currentCheckpointTile.worldX, ghost.currentCheckpointTile.worldY);
-
-    if (distance <= ghost.MAX_DISTANCE) {
-        ghost.currentCheckpoint = ghost.checkpoints.pop();
-        ghost.setDirection();
+    if (!ghost.tileWalker.isGoingToTile || ghost.game.isJunction(currentTile)) {
+        var targetTile = ghost.game.getObjectTile(target);
+        self.ghost.tileWalker.goToTile(targetTile);
     }
 };
 
@@ -64,24 +54,11 @@ SlightlyRandomizedChasing = function (ghost) {
 SlightlyRandomizedChasing.prototype.chase = function (target) {
     var self = this;
     var ghost = self.ghost;
+    var RANDOMNESS_FACTOR = 10;
 
-    var virtualTarget = getRandomizedTargetTile(ghost, target, 10);
-
-    if (ghost.checkpoints.length === 0 || ghost.game.isJunction(ghost.game.getObjectTile(ghost, true))
-        || (ghost.body.deltaX() === 0 && ghost.body.deltaY() ===0)) {
-        ghost.updateCheckPoints(virtualTarget);
-        ghost.currentCheckpoint = ghost.checkpoints.pop();
-        ghost.currentCheckpointTile = ghost.map.getTile(
-            ghost.currentCheckpoint.x, ghost.currentCheckpoint.y)
-        ghost.setDirection();
-    }
-    var distance = ghost.game.math.distance(
-            ghost.worldX(), ghost.worldY(),
-            ghost.currentCheckpointTile.worldX, ghost.currentCheckpointTile.worldY);
-
-    if (distance <= ghost.MAX_DISTANCE) {
-        ghost.currentCheckpoint = ghost.checkpoints.pop();
-        ghost.setDirection();
+    if (!ghost.tileWalker.isGoingToTile || ghost.game.isJunction(currentTile)) {
+        var virtualTarget = getRandomizedTargetTile(ghost, target, RANDOMNESS_FACTOR);
+        self.ghost.tileWalker.goToTile(targetTile);
     }
 };
 
@@ -95,33 +72,12 @@ RandomizedChasing = function (ghost) {
 RandomizedChasing.prototype.chase = function (target) {
     var self = this;
     var ghost = self.ghost;
+    var RANDOMNESS_FACTOR = 30;
 
-    var virtualTarget = getRandomizedTargetTile(ghost, target, 30);
 
-    if (ghost.checkpoints.length === 0 || ghost.game.isJunction(ghost.game.getObjectTile(ghost, true))
-        || (ghost.body.deltaX() === 0 && ghost.body.deltaY() ===0)) {
-        ghost.updateCheckPoints(virtualTarget);
-        ghost.currentCheckpoint = ghost.checkpoints.pop();
-        ghost.checkpoints.unshift(ghost.currentCheckpoint);
-        ghost.currentCheckpointTile = ghost.map.getTile(
-            ghost.currentCheckpoint.x, ghost.currentCheckpoint.y)
-        ghost.setDirection();
-    }
-    var x = ghost.x - (ghost.body.width * ghost.anchor.x);
-    var y = ghost.y - (ghost.body.height * ghost.anchor.y);
-
-    //var currentCheckpointPoint = new Phaser.Point(
-            //currentCheckpointTile.worldX, currentCheckpointTile.worldY);
-    //game.debug.geom(currentCheckpointPoint, '#ffff00');
-
-    var distance = ghost.game.math.distance(
-            x, y,
-            ghost.currentCheckpointTile.worldX, ghost.currentCheckpointTile.worldY);
-
-    if (distance <= ghost.MAX_DISTANCE) {
-        ghost.currentCheckpoint = ghost.checkpoints.pop();
-        ghost.checkpoints.unshift(ghost.currentCheckpoint);
-        ghost.setDirection();
+    if (!ghost.tileWalker.isGoingToTile || ghost.game.isJunction(currentTile)) {
+        var virtualTarget = getRandomizedTargetTile(ghost, target, RANDOMNESS_FACTOR);
+        self.ghost.tileWalker.goToTile(targetTile);
     }
 };
 
@@ -236,38 +192,8 @@ Ghost.prototype.update = function () {
 };
 
 
-Ghost.prototype.updateCheckPoints = function (targetTile) {
-    var self = this;
-    var objectTile = self.game.getObjectTile(self, true);
-    var path = self.game.findPathToTile(objectTile, targetTile);
-    var checkpoints = self.game.getTurnPointsFromPath(path);
-    checkpoints = checkpoints.map(makePoint);
-    //checkpoints.unshift(self.game.getPointTileXY(target.position));
-    checkpoints.unshift(makePoint([targetTile.x, targetTile.y]));
-    self.checkpoints = checkpoints;
-};
-
 // TODO: corner - Integer. Should be a property.
 Ghost.prototype.cruise = function () {
     var self = this;
-
-    if (!self.currentCheckpoint || !self.currentCheckpointTile){
-        var cornerPath = self.cornerPath;
-        cornerPath = cornerPath.map(makePoint);
-        self.pathIterator = itertools.cycle(cornerPath);
-        self.currentCheckpoint = self.pathIterator.next();
-        self.currentCheckpointTile = self.game.getPointXYTile(self.currentCheckpoint);
-    }
-
-    var distance = self.game.math.distance(
-            self.worldX(), self.worldY(),
-            self.currentCheckpointTile.worldX, self.currentCheckpointTile.worldY);
-
-    if (distance <= self.MAX_DISTANCE) {
-        self.currentCheckpoint = self.pathIterator.next();
-        self.currentCheckpointTile = self.game.getPointXYTile(self.currentCheckpoint);
-        self.updateCheckPoints(self.currentCheckpointTile);
-        self.game.alignToTile(self);
-        self.setDirection();
-    }
+    self.tileWalker.patrol(self.cornerPath);
 };
