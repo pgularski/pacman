@@ -80,14 +80,14 @@ PacmanGame.prototype.create = function () {
     self.ghosts = self.add.group();
 
     self.ghost1 = new Ghost(self, self.game, (1 * 32) + 16, (1 * 32) + 16, StraightToThePointChasing, 1);
-    self.ghost2 = new Ghost(self, self.game, (26 * 32) + 16, (1 * 32) + 16, SlightlyRandomizedChasing, 2);
-    self.ghost3 = new Ghost(self, self.game, (1 * 32) + 16, (29 * 32) + 16, RandomizedChasing, 3);
-    self.ghost4 = new Ghost(self, self.game, (26 * 32) + 16, (29 * 32) + 16, RandomizedChasing, 4);
+    //self.ghost2 = new Ghost(self, self.game, (26 * 32) + 16, (1 * 32) + 16, SlightlyRandomizedChasing, 2);
+    //self.ghost3 = new Ghost(self, self.game, (1 * 32) + 16, (29 * 32) + 16, RandomizedChasing, 3);
+    //self.ghost4 = new Ghost(self, self.game, (26 * 32) + 16, (29 * 32) + 16, RandomizedChasing, 4);
 
     self.ghosts.add(self.ghost1);
-    self.ghosts.add(self.ghost2);
-    self.ghosts.add(self.ghost3);
-    self.ghosts.add(self.ghost4);
+    //self.ghosts.add(self.ghost2);
+    //self.ghosts.add(self.ghost3);
+    //self.ghosts.add(self.ghost4);
 
     self.cursors = self.game.input.keyboard.createCursorKeys();
     self.debugKey = self.game.input.keyboard.addKey(Phaser.Keyboard.D);
@@ -109,15 +109,15 @@ PacmanGame.prototype.update = function () {
     self.physics.arcade.collide(self.pacman, self.layer);
     //self.physics.arcade.collide(self.pacman, self.ghosts);
     self.physics.arcade.collide(self.ghosts, self.layer);
-    //self.game.physics.arcade.overlap(self.pacman, self.ghosts, self.onPacmanTouched, null, this);
+    self.game.physics.arcade.overlap(self.pacman, self.ghosts, self.onPacmanTouched, null, this);
     self.game.physics.arcade.overlap(self.pacman, self.dots, self.onEat, null, this);
 
     self.game.world.wrap(self.pacman, 0);
     // TODO: Fix it - I want to add groups to the wrap method.
     self.game.world.wrap(self.ghost1, 0);
-    self.game.world.wrap(self.ghost2, 0);
-    self.game.world.wrap(self.ghost3, 0);
-    self.game.world.wrap(self.ghost4, 0);
+    //self.game.world.wrap(self.ghost2, 0);
+    //self.game.world.wrap(self.ghost3, 0);
+    //self.game.world.wrap(self.ghost4, 0);
 
     self.checkKeys();
 };

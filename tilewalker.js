@@ -6,6 +6,7 @@ var TileWalker = function (object) {
     self.object = object;
     self.game = object.game;
     self.map = object.map;
+    // TODO: A duplicate of hasArrived?
     self.isGoingToTile = false; // TODO: Replace with self.hasTarget = false;
     self.hasArrived = false;
     // TODO: If it changes, clear the state as the new target is set.
@@ -14,6 +15,10 @@ var TileWalker = function (object) {
     self.currentCheckpoint = null;
     // FIXME: Get rid of that one, or merge somehow cuurentCheckpoint wit this one.
     self.currentCheckpointTile = null;
+    self.isPatroling = false;
+    self.pathIterator = null;
+
+    self.MAX_DISTANCE = 3;
 };
 
 TileWalker.prototype.goToTile = function (targetTile, callback, callback_arg) {
@@ -21,13 +26,20 @@ TileWalker.prototype.goToTile = function (targetTile, callback, callback_arg) {
 
     if (targetTile !== self.targetTile) {
         // TODO: Reset the path and everything!
+        self.hasArrived = false;
+        self.isGoingToTile = false;
+    }
+
+    if (self.hasArrived) {
+        return;
     }
 
     // TODO: Hook methods?
     // onStart
     if (!self.isGoingToTile || !self.isMoving()) {
-        self.goToTileFinished = false;
-        self.goToTileCalled = true;
+        self.isGoingToTile = true;
+        self.hasArrived = false;
+        self.targetTile = targetTile;
         self.updateCheckPoints(targetTile);
         self.currentCheckpoint = self.checkpoints.pop();
         self.currentCheckpointTile = self.map.getTile(
@@ -37,31 +49,44 @@ TileWalker.prototype.goToTile = function (targetTile, callback, callback_arg) {
 
     // in the middle
     var distance = self.game.math.distance(
-            self.worldX(), self.worldY(),
+            self.object.worldX(), self.object.worldY(),
             self.currentCheckpointTile.worldX, self.currentCheckpointTile.worldY);
 
     if (distance <= self.MAX_DISTANCE) {
         self.currentCheckpoint = self.checkpoints.pop();
+        self.game.alignToTile(self.object);
+
         // on finished
         if (!self.currentCheckpoint) {
-            self.goToTileFinished = true;
+            console.log('has arrived');
+            self.hasArrived = true;
+            self.isGoingToTile = false;
+
             if (callback) {
                 callback(callback_arg);
             }
+
+            self.object.body.velocity.setTo(0, 0);
         }
-        self.setDirection();
+        else {
+            self.setDirection();
+
+            self.currentCheckpointTile = self.map.getTile(
+                self.currentCheckpoint.x, self.currentCheckpoint.y)
+        }
     }
 };
 
 
 TileWalker.prototype.updateCheckPoints = function (targetTile) {
     var self = this;
-    var objectTile = self.game.getObjectTile(self, true);
+    var objectTile = self.game.getObjectTile(self.object);
     var path = self.game.findPathToTile(objectTile, targetTile);
     var checkpoints = self.game.getTurnPointsFromPath(path);
     checkpoints = checkpoints.map(makePoint);
     //checkpoints.unshift(self.game.getPointTileXY(target.position));
     checkpoints.unshift(makePoint([targetTile.x, targetTile.y]));
+    // TODO: Ceckpoints should be tiles;
     self.checkpoints = checkpoints;
 };
 
@@ -70,7 +95,7 @@ TileWalker.prototype.setDirection = function () {
     var self = this;
     var speed = self.object.speed;
 
-    var selfTileXY = self.game.getObjectTileXY(self)
+    var selfTileXY = self.game.getObjectTileXY(self.object)
     if (!self.currentCheckpoint) {
         return;
     }
@@ -90,7 +115,6 @@ TileWalker.prototype.setDirection = function () {
 };
 
 
-
 TileWalker.prototype.isMoving = function () {
     var self = this;
     return !(self.object.body.deltaX() === 0 && self.object.body.deltaY() === 0)
@@ -99,24 +123,8 @@ TileWalker.prototype.isMoving = function () {
 
 TileWalker.prototype.patrol = function (arrayOfTiles) {
     var self = this;
-
-    if (!self.currentCheckpoint || !self.currentCheckpointTile){
-        var cornerPath = self.cornerPath;
-        cornerPath = cornerPath.map(makePoint);
-        self.pathIterator = itertools.cycle(cornerPath);
-        self.currentCheckpoint = self.pathIterator.next();
-        self.currentCheckpointTile = self.game.getPointXYTile(self.currentCheckpoint);
+    if (!self.isPatroling) {
+        self.pathIterator = itertools.cycle(arrayOfTiles);
     }
-
-    var distance = self.game.math.distance(
-            self.worldX(), self.worldY(),
-            self.currentCheckpointTile.worldX, self.currentCheckpointTile.worldY);
-
-    if (distance <= self.MAX_DISTANCE) {
-        self.currentCheckpoint = self.pathIterator.next();
-        self.currentCheckpointTile = self.game.getPointXYTile(self.currentCheckpoint);
-        self.updateCheckPoints(self.currentCheckpointTile);
-        self.game.alignToTile(self);
-        self.setDirection();
-    }
+    self.goToTile(self.pathIterator.next());
 };
