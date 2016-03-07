@@ -8,6 +8,8 @@ var TileWalker = function (object) {
     self.map = object.map;
     self.isGoingToTile = false;
     self.hasArrived = false;
+    // TODO: If it changes, clear the state as the new target is set.
+    self.targetTile = null;
     self.checkpoints = [];
     self.currentCheckpoint = null;
     // FIXME: Get rid of that one, or merge somehow cuurentCheckpoint wit this one.
