@@ -209,11 +209,18 @@ Ghost.prototype.update = function () {
     switch (self.state) {
         case 'goToTile':
             self.goToTileCalled = false;
-            self.goToTile(self.game.getPointXYTile(makePoint(self.cornerPath[0])));
-            if (self.goToTileFinished) {
-                self.state = 'cruise';
-                self.counter = 0;
-            }
+            self.goToTile(self.game.getPointXYTile(makePoint(self.cornerPath[0])),
+                    (function(state){
+                        self.state=state;
+                        self.counter=0;
+                        console.log('state updated: ' + self.state);
+                    }), 'cruise'
+            );
+            //self.goToTile(self.game.getPointXYTile(makePoint(self.cornerPath[0])));
+            //if (self.goToTileFinished) {
+                //self.state = 'cruise';
+                //self.counter = 0;
+            //}
             break;
         case 'cruise':
             self.cruise();
@@ -299,7 +306,7 @@ Ghost.prototype.isMoving = function () {
 }
 
 
-Ghost.prototype.goToTile = function (targetTile) {
+Ghost.prototype.goToTile = function (targetTile, callback, callback_arg) {
     var self = this;
 
     // TODO: Hooks methods?
@@ -324,6 +331,9 @@ Ghost.prototype.goToTile = function (targetTile) {
         // on finished
         if (!self.currentCheckpoint) {
             self.goToTileFinished = true;
+            if (callback) {
+                callback(callback_arg);
+            }
         }
         self.setDirection();
     }
