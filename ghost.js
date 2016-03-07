@@ -209,7 +209,7 @@ Ghost.prototype.update = function () {
 
     switch (self.state) {
         case 'goToTile':
-            var tile = self.game.getPointXYTile(makePoint(self.cornerPath[0]);
+            var tile = self.game.getPointXYTile(makePoint(self.cornerPath[0]));
             self.tileWalker.goToTile(tile,
                     (function(state){
                         self.state=state;
