@@ -1,7 +1,9 @@
+// TODO: Move it somewhere else
 var makePoint = function (point_array) {
     return new Phaser.Point(point_array[0], point_array[1]);
 };
 
+// TODO: Move it somewhere else
 var randomize = function(number, range) {
     return (function(number){
         number -= Math.floor(Math.random() * range);
@@ -11,6 +13,7 @@ var randomize = function(number, range) {
 };
 
 
+// TODO: Move it somewhere else
 var getRandomizedTargetTile = function (ghost, target, factor) {
     var point = new Phaser.Point(
             randomize(target.x, ghost.width * factor),
@@ -24,6 +27,7 @@ var getRandomizedTargetTile = function (ghost, target, factor) {
 };
 
 
+// TODO: Tidy up the chasing algorithms. Remove duplicated code.
 StraightToThePointChasing = function (ghost) {
     var self = this;
     self.ghost = ghost;
@@ -303,13 +307,16 @@ Ghost.prototype.cruise = function () {
 Ghost.prototype.isMoving = function () {
     var self = this;
     return !(self.body.deltaX() === 0 && self.body.deltaY() === 0)
-}
+};
 
 
+// TODO: Maybe Crazy idea: Instead of polluting Ghost class with flags, have a
+// TileWalker object that stores the walking state and goToTile() in that
+// object. Would have also hasArrived() and similar methods.
 Ghost.prototype.goToTile = function (targetTile, callback, callback_arg) {
     var self = this;
 
-    // TODO: Hooks methods?
+    // TODO: Hook methods?
     // onStart
     if (!self.goToTileCalled || !self.isMoving()) {
         self.goToTileFinished = false;
