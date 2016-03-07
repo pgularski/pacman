@@ -6,7 +6,7 @@ var TileWalker = function (object) {
     self.object = object;
     self.game = object.game;
     self.map = object.map;
-    self.isGoingToTile = false;
+    self.isGoingToTile = false; // TODO: Replace with self.hasTarget = false;
     self.hasArrived = false;
     // TODO: If it changes, clear the state as the new target is set.
     self.targetTile = null;
@@ -18,6 +18,10 @@ var TileWalker = function (object) {
 
 TileWalker.prototype.goToTile = function (targetTile, callback, callback_arg) {
     var self = this;
+
+    if (targetTile !== self.targetTile) {
+        // TODO: Reset the path and everything!
+    }
 
     // TODO: Hook methods?
     // onStart
