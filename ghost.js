@@ -27,6 +27,60 @@ var getRandomizedTargetTile = function (ghost, target, factor) {
 };
 
 
+var TileWalker = function (object) {
+    var self = this;
+    self.object = object;
+    self.game = object.game;
+    self.map = object.map;
+    self.isGoingToTile = false;
+    self.hasArrived = false;
+    self.checkpoints = [];
+    self.currentCheckpoint = null;
+    // FIXME: Get rid of that one, or merge somehow cuurentCheckpoint wit this one.
+    self.currentCheckpointTile = null;
+};
+
+TileWalker.prototype.goToTile = function (targetTile, callback, callback_arg) {
+    var self = this;
+
+    // TODO: Hook methods?
+    // onStart
+    if (!self.isGoingToTile || !self.isMoving()) {
+        self.goToTileFinished = false;
+        self.goToTileCalled = true;
+        self.updateCheckPoints(targetTile);
+        self.currentCheckpoint = self.checkpoints.pop();
+        self.currentCheckpointTile = self.map.getTile(
+            self.currentCheckpoint.x, self.currentCheckpoint.y)
+        self.setDirection();
+    }
+
+    // in the middle
+    var distance = self.game.math.distance(
+            self.worldX(), self.worldY(),
+            self.currentCheckpointTile.worldX, self.currentCheckpointTile.worldY);
+
+    if (distance <= self.MAX_DISTANCE) {
+        self.currentCheckpoint = self.checkpoints.pop();
+        // on finished
+        if (!self.currentCheckpoint) {
+            self.goToTileFinished = true;
+            if (callback) {
+                callback(callback_arg);
+            }
+        }
+        self.setDirection();
+    }
+};
+
+TileWalker.prototype.isMoving = function () {
+    var self = this;
+    return !(self.object.body.deltaX() === 0 && self.object.body.deltaY() === 0)
+};
+
+
+
+
 // TODO: Tidy up the chasing algorithms. Remove duplicated code.
 StraightToThePointChasing = function (ghost) {
     var self = this;
@@ -301,12 +355,6 @@ Ghost.prototype.cruise = function () {
         self.game.alignToTile(self);
         self.setDirection();
     }
-};
-
-
-Ghost.prototype.isMoving = function () {
-    var self = this;
-    return !(self.body.deltaX() === 0 && self.body.deltaY() === 0)
 };
 
 
