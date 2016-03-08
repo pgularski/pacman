@@ -39,33 +39,34 @@ StraightToThePointChasing = function (ghost) {
     self.justAligned = false;
 };
 
-StraightToThePointChasing.prototype.chase = function (target) {
+// TODO: Rename this method as it does more than just a check.
+StraightToThePointChasing.prototype.isPathUpdateNeeded = function () {
     var self = this;
     var ghost = self.ghost;
     var currentTile = self.game.getObjectTile(ghost, true);
-
-    //if (!ghost.tileWalker.isGoingToTile || ghost.game.isJunction(currentTile)) {
-    //if (!ghost.tileWalker.isGoingToTile || ghost.game.isJunction(currentTile)
-            //|| !self.ghost.isMoving()) {
-        //self.targetTile = ghost.game.getObjectTile(target);
-    //}
-    //if (!self.targetTile || ghost.game.isJunction(currentTile) || !self.ghost.isMoving()) {
-        //self.targetTile = ghost.game.getObjectTile(target);
-    //}
 
     var distance = self.game.math.distance(
             self.ghost.worldX(), self.ghost.worldY(),
             currentTile.worldX, currentTile.worldY);
 
-    //if (!self.targetTile || self.justEnteredJunction()) {
     if (!self.game.isJunction(currentTile)) {
         self.justAligned = false;
     }
 
     if (!self.targetTile || !self.ghost.isMoving() ||
             (!self.justAligned & self.game.isJunction(currentTile) && distance <= self.MAX_DISTANCE)) {
-        self.game.alignToTile(ghost);
         self.justAligned = true;
+        return true;
+    }
+    return false;
+};
+
+StraightToThePointChasing.prototype.chase = function (target) {
+    var self = this;
+    var ghost = self.ghost;
+
+    if (self.isPathUpdateNeeded()) {
+        self.game.alignToTile(ghost);
         self.targetTile = ghost.game.getObjectTile(target);
     }
     self.ghost.tileWalker.goToTile(self.targetTile);
