@@ -33,6 +33,10 @@ StraightToThePointChasing = function (ghost) {
     self.ghost = ghost;
     self.game = ghost.game;
     self.targetTile = null;
+    self.junctionEntered = false;
+    self.junctionLeft = false;
+    self.MAX_DISTANCE = 3;
+    self.justAligned = false;
 };
 
 StraightToThePointChasing.prototype.chase = function (target) {
@@ -41,12 +45,42 @@ StraightToThePointChasing.prototype.chase = function (target) {
     var currentTile = self.game.getObjectTile(ghost, true);
 
     //if (!ghost.tileWalker.isGoingToTile || ghost.game.isJunction(currentTile)) {
-    if (!ghost.tileWalker.isGoingToTile || ghost.game.isJunction(currentTile)
-            || !self.ghost.isMoving()) {
+    //if (!ghost.tileWalker.isGoingToTile || ghost.game.isJunction(currentTile)
+            //|| !self.ghost.isMoving()) {
+        //self.targetTile = ghost.game.getObjectTile(target);
+    //}
+    //if (!self.targetTile || ghost.game.isJunction(currentTile) || !self.ghost.isMoving()) {
+        //self.targetTile = ghost.game.getObjectTile(target);
+    //}
+
+    var distance = self.game.math.distance(
+            self.ghost.worldX(), self.ghost.worldY(),
+            currentTile.worldX, currentTile.worldY);
+
+    //if (!self.targetTile || self.justEnteredJunction()) {
+    if (!self.game.isJunction(currentTile)) {
+        self.justAligned = false;
+    }
+
+    if (!self.targetTile || !self.ghost.isMoving() ||
+            (!self.justAligned & self.game.isJunction(currentTile) && distance <= self.MAX_DISTANCE)) {
+        self.game.alignToTile(ghost);
+        self.justAligned = true;
         self.targetTile = ghost.game.getObjectTile(target);
     }
     self.ghost.tileWalker.goToTile(self.targetTile);
+
 };
+
+StraightToThePointChasing.prototype.justEnteredJunction = function () {
+    var self = this;
+    var currentTile = self.game.getObjectTile(self.ghost, true);
+    if (!self.junctionEntered && self.game.isJunction(currentTile)) {
+        self.junctionEntered = true;
+        return true;
+    }
+    return false;
+}
 
 
 SlightlyRandomizedChasing = function (ghost) {
@@ -162,29 +196,30 @@ Ghost.prototype.worldY = function () {
 Ghost.prototype.isMoving = function () {
     var self = this;
     return self.tileWalker.isMoving();
-}
+};
+
 
 Ghost.prototype.update = function () {
     var self = this;
     self.counter++;
 
     /* Below depends on the state. Implement 'self.state.update();' */
-    //self.chasingStrategy.chase(self.game.pacman);
+    self.chasingStrategy.chase(self.game.pacman);
     //self.cruise();
     //self.goHome();
     //self.flee();
     //self.goToTile(self.game.getPointXYTile(makePoint(self.cornerPath[0])));
 
     //var tile = self.game.getPointXYTile(makePoint(self.cornerPath[1]));
-    if (!self.tile) {
-        var tile = self.game.getPointXYTile(makePoint([26, 29]));
-    }
-    else{
-        var tile = self.tile;
-    }
-    self.tileWalker.goToTile(tile, (function(){
-        self.tile = self.game.getPointXYTile(makePoint([1,1]));
-    }));
+    //if (!self.tile) {
+        //var tile = self.game.getPointXYTile(makePoint([26, 29]));
+    //}
+    //else{
+        //var tile = self.tile;
+    //}
+    //self.tileWalker.goToTile(tile, (function(){
+        //self.tile = self.game.getPointXYTile(makePoint([1,1]));
+    //}));
 
     /*
      *switch (self.state) {
