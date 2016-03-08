@@ -26,9 +26,7 @@ var getRandomizedTargetTile = function (ghost, target, factor) {
     return ghost.game.getObjectTile(target, true);
 };
 
-
-// TODO: Tidy up the chasing algorithms. Remove duplicated code.
-StraightToThePointChasing = function (ghost) {
+ChasingStrategy = function (ghost) {
     var self = this;
     self.ghost = ghost;
     self.game = ghost.game;
@@ -37,10 +35,10 @@ StraightToThePointChasing = function (ghost) {
     self.junctionLeft = false;
     self.MAX_DISTANCE = 3;
     self.justAligned = false;
-};
+}
 
 // TODO: Rename this method as it does more than just a check.
-StraightToThePointChasing.prototype.isPathUpdateNeeded = function () {
+ChasingStrategy.prototype.isPathUpdateNeeded = function () {
     var self = this;
     var ghost = self.ghost;
     var currentTile = self.game.getObjectTile(ghost, true);
@@ -61,6 +59,15 @@ StraightToThePointChasing.prototype.isPathUpdateNeeded = function () {
     return false;
 };
 
+
+// TODO: Tidy up the chasing algorithms. Remove duplicated code.
+StraightToThePointChasing = function (ghost) {
+    var self = this;
+    ChasingStrategy.call(self, ghost);
+};
+StraightToThePointChasing.prototype = Object.create(ChasingStrategy.prototype);
+StraightToThePointChasing.prototype.constructor = StraightToThePointChasing;
+
 StraightToThePointChasing.prototype.chase = function (target) {
     var self = this;
     var ghost = self.ghost;
@@ -73,32 +80,22 @@ StraightToThePointChasing.prototype.chase = function (target) {
 
 };
 
-StraightToThePointChasing.prototype.justEnteredJunction = function () {
-    var self = this;
-    var currentTile = self.game.getObjectTile(self.ghost, true);
-    if (!self.junctionEntered && self.game.isJunction(currentTile)) {
-        self.junctionEntered = true;
-        return true;
-    }
-    return false;
-}
-
 
 SlightlyRandomizedChasing = function (ghost) {
     var self = this;
-    self.ghost = ghost;
-    self.game = ghost.game;
-    self.targetTile = null;
+    ChasingStrategy.call(self, ghost);
 };
+SlightlyRandomizedChasing.prototype = Object.create(ChasingStrategy.prototype);
+SlightlyRandomizedChasing.prototype.constructor = SlightlyRandomizedChasing;
 
 
 SlightlyRandomizedChasing.prototype.chase = function (target) {
     var self = this;
     var ghost = self.ghost;
     var RANDOMNESS_FACTOR = 10;
-    var currentTile = self.game.getObjectTile(ghost, true);
 
-    if (!self.targetTile || !ghost.tileWalker.isGoingToTile || ghost.game.isJunction(currentTile)) {
+    if (self.isPathUpdateNeeded()) {
+        self.game.alignToTile(ghost);
         self.targetTile = getRandomizedTargetTile(ghost, target, RANDOMNESS_FACTOR);
     }
     self.ghost.tileWalker.goToTile(self.targetTile);
@@ -107,24 +104,22 @@ SlightlyRandomizedChasing.prototype.chase = function (target) {
 
 RandomizedChasing = function (ghost) {
     var self = this;
-    self.ghost = ghost;
-    self.game = ghost.game;
-    self.targetTile = null;
+    ChasingStrategy.call(self, ghost);
 };
-
+RandomizedChasing.prototype = Object.create(ChasingStrategy.prototype);
+RandomizedChasing.prototype.constructor = RandomizedChasing;
 
 RandomizedChasing.prototype.chase = function (target) {
     var self = this;
     var ghost = self.ghost;
     var RANDOMNESS_FACTOR = 30;
-    var currentTile = self.game.getObjectTile(ghost, true);
 
-    if (!self.targetTile || !ghost.tileWalker.isGoingToTile || ghost.game.isJunction(currentTile)) {
+    if (self.isPathUpdateNeeded()) {
+        self.game.alignToTile(ghost);
         self.targetTile = getRandomizedTargetTile(ghost, target, RANDOMNESS_FACTOR);
     }
     self.ghost.tileWalker.goToTile(self.targetTile);
 };
-
 
 Ghost = function (pacmanGameState, game, x, y, chasingStrategy, corner) {
     var self = this;
