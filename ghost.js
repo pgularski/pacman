@@ -154,19 +154,19 @@ Ghost = function (pacmanGameState, game, x, y, chasingStrategy, corner) {
 
     switch (corner) {
         case 1:
-            self.cornerPath = [[1, 1], [6, 1], [6, 5], [1, 5]]
+            self.cornerPath = [[1, 1], [6, 1], [6, 5], [1, 5]].map(self.updateOffset.bind(self));
             break;
         case 2:
-            self.cornerPath = [[26, 1], [26, 5], [21, 5], [21, 1]]
+            self.cornerPath = [[26, 1], [26, 5], [21, 5], [21, 1]].map(self.updateOffset.bind(self));
             break;
         case 3:
-            self.cornerPath = [[1, 29], [1, 26], [6, 26], [6, 23], [9, 23], [9, 26], [12, 26], [12, 29]]
+            self.cornerPath = [[1, 29], [1, 26], [6, 26], [6, 23], [9, 23], [9, 26], [12, 26], [12, 29]].map(self.updateOffset.bind(self));
             break;
         case 4:
-            self.cornerPath = [[26, 29], [15, 29], [15, 26], [18, 26], [18, 23], [21, 23], [21, 26], [26, 26]]
+            self.cornerPath = [[26, 29], [15, 29], [15, 26], [18, 26], [18, 23], [21, 23], [21, 26], [26, 26]].map(self.updateOffset.bind(self));
             break;
         default:
-            self.cornerPath = [[1, 1], [6, 1], [6, 5], [1, 5]]
+            self.cornerPath = [[1, 1], [6, 1], [6, 5], [1, 5]].map(self.updateOffset.bind(self));
     }
 
     //self.state = 'goToTile';
@@ -178,6 +178,11 @@ Ghost = function (pacmanGameState, game, x, y, chasingStrategy, corner) {
 };
 Ghost.prototype = Object.create(Phaser.Sprite.prototype);
 Ghost.prototype.constructor = Ghost;
+
+Ghost.prototype.updateOffset = function (point_array) {
+    var self = this;
+    return [point_array[0], point_array[1] + self.game.Y_OFFSET / self.map.tileHeight];
+};
 
 Ghost.prototype.worldX = function () {
     var self = this;
