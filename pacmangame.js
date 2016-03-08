@@ -32,6 +32,8 @@ var PacmanGame = function(game) {
     self.speed = 150;
     self.threshold = 5;
     self.justTeleported = false;
+
+    self.Y_OFFSET = 4 * 32;
 };
 
 PacmanGame.prototype.init = function () {
@@ -71,13 +73,13 @@ PacmanGame.prototype.create = function () {
 
     self.camera.y = 100;
 
-    self.pacman = new Pacman(self, self.game, (14 * 32) + 16, (23 * 32) + 16);
+    self.pacman = new Pacman(self, self.game, (14 * 32) + 16, ((23 * 32) + 16) + self.Y_OFFSET);
     self.ghosts = self.add.group();
 
-    self.ghost1 = new Ghost(self, self.game, (1 * 32) + 16, (1 * 32) + 16, StraightToThePointChasing, 1);
-    self.ghost2 = new Ghost(self, self.game, (26 * 32) + 16, (1 * 32) + 16, SlightlyRandomizedChasing, 2);
-    self.ghost3 = new Ghost(self, self.game, (1 * 32) + 16, (29 * 32) + 16, RandomizedChasing, 3);
-    self.ghost4 = new Ghost(self, self.game, (26 * 32) + 16, (29 * 32) + 16, RandomizedChasing, 4);
+    self.ghost1 = new Ghost(self, self.game, (1 * 32) + 16,  ((1 * 32)  + 16) + self.Y_OFFSET, StraightToThePointChasing, 1);
+    self.ghost2 = new Ghost(self, self.game, (26 * 32) + 16, ((1 * 32)  + 16) + self.Y_OFFSET, SlightlyRandomizedChasing, 2);
+    self.ghost3 = new Ghost(self, self.game, (1 * 32) + 16,  ((29 * 32) + 16) + self.Y_OFFSET, RandomizedChasing, 3);
+    self.ghost4 = new Ghost(self, self.game, (26 * 32) + 16, ((29 * 32) + 16) + self.Y_OFFSET, RandomizedChasing, 4);
 
     self.ghosts.add(self.ghost1);
     self.ghosts.add(self.ghost2);
