@@ -28,7 +28,7 @@
      inkscape:pageshadow="2"
      inkscape:zoom="0.70710678"
      inkscape:cx="447.1427"
-     inkscape:cy="412.52796"
+     inkscape:cy="186.25379"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -447,6 +447,26 @@
        id="path4184-4"
        cx="660.43774"
        cy="478.1915"
+       r="17.092859"
+       inkscape:export-xdpi="22.610001"
+       inkscape:export-ydpi="22.610001" />
+    <rect
+       inkscape:tile-y0="413.83817"
+       inkscape:tile-x0="193.54546"
+       ry="0"
+       y="871.80493"
+       x="194.2093"
+       height="126.35514"
+       width="126.35514"
+       id="use4165-4-6"
+       style="fill:#1c241f;fill-opacity:0;stroke:none;stroke-opacity:1"
+       inkscape:export-xdpi="22.610001"
+       inkscape:export-ydpi="22.610001" />
+    <circle
+       style="opacity:0.87000002;fill:#ffff00;fill-opacity:1;stroke:#000000;stroke-width:0.75540483;stroke-opacity:1"
+       id="path4184-3"
+       cx="257.38687"
+       cy="934.98248"
        r="17.092859"
        inkscape:export-xdpi="22.610001"
        inkscape:export-ydpi="22.610001" />

@@ -49,7 +49,7 @@ PacmanGame.prototype.preload = function () {
     self.load.spritesheet("pacman", "assets/pacman.png", 32, 32);
     self.load.spritesheet("ghost", "assets/ghost.png", 32, 32);
     self.load.spritesheet("boom", "assets/boom.png", 128, 128);
-    self.load.spritesheet("dot", "assets/dot.png", 8, 8);
+    self.load.spritesheet("dot", "assets/dot_tile.png", 32, 32);
     self.load.tilemap("map", "assets/map.json", null, Phaser.Tilemap.TILED_JSON);
 }
 
@@ -58,23 +58,18 @@ PacmanGame.prototype.create = function () {
     self.map = self.add.tilemap("map");
     self.map.addTilesetImage("tiles");
     // Display the layer from the map.json file. The name as in the json file.
-    self.layer = self.map.createLayer("Tile Layer 1");
+    self.layer = self.map.createLayer('Layer1');
     self.map.setCollisionByExclusion([self.safetile], true, self.layer);
+    //self.layer.fixedToCamera = false;
+    //self.layer.anchor.setTo(0.5);
+    //self.layer.position.set(0, 128);
 
     self.dots = self.add.group();
     self.dots.enableBody = true;
-    for (var i = 0; i < self.map.width; i++) {
-        for (var j = 0; j < self.map.height; j++) {
-            var tile = self.map.getTile(i, j);
-            if (tile.index === self.safetile) {
-                self.dots.create(
-                        tile.x * tile.width + tile.width / 2 - 4,
-                        tile.y * tile.height + tile.height / 2 - 4,
-                        'dot');
-            }
-        }
-    }
+    self.map.createFromObjects('Objects', 4, 'dot', 0, true, false, self.dots);
+    self.dots.callAll('body.setSize', 'body', 8, 8, 12, 12);
 
+    self.camera.y = 100;
 
     self.pacman = new Pacman(self, self.game, (14 * 32) + 16, (23 * 32) + 16);
     self.ghosts = self.add.group();
@@ -150,8 +145,11 @@ PacmanGame.prototype.restart = function () {
 /*
  *PacmanGame.prototype.render = function () {
  *    var self = this;
- *    game.debug.bodyInfo(self.pacman, 32, 32);
- *    game.debug.body(self.pacman);
+ *    //game.debug.bodyInfo(self.pacman, 32, 32);
+ *    //game.debug.body(self.pacman);
+ *
+ *    //game.debug.bodyInfo(self.dots, 32, 32);
+ *    //game.debug.body(self.dots);
  *
  *    //for (var t = 1; t < 5; t++)
  *    //{
@@ -180,8 +178,8 @@ PacmanGame.prototype.restart = function () {
  *    //self.game.debug.bodyInfo(self.pacman, 10, 20);
  *    //self.game.debug.bodyInfo(self.ghost, 10, 20);
  *}
- *
  */
+
 // TODO: Extract to external plugin
 PacmanGame.prototype.getPointTile = function (point, nonNull) {
     var self = this;
@@ -393,5 +391,5 @@ PacmanGame.prototype.getTurnPointsFromPath = function (path) {
     return turnPoints;
 }
 
-var game = new Phaser.Game(28 * 32, 31 * 32, Phaser.AUTO, "game");
+var game = new Phaser.Game(28 * 32, 37 * 32, Phaser.AUTO, "game");
 game.state.add("Game", PacmanGame, true);
