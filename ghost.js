@@ -205,11 +205,11 @@ Ghost.prototype.update = function () {
     self.counter++;
 
     /* Below depends on the state. Implement 'self.state.update();' */
-    self.chasingStrategy.chase(self.game.pacman);
+    //self.chasingStrategy.chase(self.game.pacman);
     //self.cruise();
     //self.goHome();
     //self.flee();
-    //self.goToTile(self.game.getPointXYTile(makePoint(self.cornerPath[0])));
+    //self.tileWalker.goToTile(self.game.getPointXYTile(makePoint(self.cornerPath[0])));
 
     //var tile = self.game.getPointXYTile(makePoint(self.cornerPath[1]));
     //if (!self.tile) {
@@ -222,39 +222,41 @@ Ghost.prototype.update = function () {
         //self.tile = self.game.getPointXYTile(makePoint([1,1]));
     //}));
 
-    /*
-     *switch (self.state) {
-     *    case 'goToTile':
-     *        var tile = self.game.getPointXYTile(makePoint(self.cornerPath[0]));
-     *        self.tileWalker.goToTile(tile,
-     *                (function(state){
-     *                    self.state=state;
-     *                    self.counter=0;
-     *                    console.log('state updated: ' + self.state);
-     *                }), 'cruise'
-     *        );
-     *        break;
-     *    case 'cruise':
-     *        self.cruise();
-     *        if (self.counter > 2e2) {
-     *            self.state = 'chase';
-     *            self.counter = 0;
-     *        }
-     *        break;
-     *    case 'chase':
-     *        self.chasingStrategy.chase(self.game.pacman);
-     *        if (self.counter > 6e2) {
-     *            self.state = 'goToTile';
-     *            self.counter = 0;
-     *        }
-     *        break;
-     *}
-     */
+    switch (self.state) {
+        case 'goToTile':
+            var tile = self.game.getPointXYTile(makePoint(self.cornerPath[0]));
+            self.tileWalker.goToTile(tile,
+                    (function(state){
+                        self.state=state;
+                        self.counter=0;
+                        console.log('state updated: ' + self.state);
+                    }), 'cruise'
+            );
+            break;
+        case 'cruise':
+            self.cruise();
+            if (self.counter > 2e2) {
+                self.state = 'chase';
+                self.counter = 0;
+            }
+            break;
+        case 'chase':
+            self.chasingStrategy.chase(self.game.pacman);
+            if (self.counter > 6e2) {
+                self.state = 'goToTile';
+                self.counter = 0;
+            }
+            break;
+    }
 };
 
 
 // TODO: corner - Integer. Should be a property.
 Ghost.prototype.cruise = function () {
     var self = this;
-    self.tileWalker.patrol(self.cornerPath);
+    var path = self.cornerPath.map((function(point_array){
+            return self.game.getPointXYTile(makePoint(point_array));
+        })
+    );
+    self.tileWalker.patrol(path);
 };
