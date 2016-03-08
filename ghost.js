@@ -154,20 +154,21 @@ Ghost = function (pacmanGameState, game, x, y, chasingStrategy, corner) {
 
     switch (corner) {
         case 1:
-            self.cornerPath = [[1, 1], [6, 1], [6, 5], [1, 5]].map(self.updateOffset.bind(self));
+            self.cornerPath = [[1, 1], [6, 1], [6, 5], [1, 5]];
             break;
         case 2:
-            self.cornerPath = [[26, 1], [26, 5], [21, 5], [21, 1]].map(self.updateOffset.bind(self));
+            self.cornerPath = [[26, 1], [26, 5], [21, 5], [21, 1]];
             break;
         case 3:
-            self.cornerPath = [[1, 29], [1, 26], [6, 26], [6, 23], [9, 23], [9, 26], [12, 26], [12, 29]].map(self.updateOffset.bind(self));
+            self.cornerPath = [[1, 29], [1, 26], [6, 26], [6, 23], [9, 23], [9, 26], [12, 26], [12, 29]];
             break;
         case 4:
-            self.cornerPath = [[26, 29], [15, 29], [15, 26], [18, 26], [18, 23], [21, 23], [21, 26], [26, 26]].map(self.updateOffset.bind(self));
+            self.cornerPath = [[26, 29], [15, 29], [15, 26], [18, 26], [18, 23], [21, 23], [21, 26], [26, 26]];
             break;
         default:
-            self.cornerPath = [[1, 1], [6, 1], [6, 5], [1, 5]].map(self.updateOffset.bind(self));
+            self.cornerPath = [[1, 1], [6, 1], [6, 5], [1, 5]];
     }
+    self.cornerPath = self.cornerPath.map(self.updateOffset.bind(self));
 
     //self.state = 'goToTile';
     self.state = 'cruise';
