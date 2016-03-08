@@ -128,5 +128,11 @@ TileWalker.prototype.patrol = function (arrayOfTiles) {
         self.pathIterator = itertools.cycle(arrayOfTiles);
         self.isPatroling = true;
     }
-    self.goToTile(self.pathIterator.next());
+    if (!self.isGoingToTile) {
+        self.goToTile(self.pathIterator.next());
+        console.log('Patroling to a new tile: ' + self.targetTile.x + ' ' + self.targetTile.y);
+    }
+    else {
+        self.goToTile(self.targetTile);
+    }
 };
