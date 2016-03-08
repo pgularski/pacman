@@ -37,6 +37,7 @@ TileWalker.prototype.goToTile = function (targetTile, callback, callback_arg) {
     // TODO: Hook methods?
     // onStart
     if (!self.isGoingToTile || !self.isMoving()) {
+        console.log('Calculating path');
         self.isGoingToTile = true;
         self.hasArrived = false;
         self.targetTile = targetTile;
