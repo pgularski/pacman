@@ -20,6 +20,8 @@ var PacmanGame = function(game) {
     self.grid = null;
     self.layer = null;
     self.pacman = null;
+    self.score = 0;
+    self.scoreText = null;
 
     self.ghosts = null;
     self.ghost1 = null;
@@ -28,10 +30,6 @@ var PacmanGame = function(game) {
     self.ghost4 = null;
 
     self.safetile = 1;
-
-    self.speed = 150;
-    self.threshold = 5;
-    self.justTeleported = false;
 
     self.Y_OFFSET = 4 * 32;
 };
@@ -57,6 +55,7 @@ PacmanGame.prototype.preload = function () {
 
 PacmanGame.prototype.create = function () {
     var self = this;
+    self.scoreText = self.game.add.text(32, 32, "Score: 0", {fontsize: "32px", fill: "#fff"});
     self.map = self.add.tilemap("map");
     self.map.addTilesetImage("tiles");
     // Display the layer from the map.json file. The name as in the json file.
@@ -121,6 +120,8 @@ PacmanGame.prototype.update = function () {
 
 PacmanGame.prototype.onEat = function (pacman, dot) {
     var self = this;
+    self.score += 10;
+    self.scoreText.text = "Score: " + self.score;
     dot.kill();
 };
 
