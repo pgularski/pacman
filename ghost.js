@@ -234,12 +234,56 @@ Ghost.prototype.update = function () {
 };
 
 
-// TODO: corner - Integer. Should be a property.
 Ghost.prototype.cruise = function () {
     var self = this;
+    // FIXME: Calculate only once.
     var tilePath = self.cornerPath.map((function(point_array){
             return self.game.getPointXYTile(makePoint(point_array));
         })
     );
     self.tileWalker.patrol(tilePath);
 };
+
+
+Ghost.prototype.walkPath = function (tilePath) {
+    var self = this;
+    self.tileWalker.walkPath(tilePath);
+};
+
+
+Ghost.prototype.goHome = function () {
+    var self = this;
+    // TODO: Implement.
+    var homeTile = null;
+    self.tileWalker.goToTile(homeTile);
+};
+
+
+Ghost.prototype.walkRandomly = function () {
+    var self = this;
+    var randomTilePath = null;
+    self.tileWalker.walkPath(tilePath);
+};
+
+
+Ghost.prototype.runAway = function (object) {
+    var self = this;
+    var objectTile = self.game.getObjectTile(object);
+    var farAwayTile = null;
+    self.tileWalker.goToTile(farAwayTile);
+};
+
+
+Ghost.prototype.enterHome = function () {
+    var self = this;
+};
+
+
+Ghost.prototype.leaveHome = function () {
+    var self = this;
+};
+
+
+Ghost.prototype.stayAtHome = function () {
+    var self = this;
+}
