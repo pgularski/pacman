@@ -96,12 +96,12 @@ PacmanGame.prototype.create = function () {
     self.ghost4 = new Ghost(self, self.game, 0, 0, RandomizedChasing, 4);
 
     self.ghost1.position.set(self.homeDoor.x, self.homeDoor.y);
-    self.ghost2.position.set(self.homeDoor.x, self.homeDoor.y);
-    self.ghost3.position.set(self.homeDoor.x, self.homeDoor.y);
-    self.ghost4.position.set(self.homeDoor.x, self.homeDoor.y);
-    //self.ghost2.position.set(self.homeArea1.x, self.homeArea1.y);
-    //self.ghost3.position.set(self.homeArea2.x, self.homeArea2.y);
-    //self.ghost4.position.set(self.homeArea3.x, self.homeArea3.y);
+    //self.ghost2.position.set(self.homeDoor.x, self.homeDoor.y);
+    //self.ghost3.position.set(self.homeDoor.x, self.homeDoor.y);
+    //self.ghost4.position.set(self.homeDoor.x, self.homeDoor.y);
+    self.ghost2.position.set(self.homeArea1.x, self.homeArea1.y);
+    self.ghost3.position.set(self.homeArea2.x, self.homeArea2.y);
+    self.ghost4.position.set(self.homeArea3.x, self.homeArea3.y);
 
     self.ghosts.add(self.ghost1);
     self.ghosts.add(self.ghost2);
