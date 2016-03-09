@@ -170,6 +170,11 @@ Ghost = function (pacmanGameState, game, x, y, chasingStrategy, corner) {
     }
     self.cornerPath = self.cornerPath.map(self.updateOffset.bind(self));
 
+    self.cornerPath = self.cornerPath.map((function(point_array){
+            return self.game.getPointXYTile(makePoint(point_array));
+        })
+    );
+
     //self.state = 'goToTile';
     self.state = 'cruise';
     // TODO: Replace with Phaser.Time.
@@ -207,7 +212,7 @@ Ghost.prototype.update = function () {
 
     switch (self.state) {
         case 'goToTile':
-            var tile = self.game.getPointXYTile(makePoint(self.cornerPath[0]));
+            var tile = self.cornerPath[0];
             self.tileWalker.goToTile(tile,
                     (function(state){
                         self.state=state;
@@ -236,12 +241,7 @@ Ghost.prototype.update = function () {
 
 Ghost.prototype.cruise = function () {
     var self = this;
-    // FIXME: Calculate only once.
-    var tilePath = self.cornerPath.map((function(point_array){
-            return self.game.getPointXYTile(makePoint(point_array));
-        })
-    );
-    self.tileWalker.patrol(tilePath);
+    self.tileWalker.patrol(self.cornerPath);
 };
 
 
