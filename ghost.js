@@ -175,8 +175,8 @@ Ghost = function (pacmanGameState, game, x, y, chasingStrategy, corner) {
         })
     );
 
-    //self.state = 'goToTile';
-    self.state = 'cruise';
+    self.state = 'goToTile';
+    //self.state = 'cruise';
     // TODO: Replace with Phaser.Time.
     self.counter = 0;
     self.tile = null;

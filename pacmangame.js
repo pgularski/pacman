@@ -80,13 +80,28 @@ PacmanGame.prototype.create = function () {
 
     self.camera.y = 100;
 
-    self.pacman = new Pacman(self, self.game, (14 * 32) + 16, ((23 * 32) + 16) + self.Y_OFFSET);
-    self.ghosts = self.add.group();
+    self.pacmanStart = self.map.objects['Landmarks'][0];
+    self.homeArea1 = self.map.objects['Landmarks'][1];
+    self.homeArea2 = self.map.objects['Landmarks'][2];
+    self.homeArea3 = self.map.objects['Landmarks'][3];
+    self.homeDoor = self.map.objects['Landmarks'][4];
 
-    self.ghost1 = new Ghost(self, self.game, (1 * 32) + 16,  ((1 * 32)  + 16) + self.Y_OFFSET, StraightToThePointChasing, 1);
-    self.ghost2 = new Ghost(self, self.game, (26 * 32) + 16, ((1 * 32)  + 16) + self.Y_OFFSET, SlightlyRandomizedChasing, 2);
-    self.ghost3 = new Ghost(self, self.game, (1 * 32) + 16,  ((29 * 32) + 16) + self.Y_OFFSET, RandomizedChasing, 3);
-    self.ghost4 = new Ghost(self, self.game, (26 * 32) + 16, ((29 * 32) + 16) + self.Y_OFFSET, RandomizedChasing, 4);
+    self.pacman = new Pacman(self, self.game, 0, 0);
+    self.pacman.position.set(self.pacmanStart.x, self.pacmanStart.y);
+
+    self.ghosts = self.add.group();
+    self.ghost1 = new Ghost(self, self.game, 0, 0, StraightToThePointChasing, 1);
+    self.ghost2 = new Ghost(self, self.game, 0, 0, SlightlyRandomizedChasing, 2);
+    self.ghost3 = new Ghost(self, self.game, 0, 0, RandomizedChasing, 3);
+    self.ghost4 = new Ghost(self, self.game, 0, 0, RandomizedChasing, 4);
+
+    self.ghost1.position.set(self.homeDoor.x, self.homeDoor.y);
+    self.ghost2.position.set(self.homeDoor.x, self.homeDoor.y);
+    self.ghost3.position.set(self.homeDoor.x, self.homeDoor.y);
+    self.ghost4.position.set(self.homeDoor.x, self.homeDoor.y);
+    //self.ghost2.position.set(self.homeArea1.x, self.homeArea1.y);
+    //self.ghost3.position.set(self.homeArea2.x, self.homeArea2.y);
+    //self.ghost4.position.set(self.homeArea3.x, self.homeArea3.y);
 
     self.ghosts.add(self.ghost1);
     self.ghosts.add(self.ghost2);
