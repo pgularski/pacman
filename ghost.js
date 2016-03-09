@@ -175,7 +175,8 @@ Ghost = function (pacmanGameState, game, x, y, chasingStrategy, corner) {
         })
     );
 
-    self.state = 'goToTile';
+    self.state = 'doNothing';
+    //self.state = 'goToTile';
     //self.state = 'cruise';
     // TODO: Replace with Phaser.Time.
     self.counter = 0;
@@ -211,6 +212,8 @@ Ghost.prototype.update = function () {
     self.counter++;
 
     switch (self.state) {
+        case 'doNothing':
+            break;
         case 'goToTile':
             var tile = self.cornerPath[0];
             self.tileWalker.goToTile(tile,
