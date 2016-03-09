@@ -50,6 +50,7 @@ PacmanGame.prototype.preload = function () {
     self.load.spritesheet("ghost", "assets/ghost.png", 32, 32);
     self.load.spritesheet("boom", "assets/boom.png", 128, 128);
     self.load.spritesheet("dot", "assets/dot_tile.png", 32, 32);
+    self.load.spritesheet("bigDot", "assets/big_dot.png", 32, 32);
     self.load.tilemap("map", "assets/map.json", null, Phaser.Tilemap.TILED_JSON);
 }
 
@@ -67,8 +68,15 @@ PacmanGame.prototype.create = function () {
 
     self.dots = self.add.group();
     self.dots.enableBody = true;
-    self.map.createFromObjects('Objects', 4, 'dot', 0, true, false, self.dots);
+    self.map.createFromObjects('Objects', 5, 'dot', 0, true, false, self.dots);
     self.dots.callAll('body.setSize', 'body', 8, 8, 12, 12);
+
+    self.bigDots = self.add.group();
+    self.bigDots.enableBody = true;
+    self.map.createFromObjects('Objects', 6, 'bigDot', 0, true, false, self.bigDots);
+    self.bigDots.callAll('body.setSize', 'body', 8, 8, 12, 12);
+    self.bigDots.callAll('animations.add', 'animations', 'blink', [0, 1], 10, true);
+    self.bigDots.callAll('animations.play', 'animations', 'blink');
 
     self.camera.y = 100;
 
@@ -107,6 +115,7 @@ PacmanGame.prototype.update = function () {
     self.physics.arcade.collide(self.ghosts, self.layer);
     self.game.physics.arcade.overlap(self.pacman, self.ghosts, self.onPacmanTouched, null, this);
     self.game.physics.arcade.overlap(self.pacman, self.dots, self.onEat, null, this);
+    self.game.physics.arcade.overlap(self.pacman, self.bigDots, self.onBigDotEat, null, this);
 
     self.game.world.wrap(self.pacman, 0);
     // TODO: Fix it - I want to add groups to the wrap method.
@@ -124,6 +133,12 @@ PacmanGame.prototype.onEat = function (pacman, dot) {
     self.scoreText.text = "Score: " + self.score;
     dot.kill();
 };
+
+PacmanGame.prototype.onBigDotEat = function (pacman, dot) {
+    var self = this;
+    dot.kill();
+};
+
 
 PacmanGame.prototype.onPacmanTouched = function () {
     var self = this;
