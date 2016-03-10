@@ -1,14 +1,7 @@
 // TODO: What are world, state and stage anyway?
 // TODO: Implement states => prepare for game/ game/ game over
-// TODO: Rename ``object'' parameters to ``sprite''
 // TODO: Ghost walking randomly/chasing in turns + running away
 // TODO: Graphics
-
-/*
- * Variable name convention
- * point - Actual Phaser.Point of an object. ie. Phaser.Point(self.pacman.x, self.pacman.y)
- * gridPoint - Grid Phaser.Point of an object . ie. self.getCurrentGridPint(new Phaser.Point(self.pacman.x, self.pacman.y))
- */
 
 "use strict";
 
@@ -133,7 +126,7 @@ PacmanGame.prototype.update = function () {
     self.game.physics.arcade.overlap(self.pacman, self.bigDots, self.onBigDotEat, null, this);
 
     self.game.world.wrap(self.pacman, 0);
-    // TODO: Fix it - I want to add groups to the wrap method.
+    // FIXME: I want to add groups to the wrap method.
     self.game.world.wrap(self.ghost1, 0);
     self.game.world.wrap(self.ghost2, 0);
     self.game.world.wrap(self.ghost3, 0);

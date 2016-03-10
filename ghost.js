@@ -125,7 +125,7 @@ Ghost = function (pacmanGameState, game, x, y, chasingStrategy, corner) {
     var self = this;
     Phaser.Sprite.call(self, game, x, y, 'ghost');
 
-    // FIXME: make game a game and state a state becaus it's hard to get to a state when it's needed.
+    // FIXME: make game a game and state a state because it's hard to get to a state when it's needed.
     self.game = pacmanGameState;
     self.map = self.game.map;
     self.layer = self.game.layer;
@@ -141,12 +141,6 @@ Ghost = function (pacmanGameState, game, x, y, chasingStrategy, corner) {
     self.game.add.existing(self);
 
     self.speed = 180;
-
-    // TODO: These should go to TileWalker.
-    self.checkpoints = [];
-    self.currentCheckpoint = new Phaser.Point();
-    self.currentCheckpointTile = null;
-    self.pathIterator = null;
 
     self.tileWalker = new TileWalker(self);
 

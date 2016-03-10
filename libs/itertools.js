@@ -31,7 +31,3 @@ itertools.cycle = function (array) {
     }
     return new Cycle(array);
 }
-
-
-//a = [1,2,3];
-//c = itertools.cycle(a);
