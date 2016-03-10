@@ -1,6 +1,3 @@
-// TODO: Maybe Crazy idea: Instead of polluting Ghost class with flags, have a
-// TileWalker object that stores the walking state and goToTile() in that
-// object. Would have also hasArrived() and similar methods.
 var TileWalker = function (object) {
     var self = this;
     self.object = object;
