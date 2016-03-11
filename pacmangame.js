@@ -83,8 +83,8 @@ PacmanGame.prototype.create = function () {
     self.pacman.position.set(self.pacmanStart.x, self.pacmanStart.y);
 
     self.ghosts = self.add.group();
-    self.ghost1 = new Ghost(self, self.game, 0, 0, StraightToThePointChasing, 1);
-    self.ghost2 = new Ghost(self, self.game, 0, 0, SlightlyRandomizedChasing, 2);
+    self.ghost1 = new Ghost(self, self.game, 0, 0, StraightToThePointChasing, 2, 'stayAtDoor');
+    self.ghost2 = new Ghost(self, self.game, 0, 0, SlightlyRandomizedChasing, 1);
     self.ghost3 = new Ghost(self, self.game, 0, 0, RandomizedChasing, 3);
     self.ghost4 = new Ghost(self, self.game, 0, 0, RandomizedChasing, 4);
 
