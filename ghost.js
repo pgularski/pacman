@@ -211,7 +211,9 @@ Ghost.prototype.isMoving = function () {
 
 Ghost.prototype.update = function () {
     var self = this;
-    self.counter++;
+    if (!self.game.physics.arcade.isPaused) {
+        self.counter++;
+    }
 
     switch (self.state) {
         case 'doNothing':

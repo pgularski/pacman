@@ -13,6 +13,7 @@ var PacmanGame = function(game) {
     self.pacman = null;
     self.score = 0;
     self.scoreText = null;
+    self.readyText = null;
 
     self.ghosts = null;
     self.ghost1 = null;
@@ -55,6 +56,13 @@ PacmanGame.prototype.create = function () {
     self.layer = self.map.createLayer('Layer1');
     self.map.setCollisionByExclusion([self.safetile], true, self.layer);
 
+    self.readyText = self.game.add.text(
+            12 * self.map.tileWidth, 21 * self.map.tileHeight,
+            "Ready!", {fontsize: "32px", fill: "#fff"});
+    self.readyText.anchor.setTo(0.5, 0);
+    self.readyText.position.set(self.game.world.centerX, self.readyText.y);
+    self.readyText.visible = false;
+
     self.dots = self.add.group();
     self.dots.enableBody = true;
     self.map.createFromObjects('Objects', 5, 'dot', 0, true, false, self.dots);
@@ -86,6 +94,7 @@ PacmanGame.prototype.create = function () {
         .getTiles(0, 0, self.layer.width, self.layer.height)
         .filter(self.isSafeTile.bind(self))
 
+    self.initTime = self.game.time.elapsed;
     //self.pacman.scale.x = 2;
     //self.pacman.scale.y = 2;
     //self.pacman.body.setSize(16, 16, 0, 0);
@@ -93,6 +102,28 @@ PacmanGame.prototype.create = function () {
     // TODO: There's definitely some better way of doing that.
     var event = new CustomEvent('gameCreated');
     window.dispatchEvent(event);
+
+    self.paused = false;
+    self.game.time.events.add(Phaser.Timer.SECOND * 0, self.togglePause, self);
+    self.game.time.events.add(Phaser.Timer.SECOND * 3, self.togglePause, self);
+
+}
+
+PacmanGame.prototype.togglePause = function () {
+    var self = this;
+    //self.game.paused = true;
+    self.game.physics.arcade.isPaused = (self.game.physics.arcade.isPaused) ? false : true;
+    if (self.paused)
+    {
+        self.game.tweens.resumeAll();
+        self.readyText.visible = false;
+    }
+    else
+    {
+        self.game.tweens.pauseAll();
+        self.readyText.visible = true;
+    }
+    self.paused = self.paused ? false : true;
 }
 
 PacmanGame.prototype.initPacman = function () {
@@ -177,6 +208,8 @@ PacmanGame.prototype.onPacmanTouched = function (pacman, ghost) {
 PacmanGame.prototype.restart = function () {
     var self = this;
     //self.game.state.start('Game');
+    self.game.time.events.add(Phaser.Timer.SECOND * 0, self.togglePause, self);
+    self.game.time.events.add(Phaser.Timer.SECOND * 4, self.togglePause, self);
     self.pacman.destroy();
     self.ghosts.destroy();
     self.initPacman();
