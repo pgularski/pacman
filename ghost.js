@@ -128,6 +128,7 @@ Ghost = function (pacmanGameState, game, x, y, chasingStrategy, corner, state) {
     self.game = pacmanGameState;
     self.map = self.game.map;
     self.layer = self.game.layer;
+    self.MAX_DISTANCE = 3;
     self.DEFAULT_SPEED = 180;
     self.FRIGHTENED_SPEED = 120;
     self.EATEN_SPEED = 300;
@@ -238,6 +239,12 @@ Ghost.prototype.update = function () {
                 console.log('state updated: ' + self.state);
             }
             break;
+
+        case 'enterHome':
+            if (self.counter === 1) {
+                self.enterHome();
+            }
+        break;
         case 'leaveHome':
             if (self.counter === 1) {
                 self.leaveHome(
@@ -330,15 +337,23 @@ Ghost.prototype.walkPath = function (tilePath) {
 Ghost.prototype.goHome = function () {
     var self = this;
     var ghostTile = self.map.getTileWorldXY(self.x, self.y, undefined, undefined, self.layer);
-    if (self.x === self.game.homeDoor.x && self.y === self.game.homeDoor.y)
+    var distance = self.game.math.distance(
+            self.x, self.y,
+            self.game.homeDoor.x, self.game.homeDoor.y);
+    var max_distance = 10
+
+    if (distance <= max_distance)
     {
         self.body.velocity.setTo(0, 0);
-        self.enterHome();
+        self.position.setTo(self.game.homeDoor.x, self.game.homeDoor.y);
+        //self.game.alignToTile(self);
+        self.counter = 0;
+        self.state = 'enterHome';
     }
 
-    if ( ghostTile === self.map.getTile(14, 15) || ghostTile === self.map.getTile(13, 15))
+    else if ( ghostTile === self.map.getTile(14, 15) || ghostTile === self.map.getTile(13, 15))
     {
-        self.game.physics.arcade.moveToXY(self, self.game.homeDoor.x, self.game.homeDoor.y);
+        self.game.physics.arcade.moveToXY(self, self.game.homeDoor.x, self.game.homeDoor.y, self.speed);
     }
     else if (!self.isMoving()) {
         self.tileWalker.goToTile(self.map.getTile(13, 15));
@@ -363,9 +378,13 @@ Ghost.prototype.enterHome = function () {
     self.tween.stop();
     self.tween = self.game.add.tween(self);
     self.tween
-        .to({x: self.game.homeArea2.x, y: self.game.homeArea2.y}, 1600, null);
+        .to({x: self.game.homeArea2.x, y: self.game.homeArea2.y}, 300, null);
+    self.tween.reverse = false;
     self.tween.start();
-    self.tween.onComplete.addOnce(function() { self.state = 'stayAtHome' });
+    self.tween.onComplete.addOnce(function()
+                { self.state = 'leaveHome',
+                  self.counter = 0;
+            });
 };
 
 
@@ -376,9 +395,10 @@ Ghost.prototype.leaveHome = function (onComplete) {
     self.tween.stop();
     self.tween = self.game.add.tween(self);
     self.tween
-        .to({y: self.game.homeArea2.y}, 800)
-        .to({x: self.game.homeArea2.x}, 800)
-        .to({y: self.game.homeDoor.y}, 800);
+        .to({y: self.game.homeArea2.y}, 600)
+        .to({x: self.game.homeArea2.x}, 600)
+        .to({y: self.game.homeDoor.y}, 600);
+    self.tween.reverse = false;
     self.tween.start();
     self.tween.onComplete.addOnce(onComplete, self);
 };
@@ -398,5 +418,7 @@ Ghost.prototype.stayAtHome = function (val) {
             500,
             function(k) {
                 return Math.sin(Math.PI * 2 * k);
-            }, true, 0, -1);
+            });
+    self.tween.reverse = false;
+    self.tween.start();
 };
