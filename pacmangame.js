@@ -77,27 +77,8 @@ PacmanGame.prototype.create = function () {
     self.homeArea3 = self.map.objects['Landmarks'][3];
     self.homeDoor = self.map.objects['Landmarks'][4];
 
-    self.pacman = new Pacman(self, self.game, 0, 0);
-    self.pacman.position.set(self.pacmanStart.x, self.pacmanStart.y);
-
-    self.ghosts = self.add.group();
-    self.ghost1 = new Ghost(self, self.game, 0, 0, StraightToThePointChasing, 2, 'stayAtDoor');
-    self.ghost2 = new Ghost(self, self.game, 0, 0, SlightlyRandomizedChasing, 1);
-    self.ghost3 = new Ghost(self, self.game, 0, 0, RandomizedChasing, 3);
-    self.ghost4 = new Ghost(self, self.game, 0, 0, RandomizedChasing, 4);
-
-    self.ghost1.position.set(self.homeDoor.x, self.homeDoor.y);
-    //self.ghost2.position.set(self.homeDoor.x, self.homeDoor.y);
-    //self.ghost3.position.set(self.homeDoor.x, self.homeDoor.y);
-    //self.ghost4.position.set(self.homeDoor.x, self.homeDoor.y);
-    self.ghost2.position.set(self.homeArea1.x, self.homeArea1.y);
-    self.ghost3.position.set(self.homeArea2.x, self.homeArea2.y);
-    self.ghost4.position.set(self.homeArea3.x, self.homeArea3.y);
-
-    self.ghosts.add(self.ghost1);
-    self.ghosts.add(self.ghost2);
-    self.ghosts.add(self.ghost3);
-    self.ghosts.add(self.ghost4);
+    self.initPacman();
+    self.initGhosts();
 
     self.cursors = self.game.input.keyboard.createCursorKeys();
     self.debugKey = self.game.input.keyboard.addKey(Phaser.Keyboard.D);
@@ -116,6 +97,30 @@ PacmanGame.prototype.create = function () {
     // TODO: There's definitely some better way of doing that.
     var event = new CustomEvent('gameCreated');
     window.dispatchEvent(event);
+}
+
+PacmanGame.prototype.initPacman = function () {
+    var self = this;
+    self.pacman = new Pacman(self, self.game, 0, 0);
+    self.pacman.position.set(self.pacmanStart.x, self.pacmanStart.y);
+};
+
+PacmanGame.prototype.initGhosts = function () {
+    var self = this;
+    self.ghosts = self.add.group();
+    self.ghost1 = new Ghost(self, self.game, 0, 0, StraightToThePointChasing, 2, 'stayAtDoor');
+    self.ghost2 = new Ghost(self, self.game, 0, 0, SlightlyRandomizedChasing, 1);
+    self.ghost3 = new Ghost(self, self.game, 0, 0, RandomizedChasing, 3);
+    self.ghost4 = new Ghost(self, self.game, 0, 0, RandomizedChasing, 4);
+    self.ghosts.add(self.ghost1);
+    self.ghosts.add(self.ghost2);
+    self.ghosts.add(self.ghost3);
+    self.ghosts.add(self.ghost4);
+
+    self.ghost1.position.set(self.homeDoor.x, self.homeDoor.y);
+    self.ghost2.position.set(self.homeArea1.x, self.homeArea1.y);
+    self.ghost3.position.set(self.homeArea2.x, self.homeArea2.y);
+    self.ghost4.position.set(self.homeArea3.x, self.homeArea3.y);
 }
 
 PacmanGame.prototype.update = function () {
@@ -158,21 +163,26 @@ PacmanGame.prototype.onPacmanTouched = function (pacman, ghost) {
         return;
     }
     self.pacman.die();
+    //self.pacman.kill();
 
-    var explosion = this.game.add.sprite(0, 0, 'boom');
-    explosion.anchor.setTo(0.5, 0.5);
-    explosion.x = self.pacman.x;
-    explosion.y = self.pacman.y;
+    //var explosion = this.game.add.sprite(0, 0, 'boom');
+    //explosion.anchor.setTo(0.5, 0.5);
+    //explosion.x = self.pacman.x;
+    //explosion.y = self.pacman.y;
 
-    var animation = explosion.animations.add('boom', [0,1,2,3,4], 10, false);
-    explosion.animations.play('boom');
-    animation.killOnComplete = true;
-    animation.onComplete.add(self.restart, self);
+    //var animation = explosion.animations.add('boom', [0,1,2,3,4], 10, false);
+    //explosion.animations.play('boom');
+    //animation.killOnComplete = true;
+    //animation.onComplete.add(self.restart, self);
+    self.restart();
 }
 
 PacmanGame.prototype.restart = function () {
     var self = this;
-    self.game.state.start('Game');
+    //self.game.state.start('Game');
+    self.ghosts.callAll('kill');
+    self.initPacman();
+    self.initGhosts();
 }
 
 /*

@@ -333,14 +333,18 @@ Ghost.prototype.walkPath = function (tilePath) {
 
 Ghost.prototype.goHome = function () {
     var self = this;
-    if (!self.isMoving() && self.x !== self.game.homeDoor.x) {
+    var ghostTile = self.map.getTileWorldXY(self.x, self.y, undefined, undefined, self.layer);
+    if ( ghostTile === self.map.getTile(14, 15) || ghostTile === self.map.getTile(13, 15))
+    {
         self.game.physics.arcade.moveToXY(self, self.game.homeDoor.x, self.game.homeDoor.y);
     }
-    if (self.x === self.game.homeDoor.x) {
+    if (self.x === self.game.homeDoor.x && self.y === self.game.homeDoor.y)
+    {
         self.body.velocity.setTo(0, 0);
         self.enterHome();
     }
-    else {
+    else
+    {
         self.tileWalker.goToTile(self.homeTile);
     }
 };
