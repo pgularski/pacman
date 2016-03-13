@@ -12,10 +12,6 @@ var randomize = function(number, range) {
     })(number);
 };
 
-var inArray = function (array, object) {
-    return array.indexOf(object) !== -1;
-}
-
 // TODO: Move it somewhere else
 var getRandomizedTargetTile = function (ghost, target, factor) {
     var point = new Phaser.Point(
@@ -299,7 +295,7 @@ Ghost.prototype.update = function () {
 
 Ghost.prototype.onBigDotEaten = function () {
     var self = this;
-    if (!inArray(['cruise', 'chase', 'stayAtDoor', 'goToCorner'], self.state)) {
+    if (!arraytools.inArray(['cruise', 'chase', 'stayAtDoor', 'goToCorner'], self.state)) {
         return;
     }
     self.play('ghost_frightened');
@@ -334,14 +330,18 @@ Ghost.prototype.walkPath = function (tilePath) {
 Ghost.prototype.goHome = function () {
     var self = this;
     var ghostTile = self.map.getTileWorldXY(self.x, self.y, undefined, undefined, self.layer);
-    if ( ghostTile === self.map.getTile(14, 15) || ghostTile === self.map.getTile(13, 15))
-    {
-        self.game.physics.arcade.moveToXY(self, self.game.homeDoor.x, self.game.homeDoor.y);
-    }
     if (self.x === self.game.homeDoor.x && self.y === self.game.homeDoor.y)
     {
         self.body.velocity.setTo(0, 0);
         self.enterHome();
+    }
+
+    if ( ghostTile === self.map.getTile(14, 15) || ghostTile === self.map.getTile(13, 15))
+    {
+        self.game.physics.arcade.moveToXY(self, self.game.homeDoor.x, self.game.homeDoor.y);
+    }
+    else if (!self.isMoving()) {
+        self.tileWalker.goToTile(self.map.getTile(13, 15));
     }
     else
     {
@@ -359,19 +359,20 @@ Ghost.prototype.walkRandomly = function () {
 
 Ghost.prototype.enterHome = function () {
     var self = this;
-    self.play('ghost');
-    self.speed = self.DEFAULT_SPEED;
+    console.log('Entering home');
     self.tween.stop();
     self.tween = self.game.add.tween(self);
     self.tween
-        .to({x: self.x, y: self.game.homeArea2.y}, 800);
-    self.state = 'stayAtHome'
+        .to({x: self.game.homeArea2.x, y: self.game.homeArea2.y}, 1600, null);
     self.tween.start();
+    self.tween.onComplete.addOnce(function() { self.state = 'stayAtHome' });
 };
 
 
 Ghost.prototype.leaveHome = function (onComplete) {
     var self = this;
+    self.play('ghost');
+    self.speed = self.DEFAULT_SPEED;
     self.tween.stop();
     self.tween = self.game.add.tween(self);
     self.tween

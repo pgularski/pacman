@@ -91,8 +91,6 @@ PacmanGame.prototype.create = function () {
     //self.pacman.scale.x = 2;
     //self.pacman.scale.y = 2;
     //self.pacman.body.setSize(16, 16, 0, 0);
-    self.pacman.move(Phaser.LEFT);
-
     // Trigger gameCreated to start tests.
     // TODO: There's definitely some better way of doing that.
     var event = new CustomEvent('gameCreated');
@@ -101,8 +99,9 @@ PacmanGame.prototype.create = function () {
 
 PacmanGame.prototype.initPacman = function () {
     var self = this;
-    self.pacman = new Pacman(self, self.game, 0, 0);
+    self.pacman = new Pacman(self, self.game, 100, 100);
     self.pacman.position.set(self.pacmanStart.x, self.pacmanStart.y);
+    self.pacman.move(Phaser.LEFT);
 };
 
 PacmanGame.prototype.initGhosts = function () {
@@ -158,29 +157,29 @@ PacmanGame.prototype.onBigDotEat = function (pacman, dot) {
 
 PacmanGame.prototype.onPacmanTouched = function (pacman, ghost) {
     var self = this;
-    if (inArray(['walkRandomly', 'goHome'], ghost.state)) {
+    if (arraytools.inArray(['walkRandomly', 'goHome'], ghost.state)) {
         ghost.onGhostEaten();
         return;
     }
     self.pacman.die();
-    //self.pacman.kill();
 
-    //var explosion = this.game.add.sprite(0, 0, 'boom');
-    //explosion.anchor.setTo(0.5, 0.5);
-    //explosion.x = self.pacman.x;
-    //explosion.y = self.pacman.y;
+    var explosion = this.game.add.sprite(0, 0, 'boom');
+    explosion.anchor.setTo(0.5, 0.5);
+    explosion.x = self.pacman.x;
+    explosion.y = self.pacman.y;
 
-    //var animation = explosion.animations.add('boom', [0,1,2,3,4], 10, false);
-    //explosion.animations.play('boom');
-    //animation.killOnComplete = true;
-    //animation.onComplete.add(self.restart, self);
-    self.restart();
+    var animation = explosion.animations.add('boom', [0,1,2,3,4], 10, false);
+    explosion.animations.play('boom');
+    animation.killOnComplete = true;
+    animation.onComplete.add(self.restart, self);
+    //self.restart();
 }
 
 PacmanGame.prototype.restart = function () {
     var self = this;
     //self.game.state.start('Game');
-    self.ghosts.callAll('kill');
+    self.pacman.destroy();
+    self.ghosts.destroy();
     self.initPacman();
     self.initGhosts();
 }
@@ -363,11 +362,11 @@ PacmanGame.prototype.findPathToTile = function (fromTile, toTile) {
     var current;
     var neighbors;
     var node;
-    cameFrom.start = null;
+    cameFrom[start] = null;
     border.push(start);
     while (border.length > 0) {
         current = border.shift();
-        if (JSON.stringify(current) === JSON.stringify(goal)) {
+        if (arraytools.isEqual(current, goal)) {
             break;
         }
         neighbors = self.getTileNeighbors(arrToTile(current), true).map(toArray);
@@ -386,7 +385,7 @@ PacmanGame.prototype.reconstructPath = function (cameFrom, start, goal) {
     var self = this;
     var current = goal;
     var path = [current];
-    while (JSON.stringify(current) !== JSON.stringify(start)){
+    while (!arraytools.isEqual(current, start)) {
         current = cameFrom[current];
         path.push(current);
     }
