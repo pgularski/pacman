@@ -19,9 +19,6 @@ Pacman = function (pacmanGameState, game, x, y) {
     self.game.physics.arcade.enable(self);
     self.body.setSize(32, 32, 0, 0);
 
-    // FIXME: Isn't that too implicit?
-    self.game.add.existing(self);
-
     self.directions = [ null, null, null, null, null ];
 
     self.turnPoint = new Phaser.Point();

@@ -59,7 +59,6 @@ ChasingStrategy.prototype.isPathUpdateNeeded = function () {
 };
 
 
-// TODO: Tidy up the chasing algorithms. Remove duplicated code.
 StraightToThePointChasing = function (ghost) {
     var self = this;
     ChasingStrategy.call(self, ghost);
@@ -142,8 +141,6 @@ Ghost = function (pacmanGameState, game, x, y, chasingStrategy, corner, state) {
     self.game.physics.arcade.enable(self);
     self.body.setSize(32, 32, 0, 0);
 
-    // TODO: This is too implicit. Move it to the PacmanGame object.
-    self.game.add.existing(self);
     self.tween = self.game.add.tween(self)
 
     self.speed = self.DEFAULT_SPEED;
@@ -346,7 +343,6 @@ Ghost.prototype.goHome = function () {
     {
         self.body.velocity.setTo(0, 0);
         self.position.setTo(self.game.homeDoor.x, self.game.homeDoor.y);
-        //self.game.alignToTile(self);
         self.counter = 0;
         self.state = 'enterHome';
     }

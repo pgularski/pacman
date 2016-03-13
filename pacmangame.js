@@ -1,6 +1,4 @@
-// TODO: What are world, state and stage anyway?
 // TODO: Implement states => prepare for game/ game/ game over
-// TODO: Ghost walking randomly/chasing in turns + running away
 // TODO: Graphics
 
 "use strict";
@@ -102,6 +100,7 @@ PacmanGame.prototype.initPacman = function () {
     self.pacman = new Pacman(self, self.game, 100, 100);
     self.pacman.position.set(self.pacmanStart.x, self.pacmanStart.y);
     self.pacman.move(Phaser.LEFT);
+    self.game.add.existing(self.pacman);
 };
 
 PacmanGame.prototype.initGhosts = function () {
@@ -173,7 +172,6 @@ PacmanGame.prototype.onPacmanTouched = function (pacman, ghost) {
     explosion.animations.play('boom');
     animation.killOnComplete = true;
     animation.onComplete.add(self.restart, self);
-    //self.restart();
 }
 
 PacmanGame.prototype.restart = function () {
@@ -395,7 +393,6 @@ PacmanGame.prototype.reconstructPath = function (cameFrom, start, goal) {
 
 PacmanGame.prototype.getTurnPointsFromPath = function (path) {
     var self = this;
-    // TODO: I feel in guts it may be more elegant.
     var turnPoints = [];
     var x, y;
     var prevX, prevY;
