@@ -63,19 +63,7 @@ PacmanGame.prototype.create = function () {
     self.readyText.position.set(self.game.world.centerX, self.readyText.y);
     self.readyText.visible = false;
 
-    self.dots = self.add.group();
-    self.dots.enableBody = true;
-    self.map.createFromObjects('Objects', 5, 'dot', 0, true, false, self.dots);
-    self.dots.callAll('body.setSize', 'body', 8, 8, 12, 12);
-
-    self.bigDots = self.add.group();
-    self.bigDots.enableBody = true;
-    self.map.createFromObjects('Objects', 6, 'bigDot', 0, true, false, self.bigDots);
-    self.bigDots.callAll('body.setSize', 'body', 8, 8, 12, 12);
-    self.bigDots.callAll('animations.add', 'animations', 'blink', [0, 1], 10, true);
-    self.bigDots.callAll('animations.play', 'animations', 'blink');
-
-    self.camera.y = 100;
+    self.initDots();
 
     self.pacmanStart = self.map.objects['Landmarks'][0];
     self.homeArea1 = self.map.objects['Landmarks'][1];
@@ -106,7 +94,22 @@ PacmanGame.prototype.create = function () {
     self.paused = false;
     self.game.time.events.add(Phaser.Timer.SECOND * 0, self.togglePause, self);
     self.game.time.events.add(Phaser.Timer.SECOND * 3, self.togglePause, self);
+}
 
+
+PacmanGame.prototype.initDots = function () {
+    var self = this;
+    self.dots = self.add.group();
+    self.dots.enableBody = true;
+    self.map.createFromObjects('Objects', 5, 'dot', 0, true, false, self.dots);
+    self.dots.callAll('body.setSize', 'body', 8, 8, 12, 12);
+
+    self.bigDots = self.add.group();
+    self.bigDots.enableBody = true;
+    self.map.createFromObjects('Objects', 6, 'bigDot', 0, true, false, self.bigDots);
+    self.bigDots.callAll('body.setSize', 'body', 8, 8, 12, 12);
+    self.bigDots.callAll('animations.add', 'animations', 'blink', [0, 1], 10, true);
+    self.bigDots.callAll('animations.play', 'animations', 'blink');
 }
 
 PacmanGame.prototype.togglePause = function () {
@@ -176,12 +179,21 @@ PacmanGame.prototype.onEat = function (pacman, dot) {
     self.score += 10;
     self.scoreText.text = "Score: " + self.score;
     dot.kill();
+
+    if (self.dots.countLiving() === 0 && self.bigDots.countLiving() === 0) {
+        self.restart();
+    }
 };
 
 PacmanGame.prototype.onBigDotEat = function (pacman, dot) {
     var self = this;
     dot.kill();
+
     self.ghosts.callAll('onBigDotEaten');
+
+    if (self.dots.countLiving() === 0 && self.bigDots.countLiving() === 0) {
+        self.restart();
+    }
 };
 
 
@@ -210,10 +222,18 @@ PacmanGame.prototype.restart = function () {
     //self.game.state.start('Game');
     self.game.time.events.add(Phaser.Timer.SECOND * 0, self.togglePause, self);
     self.game.time.events.add(Phaser.Timer.SECOND * 4, self.togglePause, self);
+
     self.pacman.destroy();
     self.ghosts.destroy();
+
+    if (self.dots.countLiving() === 0 && self.bigDots.countLiving() === 0) {
+        self.dots.destroy();
+        self.bigDots.destroy();
+        self.initDots();
+    }
     self.initPacman();
     self.initGhosts();
+
 }
 
 /*
