@@ -23,6 +23,7 @@ var PacmanGame = function(game) {
     self.ghost4 = null;
 
     self.safetile = 1;
+    self.safeTiles = [];
 
     self.Y_OFFSET = 4 * 32;
 };
@@ -55,9 +56,6 @@ PacmanGame.prototype.create = function () {
     // Display the layer from the map.json file. The name as in the json file.
     self.layer = self.map.createLayer('Layer1');
     self.map.setCollisionByExclusion([self.safetile], true, self.layer);
-    //self.layer.fixedToCamera = false;
-    //self.layer.anchor.setTo(0.5);
-    //self.layer.position.set(0, 128);
 
     self.dots = self.add.group();
     self.dots.enableBody = true;
@@ -105,6 +103,10 @@ PacmanGame.prototype.create = function () {
     self.debugKey = self.game.input.keyboard.addKey(Phaser.Keyboard.D);
     self.debugKey.isPressed = false;
 
+    self.safeTiles = self.layer
+        .getTiles(0, 0, self.layer.width, self.layer.height)
+        .filter(self.isSafeTile.bind(self))
+
     //self.pacman.scale.x = 2;
     //self.pacman.scale.y = 2;
     //self.pacman.body.setSize(16, 16, 0, 0);
@@ -145,11 +147,16 @@ PacmanGame.prototype.onEat = function (pacman, dot) {
 PacmanGame.prototype.onBigDotEat = function (pacman, dot) {
     var self = this;
     dot.kill();
+    self.ghosts.callAll('onBigDotEaten');
 };
 
 
-PacmanGame.prototype.onPacmanTouched = function () {
+PacmanGame.prototype.onPacmanTouched = function (pacman, ghost) {
     var self = this;
+    if (inArray(['walkRandomly', 'goHome'], ghost.state)) {
+        ghost.onGhostEaten();
+        return;
+    }
     self.pacman.die();
 
     var explosion = this.game.add.sprite(0, 0, 'boom');
@@ -332,6 +339,7 @@ PacmanGame.prototype.getTileNeighbors = function (tile, passableOnly) {
     return neighbors;
 };
 
+// TODO: Change this algorithm to A*, instead of a simple breadth first search.
 PacmanGame.prototype.findPathToTile = function (fromTile, toTile) {
     var self = this;
     var toArray = function(elem){return [elem.x, elem.y];};

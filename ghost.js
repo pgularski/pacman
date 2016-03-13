@@ -12,6 +12,9 @@ var randomize = function(number, range) {
     })(number);
 };
 
+var inArray = function (array, object) {
+    return array.indexOf(object) !== -1;
+}
 
 // TODO: Move it somewhere else
 var getRandomizedTargetTile = function (ghost, target, factor) {
@@ -129,9 +132,14 @@ Ghost = function (pacmanGameState, game, x, y, chasingStrategy, corner, state) {
     self.game = pacmanGameState;
     self.map = self.game.map;
     self.layer = self.game.layer;
+    self.DEFAULT_SPEED = 180;
+    self.FRIGHTENED_SPEED = 120;
+    self.EATEN_SPEED = 300;
 
     self.anchor.set(0.5);
     self.animations.add('ghost', [0, 1, 2, 1], 10, true);
+    self.animations.add('ghost_frightened', [3, 4], 3, true);
+    self.animations.add('ghost_eaten', [5], 10, true);
     self.play('ghost');
 
     self.game.physics.arcade.enable(self);
@@ -141,7 +149,7 @@ Ghost = function (pacmanGameState, game, x, y, chasingStrategy, corner, state) {
     self.game.add.existing(self);
     self.tween = self.game.add.tween(self)
 
-    self.speed = 180;
+    self.speed = self.DEFAULT_SPEED;
 
     self.tileWalker = new TileWalker(self);
 
@@ -170,10 +178,13 @@ Ghost = function (pacmanGameState, game, x, y, chasingStrategy, corner, state) {
         })
     );
 
+    self.randomTile = random.choice(self.game.safeTiles);
+    self.homeTile = self.map.getTileWorldXY(self.game.homeDoor.x, self.game.homeDoor.y);
+
     self.state = state || 'stayAtHome';
     //self.state = 'stayAtHome';
     //self.state = 'doNothing';
-    //self.state = 'goToTile';
+    //self.state = 'goToCorner';
     //self.state = 'cruise';
     // TODO: Replace with Phaser.Time.
     self.counter = 0;
@@ -218,7 +229,7 @@ Ghost.prototype.update = function () {
                         self.state=state;
                         self.counter=0;
                         console.log('state updated: ' + self.state);
-                    }), 'goToTile'
+                    }), 'goToCorner'
             );
             break
         case 'stayAtHome':
@@ -228,19 +239,20 @@ Ghost.prototype.update = function () {
             if (self.counter > 2e2) {
                 self.state = 'leaveHome';
                 self.counter = 0;
+                console.log('state updated: ' + self.state);
             }
             break;
-
         case 'leaveHome':
             if (self.counter === 1) {
                 self.leaveHome(
                         function(){
-                            self.state = 'goToTile';
+                            self.state = 'goToCorner';
                             self.counter = 0;
+                            console.log('state updated: ' + self.state);
                         });
             }
             break;
-        case 'goToTile':
+        case 'goToCorner':
             var tile = self.cornerPath[0];
             self.tileWalker.goToTile(tile,
                     (function(state){
@@ -257,14 +269,53 @@ Ghost.prototype.update = function () {
                 self.counter = 0;
             }
             break;
+        case 'walkRandomly':
+            if (self.counter === 1 || !self.isMoving()) {
+                self.walkRandomly();
+            }
+            self.tileWalker.goToTile(self.randomTile);
+            if (self.counter > 1e3) {
+                self.play('ghost');
+                self.speed = self.DEFAULT_SPEED;
+                self.state = 'chase';
+                self.counter = 0;
+                console.log('state updated: ' + self.state);
+            }
+            break;
         case 'chase':
             self.chasingStrategy.chase(self.game.pacman);
             if (self.counter > 6e2) {
-                self.state = 'goToTile';
+                self.state = 'goToCorner';
                 self.counter = 0;
+                console.log('state updated: ' + self.state);
             }
             break;
+        case 'goHome':
+            self.goHome();
+            break;
     }
+};
+
+
+Ghost.prototype.onBigDotEaten = function () {
+    var self = this;
+    if (!inArray(['cruise', 'chase', 'stayAtDoor', 'goToCorner'], self.state)) {
+        return;
+    }
+    self.play('ghost_frightened');
+    self.speed = self.FRIGHTENED_SPEED;
+    self.state = 'walkRandomly';
+    self.counter = 0;
+    console.log('state updated: ' + self.state);
+};
+
+Ghost.prototype.onGhostEaten = function () {
+    var self = this;
+    self.play('ghost_eaten');
+    self.speed = self.EATEN_SPEED;
+    self.state = 'goHome';
+    self.counter = 0;
+    console.log('state updated: ' + self.state);
 };
 
 
@@ -282,31 +333,35 @@ Ghost.prototype.walkPath = function (tilePath) {
 
 Ghost.prototype.goHome = function () {
     var self = this;
-    // TODO: Implement.
-    var homeTile = null;
-    self.tileWalker.goToTile(homeTile);
+    if (!self.isMoving() && self.x !== self.game.homeDoor.x) {
+        self.game.physics.arcade.moveToXY(self, self.game.homeDoor.x, self.game.homeDoor.y);
+    }
+    if (self.x === self.game.homeDoor.x) {
+        self.body.velocity.setTo(0, 0);
+        self.enterHome();
+    }
+    else {
+        self.tileWalker.goToTile(self.homeTile);
+    }
 };
 
 
 Ghost.prototype.walkRandomly = function () {
     var self = this;
-    var randomTilePath = null;
-    self.tileWalker.walkPath(tilePath);
-};
-
-
-Ghost.prototype.runAway = function (object) {
-    var self = this;
-    var objectTile = self.game.getObjectTile(object);
-    var farAwayTile = null;
-    self.tileWalker.goToTile(farAwayTile);
+    self.randomTile = random.choice(self.game.safeTiles);
+    self.tileWalker.goToTile(self.randomTile);
 };
 
 
 Ghost.prototype.enterHome = function () {
     var self = this;
+    self.play('ghost');
+    self.speed = self.DEFAULT_SPEED;
+    self.tween.stop();
+    self.tween = self.game.add.tween(self);
     self.tween
-        .to({y: self.game.homeArea2.y}, 800)
+        .to({x: self.x, y: self.game.homeArea2.y}, 800);
+    self.state = 'stayAtHome'
     self.tween.start();
 };
 
@@ -326,6 +381,8 @@ Ghost.prototype.leaveHome = function (onComplete) {
 
 Ghost.prototype.stayAtHome = function (val) {
     var self = this;
+    self.tween.stop();
+    self.tween = self.game.add.tween(self);
     if ((self.x !== self.game.homeArea1.x && self.y !== self.game.homeArea1.y) ||
         (self.x !== self.game.homeArea2.x && self.y !== self.game.homeArea2.y) ||
         (self.x !== self.game.homeArea3.x && self.y !== self.game.homeArea3.y))

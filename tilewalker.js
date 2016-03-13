@@ -35,7 +35,7 @@ TileWalker.prototype.goToTile = function (targetTile, callback, callback_arg) {
     // TODO: Hook methods?
     // onStart
     if (!self.isGoingToTile || !self.isMoving()) {
-        console.log('Calculating path');
+        //console.log('Calculating path');
         self.isGoingToTile = true;
         self.hasArrived = false;
         self.targetTile = targetTile;
@@ -57,7 +57,7 @@ TileWalker.prototype.goToTile = function (targetTile, callback, callback_arg) {
 
         // on finished
         if (!self.currentCheckpoint) {
-            console.log('has arrived');
+            //console.log('has arrived');
             self.hasArrived = true;
             self.isGoingToTile = false;
 
@@ -128,7 +128,7 @@ TileWalker.prototype.patrol = function (arrayOfTiles) {
     }
     if (!self.isGoingToTile) {
         self.goToTile(self.pathIterator.next());
-        console.log('Patroling to a new tile: ' + self.targetTile.x + ' ' + self.targetTile.y);
+        //console.log('Patroling to a new tile: ' + self.targetTile.x + ' ' + self.targetTile.y);
     }
     else {
         self.goToTile(self.targetTile);
