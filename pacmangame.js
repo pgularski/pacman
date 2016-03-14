@@ -196,8 +196,9 @@ PacmanGame.prototype.onEat = function (pacman, dot) {
 
 PacmanGame.prototype.onBigDotEat = function (pacman, dot) {
     var self = this;
+    self.score += 50;
+    self.scoreText.text = "Score: " + self.score;
     dot.kill();
-
     self.ghosts.callAll('onBigDotEaten');
 
     if (self.dots.countLiving() === 0 && self.bigDots.countLiving() === 0) {
