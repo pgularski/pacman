@@ -123,12 +123,12 @@ Pacman.prototype.move = function (direction) {
     }
 
     //  Reset the scale and angle (Pacman is facing to the right in the sprite sheet)
-    self.scale.x = 1;
+    self.scale.x = 2;
     self.angle = 0;
 
     if (direction === Phaser.LEFT)
     {
-        self.scale.x = -1;
+        self.scale.x = -2;
     }
     else if (direction === Phaser.UP)
     {

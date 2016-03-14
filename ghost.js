@@ -139,7 +139,9 @@ Ghost = function (pacmanGameState, game, x, y, chasingStrategy, corner, state) {
     self.play('ghost');
 
     self.game.physics.arcade.enable(self);
-    self.body.setSize(32, 32, 0, 0);
+    self.scale.x = 2;
+    self.scale.y = 2;
+    self.body.setSize(16, 16, 0, 0);
 
     self.tween = self.game.add.tween(self)
 

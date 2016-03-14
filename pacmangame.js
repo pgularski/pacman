@@ -90,9 +90,6 @@ PacmanGame.prototype.create = function () {
         .filter(self.isSafeTile.bind(self))
 
     self.initTime = self.game.time.elapsed;
-    //self.pacman.scale.x = 2;
-    //self.pacman.scale.y = 2;
-    //self.pacman.body.setSize(16, 16, 0, 0);
     // Trigger gameCreated to start tests.
     // TODO: There's definitely some better way of doing that.
     var event = new CustomEvent('gameCreated');
@@ -108,12 +105,12 @@ PacmanGame.prototype.initDots = function () {
     var self = this;
     self.dots = self.add.group();
     self.dots.enableBody = true;
-    self.map.createFromObjects('Objects', 5, 'dot', 0, true, false, self.dots);
+    self.map.createFromObjects('Objects', 25, 'dot', 0, true, false, self.dots);
     self.dots.callAll('body.setSize', 'body', 8, 8, 12, 12);
 
     self.bigDots = self.add.group();
     self.bigDots.enableBody = true;
-    self.map.createFromObjects('Objects', 6, 'bigDot', 0, true, false, self.bigDots);
+    self.map.createFromObjects('Objects', 26, 'bigDot', 0, true, false, self.bigDots);
     self.bigDots.callAll('body.setSize', 'body', 8, 8, 12, 12);
     self.bigDots.callAll('animations.add', 'animations', 'blink', [0, 1], 10, true);
     self.bigDots.callAll('animations.play', 'animations', 'blink');
@@ -144,6 +141,9 @@ PacmanGame.prototype.initPacman = function () {
     self.pacman.position.set(self.pacmanStart.x, self.pacmanStart.y);
     self.pacman.move(Phaser.LEFT);
     self.game.add.existing(self.pacman);
+    self.pacman.scale.x = 2;
+    self.pacman.scale.y = 2;
+    self.pacman.body.setSize(16, 16, 0, 0);
 };
 
 PacmanGame.prototype.initGhosts = function () {
