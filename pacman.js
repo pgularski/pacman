@@ -11,7 +11,7 @@ Pacman = function (pacmanGameState, game, x, y) {
     self.layer = self.game.layer;
 
     self.anchor.set(0.5);
-    self.animations.add("eat", [0, 1, 2, 1], 10, true);
+    self.animations.add("eat", [0, 1, 2], 10, true);
     self.play("eat");
 
     self.speed = 180;

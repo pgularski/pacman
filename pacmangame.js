@@ -141,7 +141,7 @@ PacmanGame.prototype.initPacman = function () {
     self.pacman.position.set(self.pacmanStart.x, self.pacmanStart.y);
     self.pacman.move(Phaser.LEFT);
     self.game.add.existing(self.pacman);
-    self.pacman.scale.x = 2;
+    self.pacman.scale.x = -2;
     self.pacman.scale.y = 2;
     self.pacman.body.setSize(16, 16, 0, 0);
 };

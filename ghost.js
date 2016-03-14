@@ -133,9 +133,10 @@ Ghost = function (pacmanGameState, game, x, y, chasingStrategy, corner, state) {
     self.EATEN_SPEED = 300;
 
     self.anchor.set(0.5);
-    self.animations.add('ghost', [0, 1, 2, 1], 10, true);
-    self.animations.add('ghost_frightened', [3, 4], 3, true);
-    self.animations.add('ghost_eaten', [5], 10, true);
+    self.animations.add('ghost', [0], 1, true);
+    self.animations.add('ghost_frightened', [1], 1, true);
+    self.animations.add('ghost_frightened_end', [1, 2], 2, true);
+    self.animations.add('ghost_eaten', [3], 1, true);
     self.play('ghost');
 
     self.game.physics.arcade.enable(self);
@@ -278,6 +279,10 @@ Ghost.prototype.update = function () {
                 self.walkRandomly();
             }
             self.tileWalker.goToTile(self.randomTile);
+
+            if (self.counter > 8e2) {
+                self.play('ghost_frightened_end');
+            }
             if (self.counter > 1e3) {
                 self.play('ghost');
                 self.speed = self.DEFAULT_SPEED;
@@ -303,7 +308,7 @@ Ghost.prototype.update = function () {
 
 Ghost.prototype.onBigDotEaten = function () {
     var self = this;
-    if (!arraytools.inArray(['cruise', 'chase', 'stayAtDoor', 'goToCorner'], self.state)) {
+    if (!arraytools.inArray(['walkRandomly', 'cruise', 'chase', 'stayAtDoor', 'goToCorner'], self.state)) {
         return;
     }
     self.play('ghost_frightened');
