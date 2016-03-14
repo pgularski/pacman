@@ -63,6 +63,13 @@ PacmanGame.prototype.create = function () {
     self.readyText.position.set(self.game.world.centerX, self.readyText.y);
     self.readyText.visible = false;
 
+    self.lives = 3;
+    self.livesText = self.game.add.text(
+            self.map.tileWidth,
+            self.map.heightInPixels - 2 * self.map.tileHeight,
+            "Lives: " + self.lives,
+            {fontsize: "32px", fill: "#fff"});
+
     self.initDots();
 
     self.pacmanStart = self.map.objects['Landmarks'][0];
@@ -112,7 +119,7 @@ PacmanGame.prototype.initDots = function () {
     self.bigDots.callAll('animations.play', 'animations', 'blink');
 }
 
-PacmanGame.prototype.togglePause = function () {
+PacmanGame.prototype.togglePause = function (gameOver) {
     var self = this;
     //self.game.paused = true;
     self.game.physics.arcade.isPaused = (self.game.physics.arcade.isPaused) ? false : true;
@@ -124,7 +131,9 @@ PacmanGame.prototype.togglePause = function () {
     else
     {
         self.game.tweens.pauseAll();
-        self.readyText.visible = true;
+        if (!gameOver) {
+            self.readyText.visible = true;
+        }
     }
     self.paused = self.paused ? false : true;
 }
@@ -205,6 +214,8 @@ PacmanGame.prototype.onPacmanTouched = function (pacman, ghost) {
         return;
     }
     self.pacman.die();
+    self.lives--;
+    self.livesText.text = "Lives: " + self.lives;
 
     var explosion = this.game.add.sprite(0, 0, 'boom');
     explosion.anchor.setTo(0.5, 0.5);
@@ -212,9 +223,24 @@ PacmanGame.prototype.onPacmanTouched = function (pacman, ghost) {
     explosion.y = self.pacman.y;
 
     var animation = explosion.animations.add('boom', [0,1,2,3,4], 10, false);
+    if (self.lives > 0) {
+        animation.onComplete.add(self.restart, self);
+    }
+    else
+    {
+        animation.onComplete.add(self.onGameOver, self);
+    }
     explosion.animations.play('boom');
     animation.killOnComplete = true;
-    animation.onComplete.add(self.restart, self);
+}
+
+PacmanGame.prototype.onGameOver = function () {
+   var self = this;
+   self.gameOverText = self.game.add.text(0, 0,
+            "Game Over", {fontsize: "32px", fill: "#fff"});
+   self.gameOverText.anchor.setTo(0.5, 0.5);
+   self.gameOverText.position.setTo(self.game.world.centerX, self.game.world.centerY);
+   self.togglePause(true);
 }
 
 PacmanGame.prototype.restart = function () {
