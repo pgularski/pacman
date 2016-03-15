@@ -50,7 +50,7 @@ PacmanGame.prototype.preload = function () {
 PacmanGame.prototype.create = function () {
     var self = this;
     self.SaveCPU = self.game.plugins.add(Phaser.Plugin.SaveCPU);
-    self.SaveCPU.renderOnFPS = 30;
+    self.SaveCPU.renderOnFPS = 45;
 
     self.scoreText = self.game.add.text(32, 32, "Score: 0", {fontsize: "32px", fill: "#fff"});
     self.map = self.add.tilemap("map");
