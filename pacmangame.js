@@ -1,5 +1,6 @@
-// TODO: Implement states => prepare for game/ game/ game over
+// TODO: Add Game states - preload, menu, game, ...
 // TODO: Graphics
+// FIXME: Key timer needs fixing
 
 "use strict";
 
