@@ -54,8 +54,8 @@ Pacman.prototype.checkDirection = function (turnTo) {
     {
         self.turning = turnTo;
 
-        self.turnPoint.x = (self.marker.x * self.map.tileWidth) + (self.map.tileWidth / 2);
-        self.turnPoint.y = (self.marker.y * self.map.tileHeight) + (self.map.tileHeight / 2);
+        self.turnPoint.x = (self.marker.x * self.map.tileWidth) + (self.map.tileWidth * 0.5);
+        self.turnPoint.y = (self.marker.y * self.map.tileHeight) + (self.map.tileHeight * 0.5);
     }
 };
 

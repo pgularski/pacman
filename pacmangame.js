@@ -49,6 +49,9 @@ PacmanGame.prototype.preload = function () {
 
 PacmanGame.prototype.create = function () {
     var self = this;
+    self.SaveCPU = self.game.plugins.add(Phaser.Plugin.SaveCPU);
+    self.SaveCPU.renderOnFPS = 30;
+
     self.scoreText = self.game.add.text(32, 32, "Score: 0", {fontsize: "32px", fill: "#fff"});
     self.map = self.add.tilemap("map");
     self.map.addTilesetImage("tiles");
@@ -371,8 +374,8 @@ PacmanGame.prototype.alignToTile = function (object, tween) {
     var gridPoint = self.getObjectTileXY(object);
     var alignPoint = new Phaser.Point();
 
-    alignPoint.x = (gridPoint.x * self.map.tileWidth) + (self.map.tileWidth / 2);
-    alignPoint.y = (gridPoint.y * self.map.tileHeight) + (self.map.tileHeight / 2);
+    alignPoint.x = (gridPoint.x * self.map.tileWidth) + (self.map.tileWidth * 0.5);
+    alignPoint.y = (gridPoint.y * self.map.tileHeight) + (self.map.tileHeight * 0.5);
 
     object.position = alignPoint;
     object.body.reset(alignPoint.x, alignPoint.y);
