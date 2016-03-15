@@ -101,6 +101,8 @@ PacmanGame.prototype.create = function () {
     self.paused = false;
     self.game.time.events.add(Phaser.Timer.SECOND * 0, self.togglePause, self);
     self.game.time.events.add(Phaser.Timer.SECOND * 3, self.togglePause, self);
+
+    self.currentKey = null;
 }
 
 
@@ -183,6 +185,7 @@ PacmanGame.prototype.update = function () {
     self.game.world.wrap(self.ghost3, 0);
     self.game.world.wrap(self.ghost4, 0);
 
+    self.updateCurrentKey();
     self.checkKeys();
 };
 
@@ -381,21 +384,46 @@ PacmanGame.prototype.alignToTile = function (object, tween) {
     object.body.reset(alignPoint.x, alignPoint.y);
 };
 
+PacmanGame.prototype.keyPressTimedOut = function () {
+    var self = this;
+    self.currentKey = null;
+}
+
+PacmanGame.prototype.updateCurrentKey = function () {
+    var self = this;
+
+    if (self.cursors.left.isDown) {
+        self.currentKey = Phaser.LEFT;
+        self.game.time.events.add(Phaser.Timer.SECOND * 1, self.keyPressTimedOut, self);
+    }
+    else if (self.cursors.right.isDown) {
+        self.currentKey = Phaser.RIGHT;
+        self.game.time.events.add(Phaser.Timer.SECOND * 1, self.keyPressTimedOut, self);
+    }
+    else if (self.cursors.up.isDown) {
+        self.currentKey = Phaser.UP;
+        self.game.time.events.add(Phaser.Timer.SECOND * 1, self.keyPressTimedOut, self);
+    }
+    else if (self.cursors.down.isDown) {
+        self.currentKey = Phaser.DOWN;
+        self.game.time.events.add(Phaser.Timer.SECOND * 1, self.keyPressTimedOut, self);
+    }
+};
+
+
 PacmanGame.prototype.checkKeys = function () {
     var self = this;
 
-    if (self.cursors.left.isDown && self.pacman.current !== Phaser.LEFT) {
+    if (self.currentKey === Phaser.LEFT && self.pacman.current !== Phaser.LEFT) {
         self.pacman.checkDirection(Phaser.LEFT);
     }
-    else if (self.cursors.right.isDown && self.pacman.current !== Phaser.RIGHT) {
+    else if (self.currentKey === Phaser.RIGHT && self.pacman.current !== Phaser.RIGHT) {
         self.pacman.checkDirection(Phaser.RIGHT);
     }
-
-    else if (self.cursors.up.isDown && self.pacman.current !== Phaser.UP) {
+    else if (self.currentKey === Phaser.UP && self.pacman.current !== Phaser.UP) {
         self.pacman.checkDirection(Phaser.UP);
     }
-
-    else if (self.cursors.down.isDown && self.pacman.current !== Phaser.DOWN) {
+    else if (self.currentKey === Phaser.DOWN && self.pacman.current !== Phaser.DOWN) {
         self.pacman.checkDirection(Phaser.DOWN);
     }
     else
