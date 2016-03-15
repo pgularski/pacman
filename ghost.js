@@ -320,6 +320,7 @@ Ghost.prototype.onBigDotEaten = function () {
 
 Ghost.prototype.onGhostEaten = function () {
     var self = this;
+    self.tileWalker.targetTile = null;
     self.play('ghost_eaten');
     self.speed = self.EATEN_SPEED;
     self.state = 'goHome';
