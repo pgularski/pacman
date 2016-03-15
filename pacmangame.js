@@ -394,19 +394,19 @@ PacmanGame.prototype.updateCurrentKey = function () {
 
     if (self.cursors.left.isDown) {
         self.currentKey = Phaser.LEFT;
-        self.game.time.events.add(Phaser.Timer.SECOND * 1, self.keyPressTimedOut, self);
+        self.game.time.events.add(Phaser.Timer.SECOND * 0.3, self.keyPressTimedOut, self);
     }
     else if (self.cursors.right.isDown) {
         self.currentKey = Phaser.RIGHT;
-        self.game.time.events.add(Phaser.Timer.SECOND * 1, self.keyPressTimedOut, self);
+        self.game.time.events.add(Phaser.Timer.SECOND * 0.3, self.keyPressTimedOut, self);
     }
     else if (self.cursors.up.isDown) {
         self.currentKey = Phaser.UP;
-        self.game.time.events.add(Phaser.Timer.SECOND * 1, self.keyPressTimedOut, self);
+        self.game.time.events.add(Phaser.Timer.SECOND * 0.3, self.keyPressTimedOut, self);
     }
     else if (self.cursors.down.isDown) {
         self.currentKey = Phaser.DOWN;
-        self.game.time.events.add(Phaser.Timer.SECOND * 1, self.keyPressTimedOut, self);
+        self.game.time.events.add(Phaser.Timer.SECOND * 0.3, self.keyPressTimedOut, self);
     }
 };
 
