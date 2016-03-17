@@ -133,7 +133,8 @@ Ghost = function (pacmanGameState, game, x, y, chasingStrategy, corner, state) {
     self.EATEN_SPEED = 350;
 
     self.anchor.set(0.5);
-    self.animations.add('ghost', [0], 1, true);
+    //self.animations.add('ghost', [0], 1, true);
+    self.animations.add('ghost', [3], 1, true);
     self.animations.add('ghost_frightened', [1], 1, true);
     self.animations.add('ghost_frightened_end', [1, 2], 2, true);
     self.animations.add('ghost_eaten', [3], 1, true);

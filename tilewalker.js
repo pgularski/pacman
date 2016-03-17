@@ -13,8 +13,6 @@ var TileWalker = function (object) {
     self.targetTile = null;
     self.checkpoints = [];
     self.currentCheckpoint = null;
-    // FIXME: Get rid of that one, or merge somehow cuurentCheckpoint wit this one.
-    self.currentCheckpointTile = null;
     self.isPatroling = false;
     self.pathIterator = null;
 
@@ -23,6 +21,7 @@ var TileWalker = function (object) {
 
 TileWalker.prototype.goToTile = function (targetTile, callback, callback_arg) {
     var self = this;
+    //self.object.speed = 60;
 
     if (targetTile !== self.targetTile) {
         // TODO: Reset the path and everything!
@@ -43,15 +42,15 @@ TileWalker.prototype.goToTile = function (targetTile, callback, callback_arg) {
         self.targetTile = targetTile;
         self.updateCheckPoints(targetTile);
         self.currentCheckpoint = self.checkpoints.pop();
-        self.currentCheckpointTile = self.map.getTile(
-            self.currentCheckpoint.x, self.currentCheckpoint.y)
         self.setDirection();
     }
 
     // in the middle
+    var checkpointX = self.currentCheckpoint.x * self.map.tileWidth;
+    var checkpointY = self.currentCheckpoint.y * self.map.tileHeight;
     var distance = self.game.math.distance(
             self.object.worldX(), self.object.worldY(),
-            self.currentCheckpointTile.worldX, self.currentCheckpointTile.worldY);
+            checkpointX, checkpointY);
 
     if (distance <= self.MAX_DISTANCE) {
         self.currentCheckpoint = self.checkpoints.pop();
@@ -72,8 +71,6 @@ TileWalker.prototype.goToTile = function (targetTile, callback, callback_arg) {
         else {
             self.setDirection();
 
-            self.currentCheckpointTile = self.map.getTile(
-                self.currentCheckpoint.x, self.currentCheckpoint.y)
         }
     }
 };
@@ -81,6 +78,7 @@ TileWalker.prototype.goToTile = function (targetTile, callback, callback_arg) {
 
 TileWalker.prototype.updateCheckPoints = function (targetTile) {
     var self = this;
+    self.object.body.velocity.setTo(0, 0);
     var objectTile = self.game.getObjectTile(self.object);
     var path = self.game.findPathToTile(objectTile, targetTile);
     var checkpoints = self.game.getTurnPointsFromPath(path);
@@ -95,24 +93,9 @@ TileWalker.prototype.updateCheckPoints = function (targetTile) {
 TileWalker.prototype.setDirection = function () {
     var self = this;
     var speed = self.object.speed;
-
-    var selfTileXY = self.game.getObjectTileXY(self.object)
-    if (!self.currentCheckpoint) {
-        return;
-    }
-
-    if (selfTileXY.x < self.currentCheckpoint.x) {
-        self.object.body.velocity.x = speed;
-    }
-    else if (selfTileXY.x > self.currentCheckpoint.x) {
-        self.object.body.velocity.x = -speed;
-    }
-    else if (selfTileXY.y < self.currentCheckpoint.y) {
-        self.object.body.velocity.y = speed;
-    }
-    else if (selfTileXY.y > self.currentCheckpoint.y) {
-        self.object.body.velocity.y = -speed;
-    }
+    var x = self.currentCheckpoint.x * self.map.tileWidth;
+    var y = self.currentCheckpoint.y * self.map.tileHeight;
+    self.game.physics.arcade.moveToXY(self.object, x, y, speed);
 };
 
 
