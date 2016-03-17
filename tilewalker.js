@@ -1,6 +1,3 @@
-// TODO: Most likely I reinvented the wheel here and game.physics.arcade.moveToXY is the way to go.
-// TODO  Use moveToXY, distanceBetween, distanceToXY, ...
-// TODO: Remember - tweens may fight body physics. Use with body.moves = false
 var TileWalker = function (object) {
     var self = this;
     self.object = object;
