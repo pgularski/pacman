@@ -1,18 +1,18 @@
 // TODO: Most likely I reinvented the wheel here and game.physics.arcade.moveToXY is the way to go.
-// TODO  Use moveToXY, distanceBetween, distanceToXY, ...
-// TODO: Remember - tweens may fight body physics. Use with body.moves = false
 var TileWalker = function (object) {
     var self = this;
     self.object = object;
     self.game = object.game;
     self.map = object.map;
     // TODO: A duplicate of hasArrived?
-    self.hasTarget = false;
+    self.isGoingToTile = false; // TODO: Replace with self.hasTarget = false;
     self.hasArrived = false;
     // TODO: If it changes, clear the state as the new target is set.
     self.targetTile = null;
     self.checkpoints = [];
     self.currentCheckpoint = null;
+    // FIXME: Get rid of that one, or merge somehow cuurentCheckpoint wit this one.
+    self.currentCheckpointTile = null;
     self.isPatroling = false;
     self.pathIterator = null;
 
@@ -21,43 +21,37 @@ var TileWalker = function (object) {
 
 TileWalker.prototype.goToTile = function (targetTile, callback, callback_arg) {
     var self = this;
-    //self.object.speed = 60;
 
     if (targetTile !== self.targetTile) {
         // TODO: Reset the path and everything!
-        //console.log('different tile');
         self.hasArrived = false;
-        self.hasTarget = false;
+        self.isGoingToTile = false;
     }
 
     if (self.hasArrived) {
-        //console.log('has arrived');
         return;
     }
 
     // TODO: Hook methods?
     // onStart
-    if (!self.hasTarget || !self.isMoving()) {
-        //console.log('not going/not moving');
+    if (!self.isGoingToTile || !self.isMoving()) {
         //console.log('Calculating path');
-        self.hasTarget = true;
+        self.isGoingToTile = true;
         self.hasArrived = false;
         self.targetTile = targetTile;
         self.updateCheckPoints(targetTile);
         self.currentCheckpoint = self.checkpoints.pop();
-        self.game.alignToTile(self.object);
+        self.currentCheckpointTile = self.map.getTile(
+            self.currentCheckpoint.x, self.currentCheckpoint.y)
         self.setDirection();
     }
 
     // in the middle
-    var checkpointX = self.currentCheckpoint.x * self.map.tileWidth;
-    var checkpointY = self.currentCheckpoint.y * self.map.tileHeight;
     var distance = self.game.math.distance(
             self.object.worldX(), self.object.worldY(),
-            checkpointX, checkpointY);
+            self.currentCheckpointTile.worldX, self.currentCheckpointTile.worldY);
 
     if (distance <= self.MAX_DISTANCE) {
-        //console.log('small distance');
         self.currentCheckpoint = self.checkpoints.pop();
         self.game.alignToTile(self.object);
 
@@ -65,7 +59,7 @@ TileWalker.prototype.goToTile = function (targetTile, callback, callback_arg) {
         if (!self.currentCheckpoint) {
             //console.log('has arrived');
             self.hasArrived = true;
-            self.hasTarget = false;
+            self.isGoingToTile = false;
 
             if (callback) {
                 callback(callback_arg);
@@ -76,6 +70,8 @@ TileWalker.prototype.goToTile = function (targetTile, callback, callback_arg) {
         else {
             self.setDirection();
 
+            self.currentCheckpointTile = self.map.getTile(
+                self.currentCheckpoint.x, self.currentCheckpoint.y)
         }
     }
 };
@@ -83,7 +79,6 @@ TileWalker.prototype.goToTile = function (targetTile, callback, callback_arg) {
 
 TileWalker.prototype.updateCheckPoints = function (targetTile) {
     var self = this;
-    self.object.body.velocity.setTo(0, 0);
     var objectTile = self.game.getObjectTile(self.object);
     var path = self.game.findPathToTile(objectTile, targetTile);
     var checkpoints = self.game.getTurnPointsFromPath(path);
@@ -98,9 +93,24 @@ TileWalker.prototype.updateCheckPoints = function (targetTile) {
 TileWalker.prototype.setDirection = function () {
     var self = this;
     var speed = self.object.speed;
-    var x = self.currentCheckpoint.x * self.map.tileWidth + 16; // 16 - adjusted for object's anchor.
-    var y = self.currentCheckpoint.y * self.map.tileHeight + 16;
-    self.game.physics.arcade.moveToXY(self.object, x, y, speed);
+
+    var selfTileXY = self.game.getObjectTileXY(self.object)
+    if (!self.currentCheckpoint) {
+        return;
+    }
+
+    if (selfTileXY.x < self.currentCheckpoint.x) {
+        self.object.body.velocity.x = speed;
+    }
+    else if (selfTileXY.x > self.currentCheckpoint.x) {
+        self.object.body.velocity.x = -speed;
+    }
+    else if (selfTileXY.y < self.currentCheckpoint.y) {
+        self.object.body.velocity.y = speed;
+    }
+    else if (selfTileXY.y > self.currentCheckpoint.y) {
+        self.object.body.velocity.y = -speed;
+    }
 };
 
 
@@ -116,7 +126,7 @@ TileWalker.prototype.patrol = function (arrayOfTiles) {
         self.pathIterator = itertools.cycle(arrayOfTiles);
         self.isPatroling = true;
     }
-    if (!self.hasTarget) {
+    if (!self.isGoingToTile) {
         self.goToTile(self.pathIterator.next());
         //console.log('Patroling to a new tile: ' + self.targetTile.x + ' ' + self.targetTile.y);
     }

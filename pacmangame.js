@@ -1,6 +1,5 @@
-// TODO: Add Game states - preload, menu, game, ...
+// TODO: Implement states => prepare for game/ game/ game over
 // TODO: Graphics
-// FIXME: Key timer needs fixing
 
 "use strict";
 
@@ -50,8 +49,8 @@ PacmanGame.prototype.preload = function () {
 
 PacmanGame.prototype.create = function () {
     var self = this;
-    //self.SaveCPU = self.game.plugins.add(Phaser.Plugin.SaveCPU);
-    //self.SaveCPU.renderOnFPS = 45;
+    self.SaveCPU = self.game.plugins.add(Phaser.Plugin.SaveCPU);
+    self.SaveCPU.renderOnFPS = 45;
 
     self.scoreText = self.game.add.text(32, 32, "Score: 0", {fontsize: "32px", fill: "#fff"});
     self.map = self.add.tilemap("map");
@@ -100,8 +99,8 @@ PacmanGame.prototype.create = function () {
     window.dispatchEvent(event);
 
     self.paused = false;
-    //self.game.time.events.add(Phaser.Timer.SECOND * 0, self.togglePause, self);
-    //self.game.time.events.add(Phaser.Timer.SECOND * 3, self.togglePause, self);
+    self.game.time.events.add(Phaser.Timer.SECOND * 0, self.togglePause, self);
+    self.game.time.events.add(Phaser.Timer.SECOND * 3, self.togglePause, self);
 
     self.currentKey = null;
 }
@@ -273,18 +272,8 @@ PacmanGame.prototype.restart = function () {
 /*
  *PacmanGame.prototype.render = function () {
  *    var self = this;
- *    game.debug.bodyInfo(self.ghost1, 32, 64);
- *    game.debug.body(self.ghost1);
- *    var checkpoint = self.ghost1.tileWalker.currentCheckpoint;
- *    var checkpointTile = self.ghost1.tileWalker.currentCheckpointTile;
- *    var color = 'rgba(255, 0, 0, 1)';
- *    if (checkpoint)
- *    {
- *        self.game.debug.geom(
- *                new Phaser.Rectangle(checkpoint.x * self.map.tileHeight,
- *                                     checkpoint.y * self.map.tileHeight,
- *                                     32, 32), color, true);
- *    }
+ *    //game.debug.bodyInfo(self.pacman, 32, 32);
+ *    //game.debug.body(self.pacman);
  *
  *    //game.debug.bodyInfo(self.dots, 32, 32);
  *    //game.debug.body(self.dots);
@@ -316,8 +305,8 @@ PacmanGame.prototype.restart = function () {
  *    //self.game.debug.bodyInfo(self.pacman, 10, 20);
  *    //self.game.debug.bodyInfo(self.ghost, 10, 20);
  *}
- *
  */
+
 // TODO: Extract to external plugin
 PacmanGame.prototype.getPointTile = function (point, nonNull) {
     var self = this;
@@ -405,19 +394,19 @@ PacmanGame.prototype.updateCurrentKey = function () {
 
     if (self.cursors.left.isDown) {
         self.currentKey = Phaser.LEFT;
-        self.game.time.events.add(Phaser.Timer.SECOND * 0.3, self.keyPressTimedOut, self);
+        self.game.time.events.add(Phaser.Timer.SECOND * 1, self.keyPressTimedOut, self);
     }
     else if (self.cursors.right.isDown) {
         self.currentKey = Phaser.RIGHT;
-        self.game.time.events.add(Phaser.Timer.SECOND * 0.3, self.keyPressTimedOut, self);
+        self.game.time.events.add(Phaser.Timer.SECOND * 1, self.keyPressTimedOut, self);
     }
     else if (self.cursors.up.isDown) {
         self.currentKey = Phaser.UP;
-        self.game.time.events.add(Phaser.Timer.SECOND * 0.3, self.keyPressTimedOut, self);
+        self.game.time.events.add(Phaser.Timer.SECOND * 1, self.keyPressTimedOut, self);
     }
     else if (self.cursors.down.isDown) {
         self.currentKey = Phaser.DOWN;
-        self.game.time.events.add(Phaser.Timer.SECOND * 0.3, self.keyPressTimedOut, self);
+        self.game.time.events.add(Phaser.Timer.SECOND * 1, self.keyPressTimedOut, self);
     }
 };
 
