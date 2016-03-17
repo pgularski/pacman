@@ -50,8 +50,8 @@ PacmanGame.prototype.preload = function () {
 
 PacmanGame.prototype.create = function () {
     var self = this;
-    self.SaveCPU = self.game.plugins.add(Phaser.Plugin.SaveCPU);
-    self.SaveCPU.renderOnFPS = 45;
+    //self.SaveCPU = self.game.plugins.add(Phaser.Plugin.SaveCPU);
+    //self.SaveCPU.renderOnFPS = 45;
 
     self.scoreText = self.game.add.text(32, 32, "Score: 0", {fontsize: "32px", fill: "#fff"});
     self.map = self.add.tilemap("map");
@@ -156,18 +156,18 @@ PacmanGame.prototype.initGhosts = function () {
     var self = this;
     self.ghosts = self.add.group();
     self.ghost1 = new Ghost(self, self.game, 0, 0, StraightToThePointChasing, 2, 'stayAtDoor');
-    //self.ghost2 = new Ghost(self, self.game, 0, 0, SlightlyRandomizedChasing, 1);
-    //self.ghost3 = new Ghost(self, self.game, 0, 0, RandomizedChasing, 3);
-    //self.ghost4 = new Ghost(self, self.game, 0, 0, RandomizedChasing, 4);
+    self.ghost2 = new Ghost(self, self.game, 0, 0, SlightlyRandomizedChasing, 1);
+    self.ghost3 = new Ghost(self, self.game, 0, 0, RandomizedChasing, 3);
+    self.ghost4 = new Ghost(self, self.game, 0, 0, RandomizedChasing, 4);
     self.ghosts.add(self.ghost1);
-    //self.ghosts.add(self.ghost2);
-    //self.ghosts.add(self.ghost3);
-    //self.ghosts.add(self.ghost4);
+    self.ghosts.add(self.ghost2);
+    self.ghosts.add(self.ghost3);
+    self.ghosts.add(self.ghost4);
 
     self.ghost1.position.set(self.homeDoor.x, self.homeDoor.y);
-    //self.ghost2.position.set(self.homeArea1.x, self.homeArea1.y);
-    //self.ghost3.position.set(self.homeArea2.x, self.homeArea2.y);
-    //self.ghost4.position.set(self.homeArea3.x, self.homeArea3.y);
+    self.ghost2.position.set(self.homeArea1.x, self.homeArea1.y);
+    self.ghost3.position.set(self.homeArea2.x, self.homeArea2.y);
+    self.ghost4.position.set(self.homeArea3.x, self.homeArea3.y);
 }
 
 PacmanGame.prototype.update = function () {
@@ -175,16 +175,16 @@ PacmanGame.prototype.update = function () {
     self.physics.arcade.collide(self.pacman, self.layer);
     //self.physics.arcade.collide(self.pacman, self.ghosts);
     self.physics.arcade.collide(self.ghosts, self.layer);
-    self.game.physics.arcade.overlap(self.pacman, self.ghosts, self.onPacmanTouched, null, this);
+    //self.game.physics.arcade.overlap(self.pacman, self.ghosts, self.onPacmanTouched, null, this);
     self.game.physics.arcade.overlap(self.pacman, self.dots, self.onEat, null, this);
     self.game.physics.arcade.overlap(self.pacman, self.bigDots, self.onBigDotEat, null, this);
 
     self.game.world.wrap(self.pacman, 0);
     // FIXME: I want to add groups to the wrap method.
     self.game.world.wrap(self.ghost1, 0);
-    //self.game.world.wrap(self.ghost2, 0);
-    //self.game.world.wrap(self.ghost3, 0);
-    //self.game.world.wrap(self.ghost4, 0);
+    self.game.world.wrap(self.ghost2, 0);
+    self.game.world.wrap(self.ghost3, 0);
+    self.game.world.wrap(self.ghost4, 0);
 
     self.updateCurrentKey();
     self.checkKeys();
@@ -270,52 +270,54 @@ PacmanGame.prototype.restart = function () {
 
 }
 
-PacmanGame.prototype.render = function () {
-    var self = this;
-    game.debug.bodyInfo(self.ghost1, 32, 64);
-    game.debug.body(self.ghost1);
-    var checkpoint = self.ghost1.tileWalker.currentCheckpoint;
-    var checkpointTile = self.ghost1.tileWalker.currentCheckpointTile;
-    var color = 'rgba(255, 0, 0, 1)';
-    if (checkpoint)
-    {
-        self.game.debug.geom(
-                new Phaser.Rectangle(checkpoint.x * self.map.tileHeight,
-                                     checkpoint.y * self.map.tileHeight,
-                                     32, 32), color, true);
-    }
-
-    //game.debug.bodyInfo(self.dots, 32, 32);
-    //game.debug.body(self.dots);
-
-    //for (var t = 1; t < 5; t++)
-    //{
-        //if (self.directions[t] === null)
-        //{
-            //continue;
-        //}
-
-        //var color = 'rgba(0,255,0,0.3)';
-
-        //if (self.directions[t].index !== self.safetile)
-        //{
-            //color = 'rgba(255,0,0,0.3)';
-        //}
-
-        //if (t === self.current)
-        //{
-            //color = 'rgba(255,255,255,0.3)';
-        //}
-
-        //self.game.debug.geom(new Phaser.Rectangle(self.directions[t].worldX, self.directions[t].worldY, 32, 32), color, true);
-    //}
-
-    //self.game.debug.geom(self.turnPoint, '#ffff00');
-    //self.game.debug.geom(self.ghostDestination, '#ffff00');
-    //self.game.debug.bodyInfo(self.pacman, 10, 20);
-    //self.game.debug.bodyInfo(self.ghost, 10, 20);
-}
-
+/*
+ *PacmanGame.prototype.render = function () {
+ *    var self = this;
+ *    game.debug.bodyInfo(self.ghost1, 32, 64);
+ *    game.debug.body(self.ghost1);
+ *    var checkpoint = self.ghost1.tileWalker.currentCheckpoint;
+ *    var checkpointTile = self.ghost1.tileWalker.currentCheckpointTile;
+ *    var color = 'rgba(255, 0, 0, 1)';
+ *    if (checkpoint)
+ *    {
+ *        self.game.debug.geom(
+ *                new Phaser.Rectangle(checkpoint.x * self.map.tileHeight,
+ *                                     checkpoint.y * self.map.tileHeight,
+ *                                     32, 32), color, true);
+ *    }
+ *
+ *    //game.debug.bodyInfo(self.dots, 32, 32);
+ *    //game.debug.body(self.dots);
+ *
+ *    //for (var t = 1; t < 5; t++)
+ *    //{
+ *        //if (self.directions[t] === null)
+ *        //{
+ *            //continue;
+ *        //}
+ *
+ *        //var color = 'rgba(0,255,0,0.3)';
+ *
+ *        //if (self.directions[t].index !== self.safetile)
+ *        //{
+ *            //color = 'rgba(255,0,0,0.3)';
+ *        //}
+ *
+ *        //if (t === self.current)
+ *        //{
+ *            //color = 'rgba(255,255,255,0.3)';
+ *        //}
+ *
+ *        //self.game.debug.geom(new Phaser.Rectangle(self.directions[t].worldX, self.directions[t].worldY, 32, 32), color, true);
+ *    //}
+ *
+ *    //self.game.debug.geom(self.turnPoint, '#ffff00');
+ *    //self.game.debug.geom(self.ghostDestination, '#ffff00');
+ *    //self.game.debug.bodyInfo(self.pacman, 10, 20);
+ *    //self.game.debug.bodyInfo(self.ghost, 10, 20);
+ *}
+ *
+ */
 // TODO: Extract to external plugin
 PacmanGame.prototype.getPointTile = function (point, nonNull) {
     var self = this;
