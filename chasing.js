@@ -1,7 +1,7 @@
 // TODO: Move it somewhere else
 var getRandomizedTargetTile = function (ghost, target, factor) {
     var x = target.x - factor * ghost.map.tileHeight;
-    var y = traget.y - factor * ghost.map.tileWidth;
+    var y = target.y - factor * ghost.map.tileWidth;
     var width = target.x + factor * ghost.map.tileHeight;
     var height = target.y + factor * ghost.map.tileWidth;
 
@@ -77,7 +77,7 @@ SlightlyRandomizedChasing.prototype.constructor = SlightlyRandomizedChasing;
 SlightlyRandomizedChasing.prototype.chase = function (target) {
     var self = this;
     var ghost = self.ghost;
-    var RANDOMNESS_FACTOR = 10;
+    var RANDOMNESS_FACTOR = 5;
 
     if (self.isPathUpdateNeeded()) {
         self.game.alignToTile(ghost);
@@ -97,7 +97,7 @@ RandomizedChasing.prototype.constructor = RandomizedChasing;
 RandomizedChasing.prototype.chase = function (target) {
     var self = this;
     var ghost = self.ghost;
-    var RANDOMNESS_FACTOR = 30;
+    var RANDOMNESS_FACTOR = 10;
 
     if (self.isPathUpdateNeeded()) {
         self.game.alignToTile(ghost);

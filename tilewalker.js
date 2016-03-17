@@ -42,7 +42,7 @@ TileWalker.prototype.goToTile = function (targetTile, callback, callback_arg) {
         self.targetTile = targetTile;
         self.updateCheckPoints(targetTile);
         self.currentCheckpoint = self.checkpoints.pop();
-        self.game.alignToTile(self.object);
+        //self.game.alignToTile(self.object);
         self.setDirection();
     }
 
@@ -95,8 +95,10 @@ TileWalker.prototype.updateCheckPoints = function (targetTile) {
 TileWalker.prototype.setDirection = function () {
     var self = this;
     var speed = self.object.speed;
-    var x = self.currentCheckpoint.x * self.map.tileWidth + 16; // 16 - adjusted for object's anchor.
-    var y = self.currentCheckpoint.y * self.map.tileHeight + 16;
+    var anchorValue = {x: self.object.body.width * self.object.anchor.x,
+                       y: self.object.body.height * self.object.anchor.y}
+    var x = self.currentCheckpoint.x * self.map.tileWidth + anchorValue.x;
+    var y = self.currentCheckpoint.y * self.map.tileHeight + anchorValue.y;
     self.game.physics.arcade.moveToXY(self.object, x, y, speed);
 };
 
