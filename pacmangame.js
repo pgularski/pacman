@@ -1,5 +1,6 @@
 // TODO: Add Game states - preload, menu, game, ...
-// TODO: Graphics
+// TODO: A*
+// TODO: Update chasing
 // FIXME: Key timer needs fixing
 
 "use strict";
@@ -50,8 +51,8 @@ PacmanGame.prototype.preload = function () {
 
 PacmanGame.prototype.create = function () {
     var self = this;
-    //self.SaveCPU = self.game.plugins.add(Phaser.Plugin.SaveCPU);
-    //self.SaveCPU.renderOnFPS = 45;
+    self.SaveCPU = self.game.plugins.add(Phaser.Plugin.SaveCPU);
+    self.SaveCPU.renderOnFPS = 45;
 
     self.scoreText = self.game.add.text(32, 32, "Score: 0", {fontsize: "32px", fill: "#fff"});
     self.map = self.add.tilemap("map");
@@ -94,16 +95,15 @@ PacmanGame.prototype.create = function () {
         .filter(self.isSafeTile.bind(self))
 
     self.initTime = self.game.time.elapsed;
-    // Trigger gameCreated to start tests.
-    // TODO: There's definitely some better way of doing that.
-    var event = new CustomEvent('gameCreated');
-    window.dispatchEvent(event);
-
     self.paused = false;
-    //self.game.time.events.add(Phaser.Timer.SECOND * 0, self.togglePause, self);
-    //self.game.time.events.add(Phaser.Timer.SECOND * 3, self.togglePause, self);
+    self.game.time.events.add(Phaser.Timer.SECOND * 0, self.togglePause, self);
+    self.game.time.events.add(Phaser.Timer.SECOND * 3, self.togglePause, self);
 
     self.currentKey = null;
+
+    // Trigger gameCreated to start tests.
+    var event = new CustomEvent('gameCreated');
+    window.dispatchEvent(event);
 }
 
 
@@ -357,9 +357,6 @@ PacmanGame.prototype.getPointXYTile = function (point) {
 
 PacmanGame.prototype.isSafeTile = function (tile) {
     var self = this;
-    //if (!tile)
-        //return false;
-    //return tile.index === self.safetile;
     return tile !== null && tile.index === self.safetile;
 };
 
