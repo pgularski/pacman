@@ -226,6 +226,9 @@ PacmanGame.prototype.onPacmanTouched = function (pacman, ghost) {
         ghost.onGhostEaten();
         return;
     }
+    if (!self.pacman.isAlive) {
+        return;
+    }
     self.pacman.die();
     self.lives--;
     self.livesText.text = "Lives: " + self.lives;

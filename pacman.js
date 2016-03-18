@@ -6,7 +6,6 @@ var Pacman = function (pacmanGameState, game, x, y) {
     //self.game = game.state.states.Game;
     self.game = pacmanGameState;
     self.map = self.game.map;
-
     self.layer = self.game.layer;
 
     self.anchor.set(0.5);
@@ -26,10 +25,10 @@ var Pacman = function (pacmanGameState, game, x, y) {
     self.current = Phaser.NONE;
     self.turning = Phaser.NONE;
 
-    self.safetile = self.game.safetile;
-
     self.threshold = 5;
     self.opposites = [ Phaser.NONE, Phaser.RIGHT, Phaser.LEFT, Phaser.DOWN, Phaser.UP ];
+
+    self.isAlive = true;
 
 };
 
@@ -38,7 +37,7 @@ Pacman.prototype.constructor = Pacman;
 
 Pacman.prototype.checkDirection = function (turnTo) {
     var self = this;
-    if (self.turning === turnTo || self.directions[turnTo] === null || self.directions[turnTo].index !== self.safetile)
+    if (self.turning === turnTo || self.directions[turnTo] === null || self.directions[turnTo].index !== self.game.safetile)
     {
         return;
     }
@@ -144,6 +143,7 @@ Pacman.prototype.move = function (direction) {
 Pacman.prototype.die = function () {
     var self = this;
     console.log('Pacman dies!');
+    self.isAlive = false;
     self.kill();
 };
 
