@@ -1,5 +1,3 @@
-// TODO: Move it somewhere else
-
 "use strict";
 
 var getRandomizedTargetTile = function (ghost, target, factor) {
@@ -95,5 +93,3 @@ var SlightlyRandomizedChasing = function (ghost) {
 };
 SlightlyRandomizedChasing.prototype = Object.create(RandomizedChasing.prototype);
 SlightlyRandomizedChasing.prototype.constructor = SlightlyRandomizedChasing;
-
-
