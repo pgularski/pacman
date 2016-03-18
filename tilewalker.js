@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 Pacman.TileWalker = function (object) {
     var self = this;

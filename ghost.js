@@ -1,5 +1,4 @@
-
-"use strict";
+'use strict';
 
 // TODO: Move it somewhere else
 var arrayToPoint = function (point_array) {
