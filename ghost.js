@@ -1,125 +1,13 @@
+
+"use strict";
+
 // TODO: Move it somewhere else
-var makePoint = function (point_array) {
+var arrayToPoint = function (point_array) {
     return new Phaser.Point(point_array[0], point_array[1]);
 };
 
-// TODO: Move it somewhere else
-var randomize = function(number, range) {
-    return (function(number){
-        number -= Math.floor(Math.random() * range);
-        number += Math.floor(Math.random() * range);
-        return number;
-    })(number);
-};
 
-// TODO: Move it somewhere else
-var getRandomizedTargetTile = function (ghost, target, factor) {
-    var point = new Phaser.Point(
-            randomize(target.x, ghost.width * factor),
-            randomize(target.y, ghost.width * factor)
-    );
-    var virtualTarget = ghost.game.getPointTile(point);
-    if (virtualTarget && ghost.game.isSafeTile(virtualTarget)) {
-        return virtualTarget;
-    }
-    return ghost.game.getObjectTile(target, true);
-};
-
-ChasingStrategy = function (ghost) {
-    var self = this;
-    self.ghost = ghost;
-    self.game = ghost.game;
-    self.targetTile = null;
-    self.junctionEntered = false;
-    self.junctionLeft = false;
-    self.MAX_DISTANCE = 3;
-    self.justAligned = false;
-}
-
-// TODO: Rename this method as it does more than just a check.
-ChasingStrategy.prototype.isPathUpdateNeeded = function () {
-    var self = this;
-    var ghost = self.ghost;
-    var currentTile = self.game.getObjectTile(ghost, true);
-
-    var distance = self.game.math.distance(
-            self.ghost.worldX(), self.ghost.worldY(),
-            currentTile.worldX, currentTile.worldY);
-
-    if (!self.game.isJunction(currentTile)) {
-        self.justAligned = false;
-    }
-
-    if (!self.targetTile || !self.ghost.isMoving() ||
-            (!self.justAligned & self.game.isJunction(currentTile) && distance <= self.MAX_DISTANCE)) {
-        self.justAligned = true;
-        return true;
-    }
-    return false;
-};
-
-
-StraightToThePointChasing = function (ghost) {
-    var self = this;
-    ChasingStrategy.call(self, ghost);
-};
-StraightToThePointChasing.prototype = Object.create(ChasingStrategy.prototype);
-StraightToThePointChasing.prototype.constructor = StraightToThePointChasing;
-
-StraightToThePointChasing.prototype.chase = function (target) {
-    var self = this;
-    var ghost = self.ghost;
-
-    if (self.isPathUpdateNeeded()) {
-        self.game.alignToTile(ghost);
-        self.targetTile = ghost.game.getObjectTile(target);
-    }
-    self.ghost.tileWalker.goToTile(self.targetTile);
-
-};
-
-
-SlightlyRandomizedChasing = function (ghost) {
-    var self = this;
-    ChasingStrategy.call(self, ghost);
-};
-SlightlyRandomizedChasing.prototype = Object.create(ChasingStrategy.prototype);
-SlightlyRandomizedChasing.prototype.constructor = SlightlyRandomizedChasing;
-
-
-SlightlyRandomizedChasing.prototype.chase = function (target) {
-    var self = this;
-    var ghost = self.ghost;
-    var RANDOMNESS_FACTOR = 10;
-
-    if (self.isPathUpdateNeeded()) {
-        self.game.alignToTile(ghost);
-        self.targetTile = getRandomizedTargetTile(ghost, target, RANDOMNESS_FACTOR);
-    }
-    self.ghost.tileWalker.goToTile(self.targetTile);
-};
-
-
-RandomizedChasing = function (ghost) {
-    var self = this;
-    ChasingStrategy.call(self, ghost);
-};
-RandomizedChasing.prototype = Object.create(ChasingStrategy.prototype);
-RandomizedChasing.prototype.constructor = RandomizedChasing;
-
-RandomizedChasing.prototype.chase = function (target) {
-    var self = this;
-    var ghost = self.ghost;
-    var RANDOMNESS_FACTOR = 30;
-
-    if (self.isPathUpdateNeeded()) {
-        self.game.alignToTile(ghost);
-        self.targetTile = getRandomizedTargetTile(ghost, target, RANDOMNESS_FACTOR);
-    }
-    self.ghost.tileWalker.goToTile(self.targetTile);
-};
-
-Ghost = function (pacmanGameState, game, x, y, chasingStrategy, corner, state) {
+var Ghost = function (pacmanGameState, game, x, y, chasingStrategy, corner, state) {
     var self = this;
     Phaser.Sprite.call(self, game, x, y, 'ghost');
 
@@ -171,7 +59,7 @@ Ghost = function (pacmanGameState, game, x, y, chasingStrategy, corner, state) {
     self.cornerPath = self.cornerPath.map(self.updateOffset.bind(self));
 
     self.cornerPath = self.cornerPath.map((function(point_array){
-            return self.game.getPointXYTile(makePoint(point_array));
+            return self.game.getPointXYTile(arrayToPoint(point_array));
         })
     );
 
@@ -427,4 +315,5 @@ Ghost.prototype.stayAtHome = function (val) {
             });
     self.tween.reverse = false;
     self.tween.start();
+
 };

@@ -1,13 +1,11 @@
-// TODO: Make it work with use strict;
-//"use strict";
+"use strict";
 
-Pacman = function (pacmanGameState, game, x, y) {
+var Pacman = function (pacmanGameState, game, x, y) {
     var self = this;
     Phaser.Sprite.call(self, game, x, y, 'pacman');
     //self.game = game.state.states.Game;
-    self.game = pacmanGameState;;
+    self.game = pacmanGameState;
     self.map = self.game.map;
-
     self.layer = self.game.layer;
 
     self.anchor.set(0.5);
@@ -27,11 +25,10 @@ Pacman = function (pacmanGameState, game, x, y) {
     self.current = Phaser.NONE;
     self.turning = Phaser.NONE;
 
-    // TODO: This should not be hardcoded.
-    self.safetile = 1;
-
     self.threshold = 5;
     self.opposites = [ Phaser.NONE, Phaser.RIGHT, Phaser.LEFT, Phaser.DOWN, Phaser.UP ];
+
+    self.isAlive = true;
 
 };
 
@@ -40,7 +37,7 @@ Pacman.prototype.constructor = Pacman;
 
 Pacman.prototype.checkDirection = function (turnTo) {
     var self = this;
-    if (self.turning === turnTo || self.directions[turnTo] === null || self.directions[turnTo].index !== self.safetile)
+    if (self.turning === turnTo || self.directions[turnTo] === null || self.directions[turnTo].index !== self.game.safetile)
     {
         return;
     }
@@ -146,6 +143,7 @@ Pacman.prototype.move = function (direction) {
 Pacman.prototype.die = function () {
     var self = this;
     console.log('Pacman dies!');
+    self.isAlive = false;
     self.kill();
 };
 

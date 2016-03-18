@@ -1,5 +1,6 @@
-// TODO: Implement states => prepare for game/ game/ game over
-// TODO: Graphics
+// TODO: Add Game states - preload, menu, game, ...
+// TODO: Change the pathfinding algorithm to A*, instead of a simple breadth first search.
+// FIXME: Key timer needs fixing
 
 "use strict";
 
@@ -14,6 +15,7 @@ var PacmanGame = function(game) {
     self.score = 0;
     self.scoreText = null;
     self.readyText = null;
+    self.currentKey = null;
 
     self.ghosts = null;
     self.ghost1 = null;
@@ -52,35 +54,12 @@ PacmanGame.prototype.create = function () {
     self.SaveCPU = self.game.plugins.add(Phaser.Plugin.SaveCPU);
     self.SaveCPU.renderOnFPS = 45;
 
-    self.scoreText = self.game.add.text(32, 32, "Score: 0", {fontsize: "32px", fill: "#fff"});
-    self.map = self.add.tilemap("map");
-    self.map.addTilesetImage("tiles");
-    // Display the layer from the map.json file. The name as in the json file.
-    self.layer = self.map.createLayer('Layer1');
-    self.map.setCollisionByExclusion([self.safetile], true, self.layer);
-
-    self.readyText = self.game.add.text(
-            12 * self.map.tileWidth, 21 * self.map.tileHeight,
-            "Ready!", {fontsize: "32px", fill: "#fff"});
-    self.readyText.anchor.setTo(0.5, 0);
-    self.readyText.position.set(self.game.world.centerX, self.readyText.y);
-    self.readyText.visible = false;
-
     self.lives = 3;
-    self.livesText = self.game.add.text(
-            self.map.tileWidth,
-            self.map.heightInPixels - 2 * self.map.tileHeight,
-            "Lives: " + self.lives,
-            {fontsize: "32px", fill: "#fff"});
 
+    self.initMap();
     self.initDots();
-
-    self.pacmanStart = self.map.objects['Landmarks'][0];
-    self.homeArea1 = self.map.objects['Landmarks'][1];
-    self.homeArea2 = self.map.objects['Landmarks'][2];
-    self.homeArea3 = self.map.objects['Landmarks'][3];
-    self.homeDoor = self.map.objects['Landmarks'][4];
-
+    self.initText();
+    self.initLandmarks();
     self.initPacman();
     self.initGhosts();
 
@@ -92,19 +71,41 @@ PacmanGame.prototype.create = function () {
         .getTiles(0, 0, self.layer.width, self.layer.height)
         .filter(self.isSafeTile.bind(self))
 
-    self.initTime = self.game.time.elapsed;
-    // Trigger gameCreated to start tests.
-    // TODO: There's definitely some better way of doing that.
-    var event = new CustomEvent('gameCreated');
-    window.dispatchEvent(event);
-
     self.paused = false;
     self.game.time.events.add(Phaser.Timer.SECOND * 0, self.togglePause, self);
     self.game.time.events.add(Phaser.Timer.SECOND * 3, self.togglePause, self);
 
-    self.currentKey = null;
+    // Trigger gameCreated to start tests.
+    var event = new CustomEvent('gameCreated');
+    window.dispatchEvent(event);
 }
 
+PacmanGame.prototype.initMap = function () {
+    var self = this;
+    self.map = self.add.tilemap("map");
+    self.map.addTilesetImage("tiles");
+    // Display the layer from the map.json file. The name as in the json file.
+    self.layer = self.map.createLayer('Layer1');
+    self.map.setCollisionByExclusion([self.safetile], true, self.layer);
+};
+
+PacmanGame.prototype.initText = function () {
+    var self = this;
+    self.scoreText = self.game.add.text(32, 32, "Score: 0", {fontsize: "32px", fill: "#fff"});
+    self.readyText = self.game.add.text(
+            12 * self.map.tileWidth, 21 * self.map.tileHeight,
+            "Ready!", {fontsize: "32px", fill: "#fff"});
+    self.readyText.anchor.setTo(0.5, 0);
+    self.readyText.position.set(self.game.world.centerX, self.readyText.y);
+    self.readyText.visible = false;
+
+    self.livesText = self.game.add.text(
+            self.map.tileWidth,
+            self.map.heightInPixels - 2 * self.map.tileHeight,
+            "Lives: " + self.lives,
+            {fontsize: "32px", fill: "#fff"});
+
+};
 
 PacmanGame.prototype.initDots = function () {
     var self = this;
@@ -119,7 +120,16 @@ PacmanGame.prototype.initDots = function () {
     self.bigDots.callAll('body.setSize', 'body', 8, 8, 12, 12);
     self.bigDots.callAll('animations.add', 'animations', 'blink', [0, 1], 10, true);
     self.bigDots.callAll('animations.play', 'animations', 'blink');
-}
+};
+
+PacmanGame.prototype.initLandmarks = function () {
+    var self = this;
+    self.pacmanStart = self.map.objects['Landmarks'][0];
+    self.homeArea1 = self.map.objects['Landmarks'][1];
+    self.homeArea2 = self.map.objects['Landmarks'][2];
+    self.homeArea3 = self.map.objects['Landmarks'][3];
+    self.homeDoor = self.map.objects['Landmarks'][4];
+};
 
 PacmanGame.prototype.togglePause = function (gameOver) {
     var self = this;
@@ -178,12 +188,8 @@ PacmanGame.prototype.update = function () {
     self.game.physics.arcade.overlap(self.pacman, self.dots, self.onEat, null, this);
     self.game.physics.arcade.overlap(self.pacman, self.bigDots, self.onBigDotEat, null, this);
 
-    self.game.world.wrap(self.pacman, 0);
-    // FIXME: I want to add groups to the wrap method.
-    self.game.world.wrap(self.ghost1, 0);
-    self.game.world.wrap(self.ghost2, 0);
-    self.game.world.wrap(self.ghost3, 0);
-    self.game.world.wrap(self.ghost4, 0);
+    self.game.world.wrap(self.pacman);
+    self.ghosts.forEach(function(ghost) {self.game.world.wrap(ghost)}, self);
 
     self.updateCurrentKey();
     self.checkKeys();
@@ -218,6 +224,9 @@ PacmanGame.prototype.onPacmanTouched = function (pacman, ghost) {
 
     if (arraytools.inArray(['walkRandomly', 'goHome'], ghost.state)) {
         ghost.onGhostEaten();
+        return;
+    }
+    if (!self.pacman.isAlive) {
         return;
     }
     self.pacman.die();
@@ -272,8 +281,18 @@ PacmanGame.prototype.restart = function () {
 /*
  *PacmanGame.prototype.render = function () {
  *    var self = this;
- *    //game.debug.bodyInfo(self.pacman, 32, 32);
- *    //game.debug.body(self.pacman);
+ *    game.debug.bodyInfo(self.ghost1, 32, 64);
+ *    game.debug.body(self.ghost1);
+ *    var checkpoint = self.ghost1.tileWalker.currentCheckpoint;
+ *    var checkpointTile = self.ghost1.tileWalker.currentCheckpointTile;
+ *    var color = 'rgba(255, 0, 0, 1)';
+ *    if (checkpoint)
+ *    {
+ *        self.game.debug.geom(
+ *                new Phaser.Rectangle(checkpoint.x * self.map.tileHeight,
+ *                                     checkpoint.y * self.map.tileHeight,
+ *                                     32, 32), color, true);
+ *    }
  *
  *    //game.debug.bodyInfo(self.dots, 32, 32);
  *    //game.debug.body(self.dots);
@@ -305,8 +324,8 @@ PacmanGame.prototype.restart = function () {
  *    //self.game.debug.bodyInfo(self.pacman, 10, 20);
  *    //self.game.debug.bodyInfo(self.ghost, 10, 20);
  *}
+ *
  */
-
 // TODO: Extract to external plugin
 PacmanGame.prototype.getPointTile = function (point, nonNull) {
     var self = this;
@@ -346,9 +365,6 @@ PacmanGame.prototype.getPointXYTile = function (point) {
 
 PacmanGame.prototype.isSafeTile = function (tile) {
     var self = this;
-    //if (!tile)
-        //return false;
-    //return tile.index === self.safetile;
     return tile !== null && tile.index === self.safetile;
 };
 
@@ -458,7 +474,6 @@ PacmanGame.prototype.getTileNeighbors = function (tile, passableOnly) {
     return neighbors;
 };
 
-// TODO: Change this algorithm to A*, instead of a simple breadth first search.
 PacmanGame.prototype.findPathToTile = function (fromTile, toTile) {
     var self = this;
     var toArray = function(elem){return [elem.x, elem.y];};
