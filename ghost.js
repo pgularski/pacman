@@ -15,10 +15,9 @@ var Ghost = function (pacmanGameState, game, x, y, chasingStrategy, corner, stat
     self.game = pacmanGameState;
     self.map = self.game.map;
     self.layer = self.game.layer;
-    self.MAX_DISTANCE = 3;
-    self.DEFAULT_SPEED = 200;
-    self.FRIGHTENED_SPEED = 120;
-    self.EATEN_SPEED = 350;
+    self.DEFAULT_SPEED = self.game.SPEED;
+    self.FRIGHTENED_SPEED = self.DEFAULT_SPEED * 0.7;
+    self.EATEN_SPEED = self.DEFAULT_SPEED * 1.5;
 
     self.anchor.set(0.5);
     self.animations.add('ghost', [0], 1, true);
@@ -168,10 +167,10 @@ Ghost.prototype.update = function () {
             }
             self.tileWalker.goToTile(self.randomTile);
 
-            if (self.counter > 8e2) {
+            if (self.counter > 4e2) {
                 self.play('ghost_frightened_end');
             }
-            if (self.counter > 1e3) {
+            if (self.counter > 6e2) {
                 self.play('ghost');
                 self.speed = self.DEFAULT_SPEED;
                 self.state = 'chase';

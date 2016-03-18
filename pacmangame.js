@@ -54,6 +54,8 @@ PacmanGame.prototype.create = function () {
     self.SaveCPU = self.game.plugins.add(Phaser.Plugin.SaveCPU);
     self.SaveCPU.renderOnFPS = 45;
 
+    self.SPEED = 220;
+
     self.lives = 3;
 
     self.initMap();
