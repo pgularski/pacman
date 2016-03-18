@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
-var Pacman = function (pacmanGameState, game, x, y) {
+Pacman.Pacman = function (pacmanGameState, game, x, y) {
     var self = this;
     Phaser.Sprite.call(self, game, x, y, 'pacman');
     //self.game = game.state.states.Game;
@@ -9,7 +9,7 @@ var Pacman = function (pacmanGameState, game, x, y) {
     self.layer = self.game.layer;
 
     self.anchor.set(0.5);
-    self.animations.add("eat", [0, 1, 2], 15, true);
+    self.animations.add("eat", [0, 1, 2, 1], 16, true);
     self.play("eat");
 
     self.speed = self.game.SPEED;
@@ -32,10 +32,10 @@ var Pacman = function (pacmanGameState, game, x, y) {
 
 };
 
-Pacman.prototype = Object.create(Phaser.Sprite.prototype);
-Pacman.prototype.constructor = Pacman;
+Pacman.Pacman.prototype = Object.create(Phaser.Sprite.prototype);
+Pacman.Pacman.prototype.constructor = Pacman.Pacman;
 
-Pacman.prototype.checkDirection = function (turnTo) {
+Pacman.Pacman.prototype.checkDirection = function (turnTo) {
     var self = this;
     if (self.turning === turnTo || self.directions[turnTo] === null || self.directions[turnTo].index !== self.game.safetile)
     {
@@ -57,7 +57,7 @@ Pacman.prototype.checkDirection = function (turnTo) {
 };
 
 
-Pacman.prototype.update = function () {
+Pacman.Pacman.prototype.update = function () {
     var self = this;
 
     self.marker = self.game.getObjectTileXY(self);
@@ -69,7 +69,7 @@ Pacman.prototype.update = function () {
     }
 };
 
-Pacman.prototype.isInTurnPoint = function (object) {
+Pacman.Pacman.prototype.isInTurnPoint = function (object) {
     var self = this;
     var objectGridPoint = self.game.getObjectTileXY(object);
     var currentX = Math.floor(object.x);
@@ -81,7 +81,7 @@ Pacman.prototype.isInTurnPoint = function (object) {
     return false;
 }
 
-Pacman.prototype.turn = function () {
+Pacman.Pacman.prototype.turn = function () {
     var self = this;
 
     if (!self.isInTurnPoint(self)) {
@@ -100,7 +100,7 @@ Pacman.prototype.turn = function () {
 }
 
 
-Pacman.prototype.move = function (direction) {
+Pacman.Pacman.prototype.move = function (direction) {
     var self = this;
 
     var speed = self.speed;
@@ -140,7 +140,7 @@ Pacman.prototype.move = function (direction) {
 };
 
 
-Pacman.prototype.die = function () {
+Pacman.Pacman.prototype.die = function () {
     var self = this;
     console.log('Pacman dies!');
     self.isAlive = false;

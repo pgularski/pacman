@@ -7,7 +7,7 @@ var arrayToPoint = function (point_array) {
 };
 
 
-var Ghost = function (pacmanGameState, game, x, y, chasingStrategy, corner, state) {
+Pacman.Ghost = function (pacmanGameState, game, x, y, chasingStrategy, corner, state) {
     var self = this;
     Phaser.Sprite.call(self, game, x, y, 'ghost');
 
@@ -35,7 +35,7 @@ var Ghost = function (pacmanGameState, game, x, y, chasingStrategy, corner, stat
 
     self.speed = self.DEFAULT_SPEED;
 
-    self.tileWalker = new TileWalker(self);
+    self.tileWalker = new Pacman.TileWalker(self);
 
     self.chasingStrategy = new chasingStrategy(self);
 
@@ -75,31 +75,31 @@ var Ghost = function (pacmanGameState, game, x, y, chasingStrategy, corner, stat
     self.tile = null;
 
 };
-Ghost.prototype = Object.create(Phaser.Sprite.prototype);
-Ghost.prototype.constructor = Ghost;
+Pacman.Ghost.prototype = Object.create(Phaser.Sprite.prototype);
+Pacman.Ghost.prototype.constructor = Pacman.Ghost;
 
-Ghost.prototype.updateOffset = function (point_array) {
+Pacman.Ghost.prototype.updateOffset = function (point_array) {
     var self = this;
     return [point_array[0], point_array[1] + self.game.Y_OFFSET / self.map.tileHeight];
 };
 
-Ghost.prototype.worldX = function () {
+Pacman.Ghost.prototype.worldX = function () {
     var self = this;
     return self.x - (self.body.width * self.anchor.x);
 };
 
-Ghost.prototype.worldY = function () {
+Pacman.Ghost.prototype.worldY = function () {
     var self = this;
     return self.y - (self.body.height * self.anchor.y);
 };
 
-Ghost.prototype.isMoving = function () {
+Pacman.Ghost.prototype.isMoving = function () {
     var self = this;
     return self.tileWalker.isMoving();
 };
 
 
-Ghost.prototype.update = function () {
+Pacman.Ghost.prototype.update = function () {
     var self = this;
     if (!self.game.physics.arcade.isPaused) {
         self.counter++;
@@ -193,7 +193,7 @@ Ghost.prototype.update = function () {
 };
 
 
-Ghost.prototype.onBigDotEaten = function () {
+Pacman.Ghost.prototype.onBigDotEaten = function () {
     var self = this;
     if (!arraytools.inArray(['walkRandomly', 'cruise', 'chase', 'stayAtDoor', 'goToCorner'], self.state)) {
         return;
@@ -205,7 +205,7 @@ Ghost.prototype.onBigDotEaten = function () {
     console.log('state updated: ' + self.state);
 };
 
-Ghost.prototype.onGhostEaten = function () {
+Pacman.Ghost.prototype.onGhostEaten = function () {
     var self = this;
     self.tileWalker.targetTile = null;
     self.play('ghost_eaten');
@@ -216,19 +216,19 @@ Ghost.prototype.onGhostEaten = function () {
 };
 
 
-Ghost.prototype.cruise = function () {
+Pacman.Ghost.prototype.cruise = function () {
     var self = this;
     self.tileWalker.patrol(self.cornerPath);
 };
 
 
-Ghost.prototype.walkPath = function (tilePath) {
+Pacman.Ghost.prototype.walkPath = function (tilePath) {
     var self = this;
     self.tileWalker.walkPath(tilePath);
 };
 
 
-Ghost.prototype.goHome = function () {
+Pacman.Ghost.prototype.goHome = function () {
     var self = this;
     var ghostTile = self.map.getTileWorldXY(self.x, self.y, undefined, undefined, self.layer);
     var distance = self.game.math.distance(
@@ -258,14 +258,14 @@ Ghost.prototype.goHome = function () {
 };
 
 
-Ghost.prototype.walkRandomly = function () {
+Pacman.Ghost.prototype.walkRandomly = function () {
     var self = this;
     self.randomTile = random.choice(self.game.safeTiles);
     self.tileWalker.goToTile(self.randomTile);
 };
 
 
-Ghost.prototype.enterHome = function () {
+Pacman.Ghost.prototype.enterHome = function () {
     var self = this;
     console.log('Entering home');
     self.tween.stop();
@@ -281,7 +281,7 @@ Ghost.prototype.enterHome = function () {
 };
 
 
-Ghost.prototype.leaveHome = function (onComplete) {
+Pacman.Ghost.prototype.leaveHome = function (onComplete) {
     var self = this;
     self.play('ghost');
     self.speed = self.DEFAULT_SPEED;
@@ -297,7 +297,7 @@ Ghost.prototype.leaveHome = function (onComplete) {
 };
 
 
-Ghost.prototype.stayAtHome = function (val) {
+Pacman.Ghost.prototype.stayAtHome = function (val) {
     var self = this;
     self.tween.stop();
     self.tween = self.game.add.tween(self);

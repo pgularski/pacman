@@ -1,6 +1,6 @@
 "use strict";
 
-var TileWalker = function (object) {
+Pacman.TileWalker = function (object) {
     var self = this;
     self.object = object;
     self.game = object.game;
@@ -16,7 +16,7 @@ var TileWalker = function (object) {
     self.MAX_DISTANCE = 3;
 };
 
-TileWalker.prototype.goToTile = function (targetTile, callback, callback_arg) {
+Pacman.TileWalker.prototype.goToTile = function (targetTile, callback, callback_arg) {
     var self = this;
 
     if (targetTile !== self.targetTile) {
@@ -70,7 +70,7 @@ TileWalker.prototype.goToTile = function (targetTile, callback, callback_arg) {
 };
 
 
-TileWalker.prototype.updateCheckPoints = function (targetTile) {
+Pacman.TileWalker.prototype.updateCheckPoints = function (targetTile) {
     var self = this;
     //self.object.body.velocity.setTo(0, 0);
     var objectTile = self.game.getObjectTile(self.object);
@@ -82,7 +82,7 @@ TileWalker.prototype.updateCheckPoints = function (targetTile) {
 };
 
 
-TileWalker.prototype.setDirection = function () {
+Pacman.TileWalker.prototype.setDirection = function () {
     var self = this;
     var speed = self.object.speed;
     var anchorValue = {x: self.object.body.width * self.object.anchor.x,
@@ -106,13 +106,13 @@ TileWalker.prototype.setDirection = function () {
 };
 
 
-TileWalker.prototype.isMoving = function () {
+Pacman.TileWalker.prototype.isMoving = function () {
     var self = this;
     return !(self.object.body.deltaX() === 0 && self.object.body.deltaY() === 0)
 };
 
 
-TileWalker.prototype.patrol = function (arrayOfTiles) {
+Pacman.TileWalker.prototype.patrol = function (arrayOfTiles) {
     var self = this;
     if (!self.isPatroling) {
         self.pathIterator = itertools.cycle(arrayOfTiles);
