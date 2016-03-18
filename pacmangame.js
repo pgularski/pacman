@@ -222,7 +222,7 @@ PacmanGame.prototype.onBigDotEat = function (pacman, dot) {
 PacmanGame.prototype.onPacmanTouched = function (pacman, ghost) {
     var self = this;
 
-    if (arraytools.inArray(['walkRandomly', 'goHome'], ghost.state)) {
+    if (arraytools.inArray(['walkRandomly', 'goHome', 'enterHome'], ghost.state)) {
         ghost.onGhostEaten();
         return;
     }
