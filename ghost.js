@@ -1,10 +1,13 @@
 // TODO: Move it somewhere else
+
+"use strict";
+
 var arrayToPoint = function (point_array) {
     return new Phaser.Point(point_array[0], point_array[1]);
 };
 
 
-Ghost = function (pacmanGameState, game, x, y, chasingStrategy, corner, state) {
+var Ghost = function (pacmanGameState, game, x, y, chasingStrategy, corner, state) {
     var self = this;
     Phaser.Sprite.call(self, game, x, y, 'ghost');
 
@@ -312,4 +315,5 @@ Ghost.prototype.stayAtHome = function (val) {
             });
     self.tween.reverse = false;
     self.tween.start();
+
 };

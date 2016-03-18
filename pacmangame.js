@@ -1,5 +1,5 @@
 // TODO: Add Game states - preload, menu, game, ...
-// TODO: A*
+// TODO: Change the pathfinding algorithm to A*, instead of a simple breadth first search.
 // FIXME: Key timer needs fixing
 
 "use strict";
@@ -461,7 +461,6 @@ PacmanGame.prototype.getTileNeighbors = function (tile, passableOnly) {
     return neighbors;
 };
 
-// TODO: Change this algorithm to A*, instead of a simple breadth first search.
 PacmanGame.prototype.findPathToTile = function (fromTile, toTile) {
     var self = this;
     var toArray = function(elem){return [elem.x, elem.y];};

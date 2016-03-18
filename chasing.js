@@ -1,4 +1,7 @@
 // TODO: Move it somewhere else
+
+"use strict";
+
 var getRandomizedTargetTile = function (ghost, target, factor) {
     var x = target.x - factor * ghost.map.tileHeight;
     var y = target.y - factor * ghost.map.tileWidth;
@@ -12,7 +15,7 @@ var getRandomizedTargetTile = function (ghost, target, factor) {
 
 };
 
-ChasingStrategy = function (ghost) {
+var ChasingStrategy = function (ghost) {
     var self = this;
     self.ghost = ghost;
     self.game = ghost.game;
@@ -47,7 +50,7 @@ ChasingStrategy.prototype.isPathUpdateNeeded = function () {
 };
 
 
-StraightToThePointChasing = function (ghost) {
+var StraightToThePointChasing = function (ghost) {
     var self = this;
     ChasingStrategy.call(self, ghost);
 };
@@ -66,7 +69,7 @@ StraightToThePointChasing.prototype.chase = function (target) {
 
 };
 
-RandomizedChasing = function (ghost) {
+var RandomizedChasing = function (ghost) {
     var self = this;
     ChasingStrategy.call(self, ghost);
     self.RANDOMNESS_FACTOR = 10;
@@ -85,7 +88,7 @@ RandomizedChasing.prototype.chase = function (target) {
     self.ghost.tileWalker.goToTile(self.targetTile);
 };
 
-SlightlyRandomizedChasing = function (ghost) {
+var SlightlyRandomizedChasing = function (ghost) {
     var self = this;
     RandomizedChasing.call(self, ghost);
     self.RANDOMNESS_FACTOR = 5;

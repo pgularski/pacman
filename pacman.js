@@ -1,11 +1,10 @@
-// TODO: Make it work with use strict;
-//"use strict";
+"use strict";
 
-Pacman = function (pacmanGameState, game, x, y) {
+var Pacman = function (pacmanGameState, game, x, y) {
     var self = this;
     Phaser.Sprite.call(self, game, x, y, 'pacman');
     //self.game = game.state.states.Game;
-    self.game = pacmanGameState;;
+    self.game = pacmanGameState;
     self.map = self.game.map;
 
     self.layer = self.game.layer;
@@ -27,8 +26,7 @@ Pacman = function (pacmanGameState, game, x, y) {
     self.current = Phaser.NONE;
     self.turning = Phaser.NONE;
 
-    // TODO: This should not be hardcoded.
-    self.safetile = 1;
+    self.safetile = self.game.safetile;
 
     self.threshold = 5;
     self.opposites = [ Phaser.NONE, Phaser.RIGHT, Phaser.LEFT, Phaser.DOWN, Phaser.UP ];
