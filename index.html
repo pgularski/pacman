@@ -9,11 +9,32 @@
         <script src="libs/itertools.js"></script>
         <script src="libs/arraytools.js"></script>
         <script src="libs/random.js"></script>
+        <script src="Boot.js"></script>
+        <script src="Preloader.js"></script>
+        <script src="MainMenu.js"></script>
         <script src="tilewalker.js"></script>
         <script src="chasing.js"></script>
         <script src="pacman.js"></script>
         <script src="ghost.js"></script>
-        <script src="pacmangame.js"></script>
+        <script src="Game.js"></script>
+
+        <script type="text/javascript">
+
+        (function () {
+
+            var game = new Phaser.Game(28 * 32, 37 * 32, Phaser.AUTO, "game");
+
+            game.state.add('Boot', Pacman.Boot);
+            game.state.add('Preloader', Pacman.Preloader);
+            game.state.add('MainMenu', Pacman.MainMenu);
+            game.state.add('Game', Pacman.Game);
+
+            game.state.start('Boot');
+
+        })();
+
+        </script>
+
     </head>
     <body>
     </body>

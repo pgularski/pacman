@@ -13,7 +13,7 @@ var getRandomizedTargetTile = function (ghost, target, factor) {
 
 };
 
-var ChasingStrategy = function (ghost) {
+Pacman.ChasingStrategy = function (ghost) {
     var self = this;
     self.ghost = ghost;
     self.game = ghost.game;
@@ -26,7 +26,7 @@ var ChasingStrategy = function (ghost) {
 }
 
 // TODO: Rename this method as it does more than just a check.
-ChasingStrategy.prototype.isPathUpdateNeeded = function () {
+Pacman.ChasingStrategy.prototype.isPathUpdateNeeded = function () {
     var self = this;
     var ghost = self.ghost;
     var currentTile = self.game.getObjectTile(ghost, true);
@@ -48,14 +48,14 @@ ChasingStrategy.prototype.isPathUpdateNeeded = function () {
 };
 
 
-var StraightToThePointChasing = function (ghost) {
+Pacman.StraightToThePointChasing = function (ghost) {
     var self = this;
-    ChasingStrategy.call(self, ghost);
+    Pacman.ChasingStrategy.call(self, ghost);
 };
-StraightToThePointChasing.prototype = Object.create(ChasingStrategy.prototype);
-StraightToThePointChasing.prototype.constructor = StraightToThePointChasing;
+Pacman.StraightToThePointChasing.prototype = Object.create(Pacman.ChasingStrategy.prototype);
+Pacman.StraightToThePointChasing.prototype.constructor = Pacman.StraightToThePointChasing;
 
-StraightToThePointChasing.prototype.chase = function (target) {
+Pacman.StraightToThePointChasing.prototype.chase = function (target) {
     var self = this;
     var ghost = self.ghost;
 
@@ -67,15 +67,15 @@ StraightToThePointChasing.prototype.chase = function (target) {
 
 };
 
-var RandomizedChasing = function (ghost) {
+Pacman.RandomizedChasing = function (ghost) {
     var self = this;
-    ChasingStrategy.call(self, ghost);
+    Pacman.ChasingStrategy.call(self, ghost);
     self.RANDOMNESS_FACTOR = 10;
 };
-RandomizedChasing.prototype = Object.create(ChasingStrategy.prototype);
-RandomizedChasing.prototype.constructor = RandomizedChasing;
+Pacman.RandomizedChasing.prototype = Object.create(Pacman.ChasingStrategy.prototype);
+Pacman.RandomizedChasing.prototype.constructor = Pacman.RandomizedChasing;
 
-RandomizedChasing.prototype.chase = function (target) {
+Pacman.RandomizedChasing.prototype.chase = function (target) {
     var self = this;
     var ghost = self.ghost;
 
@@ -86,10 +86,10 @@ RandomizedChasing.prototype.chase = function (target) {
     self.ghost.tileWalker.goToTile(self.targetTile);
 };
 
-var SlightlyRandomizedChasing = function (ghost) {
+Pacman.SlightlyRandomizedChasing = function (ghost) {
     var self = this;
-    RandomizedChasing.call(self, ghost);
+    Pacman.RandomizedChasing.call(self, ghost);
     self.RANDOMNESS_FACTOR = 5;
 };
-SlightlyRandomizedChasing.prototype = Object.create(RandomizedChasing.prototype);
-SlightlyRandomizedChasing.prototype.constructor = SlightlyRandomizedChasing;
+Pacman.SlightlyRandomizedChasing.prototype = Object.create(Pacman.RandomizedChasing.prototype);
+Pacman.SlightlyRandomizedChasing.prototype.constructor = Pacman.SlightlyRandomizedChasing;

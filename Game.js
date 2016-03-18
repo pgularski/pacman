@@ -1,58 +1,40 @@
-// TODO: Add Game states - preload, menu, game, ...
 // TODO: Change the pathfinding algorithm to A*, instead of a simple breadth first search.
+// TODO: Touch controls
 // FIXME: Key timer needs fixing
+// TODO: Sounds
+// TODO: Add 1UP
 
-"use strict";
+'use strict';
 
 
-var PacmanGame = function(game) {
+Pacman.Game = function(game) {
     var self = this;
     self.game = game;
-    self.map = null;
-    self.grid = null;
-    self.layer = null;
-    self.pacman = null;
+    self.map;
+    self.grid;
+    self.layer;
+    self.pacman;
+    self.scoreText;
+    self.readyText;
+    self.currentKey;
+
+    self.ghosts;
+    self.ghost1;
+    self.ghost2;
+    self.ghost3;
+    self.ghost4;
+
     self.score = 0;
-    self.scoreText = null;
-    self.readyText = null;
-    self.currentKey = null;
-
-    self.ghosts = null;
-    self.ghost1 = null;
-    self.ghost2 = null;
-    self.ghost3 = null;
-    self.ghost4 = null;
-
     self.safetile = 1;
     self.safeTiles = [];
 
     self.Y_OFFSET = 4 * 32;
 };
 
-PacmanGame.prototype.init = function () {
+
+Pacman.Game.prototype.create = function () {
     var self = this;
-    self.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-    self.scale.pageAlignVertically = true;
-    self.scale.pageAlignHorizontally = true;
-    //Phaser.Canvas.setImageRenderingCrisp(self.game.canvas);
     self.physics.startSystem(Phaser.Physics.ARCADE);
-}
-
-PacmanGame.prototype.preload = function () {
-    var self = this;
-    self.load.image("tiles", "assets/tiles.png");
-    self.load.spritesheet("pacman", "assets/pacman.png", 32, 32);
-    self.load.spritesheet("ghost", "assets/ghost.png", 32, 32);
-    self.load.spritesheet("boom", "assets/boom.png", 128, 128);
-    self.load.spritesheet("dot", "assets/dot_tile.png", 32, 32);
-    self.load.spritesheet("bigDot", "assets/big_dot.png", 32, 32);
-    self.load.tilemap("map", "assets/map.json", null, Phaser.Tilemap.TILED_JSON);
-}
-
-PacmanGame.prototype.create = function () {
-    var self = this;
-    self.SaveCPU = self.game.plugins.add(Phaser.Plugin.SaveCPU);
-    self.SaveCPU.renderOnFPS = 45;
 
     self.SPEED = 220;
 
@@ -82,7 +64,7 @@ PacmanGame.prototype.create = function () {
     window.dispatchEvent(event);
 }
 
-PacmanGame.prototype.initMap = function () {
+Pacman.Game.prototype.initMap = function () {
     var self = this;
     self.map = self.add.tilemap("map");
     self.map.addTilesetImage("tiles");
@@ -91,7 +73,7 @@ PacmanGame.prototype.initMap = function () {
     self.map.setCollisionByExclusion([self.safetile], true, self.layer);
 };
 
-PacmanGame.prototype.initText = function () {
+Pacman.Game.prototype.initText = function () {
     var self = this;
     self.scoreText = self.game.add.text(32, 32, "Score: 0", {fontsize: "32px", fill: "#fff"});
     self.readyText = self.game.add.text(
@@ -109,7 +91,7 @@ PacmanGame.prototype.initText = function () {
 
 };
 
-PacmanGame.prototype.initDots = function () {
+Pacman.Game.prototype.initDots = function () {
     var self = this;
     self.dots = self.add.group();
     self.dots.enableBody = true;
@@ -124,7 +106,7 @@ PacmanGame.prototype.initDots = function () {
     self.bigDots.callAll('animations.play', 'animations', 'blink');
 };
 
-PacmanGame.prototype.initLandmarks = function () {
+Pacman.Game.prototype.initLandmarks = function () {
     var self = this;
     self.pacmanStart = self.map.objects['Landmarks'][0];
     self.homeArea1 = self.map.objects['Landmarks'][1];
@@ -133,7 +115,7 @@ PacmanGame.prototype.initLandmarks = function () {
     self.homeDoor = self.map.objects['Landmarks'][4];
 };
 
-PacmanGame.prototype.togglePause = function (gameOver) {
+Pacman.Game.prototype.togglePause = function (gameOver) {
     var self = this;
     //self.game.paused = true;
     self.game.physics.arcade.isPaused = (self.game.physics.arcade.isPaused) ? false : true;
@@ -152,9 +134,9 @@ PacmanGame.prototype.togglePause = function (gameOver) {
     self.paused = self.paused ? false : true;
 }
 
-PacmanGame.prototype.initPacman = function () {
+Pacman.Game.prototype.initPacman = function () {
     var self = this;
-    self.pacman = new Pacman(self, self.game, 100, 100);
+    self.pacman = new Pacman.Pacman(self, self.game, 100, 100);
     self.pacman.position.set(self.pacmanStart.x, self.pacmanStart.y);
     self.pacman.move(Phaser.LEFT);
     self.game.add.existing(self.pacman);
@@ -163,13 +145,13 @@ PacmanGame.prototype.initPacman = function () {
     self.pacman.body.setSize(16, 16, 0, 0);
 };
 
-PacmanGame.prototype.initGhosts = function () {
+Pacman.Game.prototype.initGhosts = function () {
     var self = this;
     self.ghosts = self.add.group();
-    self.ghost1 = new Ghost(self, self.game, 0, 0, StraightToThePointChasing, 2, 'stayAtDoor');
-    self.ghost2 = new Ghost(self, self.game, 0, 0, SlightlyRandomizedChasing, 1);
-    self.ghost3 = new Ghost(self, self.game, 0, 0, RandomizedChasing, 3);
-    self.ghost4 = new Ghost(self, self.game, 0, 0, RandomizedChasing, 4);
+    self.ghost1 = new Pacman.Ghost(self, self.game, 0, 0, Pacman.StraightToThePointChasing, 2, 'stayAtDoor');
+    self.ghost2 = new Pacman.Ghost(self, self.game, 0, 0, Pacman.SlightlyRandomizedChasing, 1);
+    self.ghost3 = new Pacman.Ghost(self, self.game, 0, 0, Pacman.RandomizedChasing, 3);
+    self.ghost4 = new Pacman.Ghost(self, self.game, 0, 0, Pacman.RandomizedChasing, 4);
     self.ghosts.add(self.ghost1);
     self.ghosts.add(self.ghost2);
     self.ghosts.add(self.ghost3);
@@ -181,7 +163,7 @@ PacmanGame.prototype.initGhosts = function () {
     self.ghost4.position.set(self.homeArea3.x, self.homeArea3.y);
 }
 
-PacmanGame.prototype.update = function () {
+Pacman.Game.prototype.update = function () {
     var self = this;
     self.physics.arcade.collide(self.pacman, self.layer);
     //self.physics.arcade.collide(self.pacman, self.ghosts);
@@ -197,7 +179,7 @@ PacmanGame.prototype.update = function () {
     self.checkKeys();
 };
 
-PacmanGame.prototype.onEat = function (pacman, dot) {
+Pacman.Game.prototype.onEat = function (pacman, dot) {
     var self = this;
     self.score += 10;
     self.scoreText.text = "Score: " + self.score;
@@ -208,7 +190,7 @@ PacmanGame.prototype.onEat = function (pacman, dot) {
     }
 };
 
-PacmanGame.prototype.onBigDotEat = function (pacman, dot) {
+Pacman.Game.prototype.onBigDotEat = function (pacman, dot) {
     var self = this;
     self.score += 50;
     self.scoreText.text = "Score: " + self.score;
@@ -221,7 +203,7 @@ PacmanGame.prototype.onBigDotEat = function (pacman, dot) {
 };
 
 
-PacmanGame.prototype.onPacmanTouched = function (pacman, ghost) {
+Pacman.Game.prototype.onPacmanTouched = function (pacman, ghost) {
     var self = this;
 
     if (arraytools.inArray(['walkRandomly', 'goHome', 'enterHome'], ghost.state)) {
@@ -252,16 +234,23 @@ PacmanGame.prototype.onPacmanTouched = function (pacman, ghost) {
     animation.killOnComplete = true;
 }
 
-PacmanGame.prototype.onGameOver = function () {
+Pacman.Game.prototype.onGameOver = function () {
    var self = this;
    self.gameOverText = self.game.add.text(0, 0,
             "Game Over", {fontsize: "32px", fill: "#fff"});
    self.gameOverText.anchor.setTo(0.5, 0.5);
    self.gameOverText.position.setTo(self.game.world.centerX, self.game.world.centerY);
    self.togglePause(true);
+   self.game.time.events.add(Phaser.Timer.SECOND * 4, self.togglePause, self);
+   self.game.time.events.add(Phaser.Timer.SECOND * 4, self.goToMainMenu, self);
 }
 
-PacmanGame.prototype.restart = function () {
+Pacman.Game.prototype.goToMainMenu = function () {
+    var self = this;
+    self.state.start('MainMenu');
+}
+
+Pacman.Game.prototype.restart = function () {
     var self = this;
     //self.game.state.start('Game');
     self.game.time.events.add(Phaser.Timer.SECOND * 0, self.togglePause, self);
@@ -281,7 +270,7 @@ PacmanGame.prototype.restart = function () {
 }
 
 /*
- *PacmanGame.prototype.render = function () {
+ *Pacman.Game.prototype.render = function () {
  *    var self = this;
  *    game.debug.bodyInfo(self.ghost1, 32, 64);
  *    game.debug.body(self.ghost1);
@@ -329,7 +318,7 @@ PacmanGame.prototype.restart = function () {
  *
  */
 // TODO: Extract to external plugin
-PacmanGame.prototype.getPointTile = function (point, nonNull) {
+Pacman.Game.prototype.getPointTile = function (point, nonNull) {
     var self = this;
     var _point = point;
     // IF is needed because nonNull doesn't seem to work properly.
@@ -341,7 +330,7 @@ PacmanGame.prototype.getPointTile = function (point, nonNull) {
 };
 
 // TODO: Extract to external plugin
-PacmanGame.prototype.getPointTileXY = function (point) {
+Pacman.Game.prototype.getPointTileXY = function (point) {
     var self = this;
     var tilePoint = new Phaser.Point();
     self.layer.getTileXY(point.x, point.y, tilePoint);
@@ -349,30 +338,30 @@ PacmanGame.prototype.getPointTileXY = function (point) {
 };
 
 // TODO: Extract to external plugin and rename it.
-PacmanGame.prototype.getObjectTile = function (object, nonNull) {
+Pacman.Game.prototype.getObjectTile = function (object, nonNull) {
     var self = this;
     return self.getPointTile(object.position, nonNull);
 };
 
 // TODO: Extract to external plugin
-PacmanGame.prototype.getObjectTileXY = function (object) {
+Pacman.Game.prototype.getObjectTileXY = function (object) {
     var self = this;
     return self.getPointTileXY(object.position);
 };
 
-PacmanGame.prototype.getPointXYTile = function (point) {
+Pacman.Game.prototype.getPointXYTile = function (point) {
     var self = this;
     return self.map.getTile(point.x, point.y)
 }
 
-PacmanGame.prototype.isSafeTile = function (tile) {
+Pacman.Game.prototype.isSafeTile = function (tile) {
     var self = this;
     return tile !== null && tile.index === self.safetile;
 };
 
 
 // TODO: Extract to external plugin
-PacmanGame.prototype.isJunction = function (tile) {
+Pacman.Game.prototype.isJunction = function (tile) {
     var self = this;
     if (!tile) {
         return false;
@@ -390,7 +379,7 @@ PacmanGame.prototype.isJunction = function (tile) {
 };
 
 // TODO: Implement tween=true.
-PacmanGame.prototype.alignToTile = function (object, tween) {
+Pacman.Game.prototype.alignToTile = function (object, tween) {
     var self = this;
     var gridPoint = self.getObjectTileXY(object);
     var alignPoint = new Phaser.Point();
@@ -402,12 +391,12 @@ PacmanGame.prototype.alignToTile = function (object, tween) {
     object.body.reset(alignPoint.x, alignPoint.y);
 };
 
-PacmanGame.prototype.keyPressTimedOut = function () {
+Pacman.Game.prototype.keyPressTimedOut = function () {
     var self = this;
     self.currentKey = null;
 }
 
-PacmanGame.prototype.updateCurrentKey = function () {
+Pacman.Game.prototype.updateCurrentKey = function () {
     var self = this;
 
     if (self.cursors.left.isDown) {
@@ -429,7 +418,7 @@ PacmanGame.prototype.updateCurrentKey = function () {
 };
 
 
-PacmanGame.prototype.checkKeys = function () {
+Pacman.Game.prototype.checkKeys = function () {
     var self = this;
 
     if (self.currentKey === Phaser.LEFT && self.pacman.current !== Phaser.LEFT) {
@@ -458,7 +447,7 @@ PacmanGame.prototype.checkKeys = function () {
     }
 }
 
-PacmanGame.prototype.getTileNeighbors = function (tile, passableOnly) {
+Pacman.Game.prototype.getTileNeighbors = function (tile, passableOnly) {
     var self = this;
     var neighbors = [null, null, null, null, null]
     var passableNeighbors = [];
@@ -476,7 +465,7 @@ PacmanGame.prototype.getTileNeighbors = function (tile, passableOnly) {
     return neighbors;
 };
 
-PacmanGame.prototype.findPathToTile = function (fromTile, toTile) {
+Pacman.Game.prototype.findPathToTile = function (fromTile, toTile) {
     var self = this;
     var toArray = function(elem){return [elem.x, elem.y];};
     var arrToTile = function(elem){return self.map.getTile(elem[0], elem[1])};
@@ -508,7 +497,7 @@ PacmanGame.prototype.findPathToTile = function (fromTile, toTile) {
     return self.reconstructPath(cameFrom, start, goal);
 }
 
-PacmanGame.prototype.reconstructPath = function (cameFrom, start, goal) {
+Pacman.Game.prototype.reconstructPath = function (cameFrom, start, goal) {
     var self = this;
     var current = goal;
     var path = [current];
@@ -519,7 +508,7 @@ PacmanGame.prototype.reconstructPath = function (cameFrom, start, goal) {
     return path;
 }
 
-PacmanGame.prototype.getTurnPointsFromPath = function (path) {
+Pacman.Game.prototype.getTurnPointsFromPath = function (path) {
     var self = this;
     var turnPoints = [];
     var x, y;
@@ -560,5 +549,5 @@ PacmanGame.prototype.getTurnPointsFromPath = function (path) {
     return turnPoints;
 }
 
-var game = new Phaser.Game(28 * 32, 37 * 32, Phaser.AUTO, "game");
-game.state.add("Game", PacmanGame, true);
+//var game = new Phaser.Game(28 * 32, 37 * 32, Phaser.AUTO, "game");
+//game.state.add("Game", Pacman.Game, true);
