@@ -80,7 +80,7 @@ TileWalker.prototype.goToTile = function (targetTile, callback, callback_arg) {
 
 TileWalker.prototype.updateCheckPoints = function (targetTile) {
     var self = this;
-    self.object.body.velocity.setTo(0, 0);
+    //self.object.body.velocity.setTo(0, 0);
     var objectTile = self.game.getObjectTile(self.object);
     var path = self.game.findPathToTile(objectTile, targetTile);
     var checkpoints = self.game.getTurnPointsFromPath(path);
@@ -99,7 +99,20 @@ TileWalker.prototype.setDirection = function () {
                        y: self.object.body.height * self.object.anchor.y}
     var x = self.currentCheckpoint.x * self.map.tileWidth + anchorValue.x;
     var y = self.currentCheckpoint.y * self.map.tileHeight + anchorValue.y;
-    self.game.physics.arcade.moveToXY(self.object, x, y, speed);
+    //self.game.physics.arcade.moveToXY(self.object, x, y, speed);
+
+    if (self.object.x < x){
+        self.object.body.velocity.x = speed;
+    }
+    else if (self.object.x > x) {
+        self.object.body.velocity.x = -speed;
+    }
+    else if (self.object.y < y) {
+        self.object.body.velocity.y = speed;
+    }
+    else if (self.object.y > y) {
+        self.object.body.velocity.y = -speed;
+    }
 };
 
 
