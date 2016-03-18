@@ -1,6 +1,5 @@
 // TODO: Add Game states - preload, menu, game, ...
 // TODO: A*
-// TODO: Update chasing
 // FIXME: Key timer needs fixing
 
 "use strict";
@@ -179,12 +178,8 @@ PacmanGame.prototype.update = function () {
     self.game.physics.arcade.overlap(self.pacman, self.dots, self.onEat, null, this);
     self.game.physics.arcade.overlap(self.pacman, self.bigDots, self.onBigDotEat, null, this);
 
-    self.game.world.wrap(self.pacman, 0);
-    // FIXME: I want to add groups to the wrap method.
-    self.game.world.wrap(self.ghost1, 0);
-    self.game.world.wrap(self.ghost2, 0);
-    self.game.world.wrap(self.ghost3, 0);
-    self.game.world.wrap(self.ghost4, 0);
+    self.game.world.wrap(self.pacman);
+    self.ghosts.forEach(function(ghost) {self.game.world.wrap(ghost)}, self);
 
     self.updateCurrentKey();
     self.checkKeys();

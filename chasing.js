@@ -21,6 +21,7 @@ ChasingStrategy = function (ghost) {
     self.junctionLeft = false;
     self.MAX_DISTANCE = 3;
     self.justAligned = false;
+    var RANDOMNESS_FACTOR = 0;
 }
 
 // TODO: Rename this method as it does more than just a check.
@@ -65,31 +66,10 @@ StraightToThePointChasing.prototype.chase = function (target) {
 
 };
 
-
-SlightlyRandomizedChasing = function (ghost) {
-    var self = this;
-    ChasingStrategy.call(self, ghost);
-};
-SlightlyRandomizedChasing.prototype = Object.create(ChasingStrategy.prototype);
-SlightlyRandomizedChasing.prototype.constructor = SlightlyRandomizedChasing;
-
-
-SlightlyRandomizedChasing.prototype.chase = function (target) {
-    var self = this;
-    var ghost = self.ghost;
-    var RANDOMNESS_FACTOR = 5;
-
-    if (self.isPathUpdateNeeded()) {
-        self.game.alignToTile(ghost);
-        self.targetTile = getRandomizedTargetTile(ghost, target, RANDOMNESS_FACTOR);
-    }
-    self.ghost.tileWalker.goToTile(self.targetTile);
-};
-
-
 RandomizedChasing = function (ghost) {
     var self = this;
     ChasingStrategy.call(self, ghost);
+    self.RANDOMNESS_FACTOR = 10;
 };
 RandomizedChasing.prototype = Object.create(ChasingStrategy.prototype);
 RandomizedChasing.prototype.constructor = RandomizedChasing;
@@ -97,12 +77,20 @@ RandomizedChasing.prototype.constructor = RandomizedChasing;
 RandomizedChasing.prototype.chase = function (target) {
     var self = this;
     var ghost = self.ghost;
-    var RANDOMNESS_FACTOR = 10;
 
     if (self.isPathUpdateNeeded()) {
         self.game.alignToTile(ghost);
-        self.targetTile = getRandomizedTargetTile(ghost, target, RANDOMNESS_FACTOR);
+        self.targetTile = getRandomizedTargetTile(ghost, target, self.RANDOMNESS_FACTOR);
     }
     self.ghost.tileWalker.goToTile(self.targetTile);
 };
+
+SlightlyRandomizedChasing = function (ghost) {
+    var self = this;
+    RandomizedChasing.call(self, ghost);
+    self.RANDOMNESS_FACTOR = 5;
+};
+SlightlyRandomizedChasing.prototype = Object.create(RandomizedChasing.prototype);
+SlightlyRandomizedChasing.prototype.constructor = SlightlyRandomizedChasing;
+
 

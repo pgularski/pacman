@@ -1,5 +1,5 @@
 // TODO: Move it somewhere else
-var makePoint = function (point_array) {
+var arrayToPoint = function (point_array) {
     return new Phaser.Point(point_array[0], point_array[1]);
 };
 
@@ -56,7 +56,7 @@ Ghost = function (pacmanGameState, game, x, y, chasingStrategy, corner, state) {
     self.cornerPath = self.cornerPath.map(self.updateOffset.bind(self));
 
     self.cornerPath = self.cornerPath.map((function(point_array){
-            return self.game.getPointXYTile(makePoint(point_array));
+            return self.game.getPointXYTile(arrayToPoint(point_array));
         })
     );
 

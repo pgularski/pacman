@@ -84,9 +84,9 @@ TileWalker.prototype.updateCheckPoints = function (targetTile) {
     var objectTile = self.game.getObjectTile(self.object);
     var path = self.game.findPathToTile(objectTile, targetTile);
     var checkpoints = self.game.getTurnPointsFromPath(path);
-    checkpoints = checkpoints.map(makePoint);
+    checkpoints = checkpoints.map(arrayToPoint);
     //checkpoints.unshift(self.game.getPointTileXY(target.position));
-    checkpoints.unshift(makePoint([targetTile.x, targetTile.y]));
+    checkpoints.unshift(arrayToPoint([targetTile.x, targetTile.y]));
     // TODO: Ceckpoints should be tiles;
     self.checkpoints = checkpoints;
 };
