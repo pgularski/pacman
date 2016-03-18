@@ -7,7 +7,9 @@ Pacman.MainMenu = function (game) {
 
 Pacman.MainMenu.prototype.create = function () {
     var self = this;
-    self.input.onDown.addOnce(self.startGame, self);
+    //self.input.onDown.addOnce(self.startGame, self);
+    self.startButton = self.add.button(self.world.centerX, self.world.centerY, 'startGameButton', self.startGame, self);
+    self.startButton.anchor.setTo(0.5, 0.5);
 };
 
 

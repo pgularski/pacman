@@ -1,7 +1,8 @@
-// TODO: Add Game states - preload, menu, game, ...
 // TODO: Change the pathfinding algorithm to A*, instead of a simple breadth first search.
 // TODO: Touch controls
 // FIXME: Key timer needs fixing
+// TODO: Sounds
+// TODO: Add 1UP
 
 'use strict';
 
@@ -33,9 +34,6 @@ Pacman.Game = function(game) {
 
 Pacman.Game.prototype.create = function () {
     var self = this;
-    self.SaveCPU = self.game.plugins.add(Phaser.Plugin.SaveCPU);
-    self.SaveCPU.renderOnFPS = 45;
-
     self.physics.startSystem(Phaser.Physics.ARCADE);
 
     self.SPEED = 220;
@@ -243,6 +241,13 @@ Pacman.Game.prototype.onGameOver = function () {
    self.gameOverText.anchor.setTo(0.5, 0.5);
    self.gameOverText.position.setTo(self.game.world.centerX, self.game.world.centerY);
    self.togglePause(true);
+   self.game.time.events.add(Phaser.Timer.SECOND * 4, self.togglePause, self);
+   self.game.time.events.add(Phaser.Timer.SECOND * 4, self.goToMainMenu, self);
+}
+
+Pacman.Game.prototype.goToMainMenu = function () {
+    var self = this;
+    self.state.start('MainMenu');
 }
 
 Pacman.Game.prototype.restart = function () {
