@@ -1,7 +1,7 @@
-// TODO: Move it somewhere else
 
 "use strict";
 
+// TODO: Move it somewhere else
 var arrayToPoint = function (point_array) {
     return new Phaser.Point(point_array[0], point_array[1]);
 };
