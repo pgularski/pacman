@@ -24,6 +24,8 @@ Pacman.Preloader.prototype.preload = function () {
     self.load.spritesheet("dot", "assets/dot_tile.png", 32, 32);
     self.load.spritesheet("bigDot", "assets/big_dot.png", 32, 32);
     self.load.tilemap("map", "assets/map.json", null, Phaser.Tilemap.TILED_JSON);
+
+    self.load.audio('sfx', 'assets/sfx/pacman.ogg');
 };
 
 Pacman.Preloader.prototype.create = function () {
