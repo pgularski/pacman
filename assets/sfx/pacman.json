@@ -1,0 +1,27 @@
+{
+  "resources": [
+    "pacman.ogg"
+  ],
+  "spritemap": {
+    "bigDot": {
+      "start": 0,
+      "end": 0.3863718820861678,
+      "loop": false
+    },
+    "die": {
+      "start": 2,
+      "end": 3.75578231292517,
+      "loop": false
+    },
+    "dot": {
+      "start": 5,
+      "end": 6.774784580498866,
+      "loop": false
+    },
+    "eatGhost": {
+      "start": 8,
+      "end": 8.569183673469388,
+      "loop": false
+    }
+  }
+}

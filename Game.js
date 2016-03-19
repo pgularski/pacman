@@ -47,6 +47,13 @@ Pacman.Game.prototype.create = function () {
     self.initPacman();
     self.initGhosts();
 
+    self.sfx = self.add.audio('sfx');
+    self.sfx.allowMultiple = true;
+    self.sfx.addMarker('sfxBigDot', 0, 0.4);
+    self.sfx.addMarker('sfxDie', 2, 1.8);
+    self.sfx.addMarker('sfxDot', 5, 1.8);
+    self.sfx.addMarker('sfxEatGhost', 8, 0.6);
+
     self.cursors = self.game.input.keyboard.createCursorKeys();
     self.debugKey = self.game.input.keyboard.addKey(Phaser.Keyboard.D);
     self.debugKey.isPressed = false;
@@ -181,6 +188,7 @@ Pacman.Game.prototype.update = function () {
 
 Pacman.Game.prototype.onEat = function (pacman, dot) {
     var self = this;
+    self.sfx.play('sfxDot');
     self.score += 10;
     self.scoreText.text = "Score: " + self.score;
     dot.kill();
@@ -192,6 +200,7 @@ Pacman.Game.prototype.onEat = function (pacman, dot) {
 
 Pacman.Game.prototype.onBigDotEat = function (pacman, dot) {
     var self = this;
+    self.sfx.play('sfxBigDot');
     self.score += 50;
     self.scoreText.text = "Score: " + self.score;
     dot.kill();
@@ -206,13 +215,18 @@ Pacman.Game.prototype.onBigDotEat = function (pacman, dot) {
 Pacman.Game.prototype.onPacmanTouched = function (pacman, ghost) {
     var self = this;
 
-    if (arraytools.inArray(['walkRandomly', 'goHome', 'enterHome'], ghost.state)) {
+    if (arraytools.inArray(['goHome'], ghost.state)) {
+        return;
+    }
+    if (arraytools.inArray(['walkRandomly', 'enterHome'], ghost.state)) {
+        self.sfx.play('sfxEatGhost');
         ghost.onGhostEaten();
         return;
     }
     if (!self.pacman.isAlive) {
         return;
     }
+    self.sfx.play('sfxDie');
     self.pacman.die();
     self.lives--;
     self.livesText.text = "Lives: " + self.lives;
