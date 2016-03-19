@@ -8,6 +8,8 @@ Pacman.MainMenu = function (game) {
 Pacman.MainMenu.prototype.create = function () {
     var self = this;
     //self.input.onDown.addOnce(self.startGame, self);
+    self.enterKey = self.game.input.keyboard.addKey(Phaser.Keyboard.ENTER);
+    self.enterKey.onDown.add(self.startGame, self);
     self.startButton = self.add.button(self.world.centerX, self.world.centerY, 'startGameButton', self.startGame, self);
     self.startButton.anchor.setTo(0.5, 0.5);
 };
