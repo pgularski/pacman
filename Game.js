@@ -1,5 +1,4 @@
 // TODO: Change the pathfinding algorithm to A*, instead of a simple breadth first search.
-// TODO: Touch controls
 // FIXME: Key timer needs fixing
 // TODO: Add 1UP
 // TODO: Generic inner state handling
@@ -66,10 +65,58 @@ Pacman.Game.prototype.create = function () {
     self.game.time.events.add(Phaser.Timer.SECOND * 0, self.togglePause, self);
     self.game.time.events.add(Phaser.Timer.SECOND * 3, self.togglePause, self);
 
+    self.swipeStartX = 0;
+    self.swipeStartY = 0;
+    self.game.input.onDown.add(self.beginSwipe, self);
+
     // Trigger gameCreated to start tests.
     var event = new CustomEvent('gameCreated');
     window.dispatchEvent(event);
-}
+};
+
+Pacman.Game.prototype.beginSwipe = function () {
+    var self = this;
+    console.log('beginSwipe');
+    self.swipeStartX = self.game.input.worldX;
+    self.swipeStartY = self.game.input.worldY;
+    self.input.onDown.remove(self.beginSwipe);
+    self.game.input.onUp.add(self.endSwipe, self);
+};
+
+Pacman.Game.prototype.endSwipe = function () {
+    var self = this;
+    console.log('endSwipe');
+    var swipeEndX = self.game.input.worldX;
+    var swipeEndY = self.game.input.worldY;
+    var deltaX = self.swipeStartX - swipeEndX;
+    var deltaY = self.swipeStartY - swipeEndY;
+    var abs = Math.abs
+
+    if (abs(deltaX) > 2 * abs(deltaY) && abs(deltaX) > 10) {
+        if (deltaX > 0) {
+            console.log('Swipe LEFT');
+            self.currentKey = Phaser.LEFT;
+        }
+        else {
+            console.log('Swipe RIGHT');
+            self.currentKey = Phaser.RIGHT;
+        }
+    }
+
+    if (abs(deltaY) > 2 * abs(deltaX) && abs(deltaY) > 10) {
+        if (deltaY > 0) {
+            console.log('Swipe UP');
+            self.currentKey = Phaser.UP;
+        }
+        else {
+            console.log('Swipe DOWN');
+            self.currentKey = Phaser.DOWN;
+        }
+    }
+
+    self.game.input.onDown.add(self.beginSwipe, self);
+    self.game.input.onUp.remove(self.endSwipe);
+};
 
 Pacman.Game.prototype.initMap = function () {
     var self = this;
@@ -562,6 +609,3 @@ Pacman.Game.prototype.getTurnPointsFromPath = function (path) {
 
     return turnPoints;
 }
-
-//var game = new Phaser.Game(28 * 32, 37 * 32, Phaser.AUTO, "game");
-//game.state.add("Game", Pacman.Game, true);
