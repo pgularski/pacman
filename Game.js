@@ -1,8 +1,8 @@
 // TODO: Change the pathfinding algorithm to A*, instead of a simple breadth first search.
 // TODO: Touch controls
 // FIXME: Key timer needs fixing
-// TODO: Sounds
 // TODO: Add 1UP
+// TODO: Generic inner state handling
 
 'use strict';
 
