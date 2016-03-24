@@ -16,6 +16,7 @@ Pacman.Game = function(game) {
     self.scoreText;
     self.readyText;
     self.currentKey;
+    self.sfx;
 
     self.ghosts;
     self.ghost1;
@@ -39,19 +40,13 @@ Pacman.Game.prototype.create = function () {
 
     self.lives = 3;
 
+    self.initSfx();
     self.initMap();
     self.initDots();
     self.initText();
     self.initLandmarks();
     self.initPacman();
     self.initGhosts();
-
-    self.sfx = self.add.audio('sfx');
-    self.sfx.allowMultiple = true;
-    self.sfx.addMarker('sfxBigDot', 0, 0.4);
-    self.sfx.addMarker('sfxDie', 2, 1.8);
-    self.sfx.addMarker('sfxDot', 5, 1.8);
-    self.sfx.addMarker('sfxEatGhost', 8, 0.6);
 
     self.cursors = self.game.input.keyboard.createCursorKeys();
     self.debugKey = self.game.input.keyboard.addKey(Phaser.Keyboard.D);
@@ -73,6 +68,17 @@ Pacman.Game.prototype.create = function () {
     var event = new CustomEvent('gameCreated');
     window.dispatchEvent(event);
 };
+
+Pacman.Game.prototype.initSfx = function () {
+    var self = this;
+    self.sfx = self.add.audio('sfx');
+    self.sfx.allowMultiple = true;
+    self.sfx.addMarker('sfxBigDot', 0, 0.4);
+    self.sfx.addMarker('sfxDie', 2, 1.8);
+    self.sfx.addMarker('sfxDot', 5, 1.8);
+    self.sfx.addMarker('sfxEatGhost', 8, 0.6);
+};
+
 
 Pacman.Game.prototype.beginSwipe = function () {
     var self = this;
