@@ -96,7 +96,7 @@ Pacman.Game.prototype.endSwipe = function () {
     var swipeEndY = self.game.input.worldY;
     var deltaX = self.swipeStartX - swipeEndX;
     var deltaY = self.swipeStartY - swipeEndY;
-    var abs = Math.abs
+    var abs = Math.abs;
 
     if (abs(deltaX) > 2 * abs(deltaY) && abs(deltaX) > 10) {
         if (deltaX > 0) {
