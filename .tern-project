@@ -5,10 +5,14 @@
     "underscore",
     "jquery"
   ],
-  "loadEagerly": [],
+  "dontLoad": [
+    "libs/*.min.js"],
+  "loadEagerly": [
+    "*.js",
+    "libs/*.js"],
   "plugins":
     {
-      "/usr/lib/node_modules/tern-phaser/phaser": {}
+      "phaser": {}
     }
 
 }

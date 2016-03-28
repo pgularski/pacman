@@ -23,24 +23,7 @@
         <script src="Pacman.js"></script>
         <script src="Ghost.js"></script>
         <script src="Game.js"></script>
-
-        <script type="text/javascript">
-
-        (function () {
-
-            var game = new Phaser.Game(28 * 32, 37 * 32, Phaser.AUTO, "game");
-
-            game.state.add('Boot', Pacman.Boot);
-            game.state.add('Preloader', Pacman.Preloader);
-            game.state.add('MainMenu', Pacman.MainMenu);
-            game.state.add('Game', Pacman.Game);
-
-            game.state.start('Boot');
-
-        })();
-
-        </script>
-
+        <script src="app.js"></script>
     </head>
     <body>
     </body>
