@@ -13,21 +13,15 @@ itertools.makeIterator = function(array){
     }
 }
 
-itertools.cycle = function (array) {
-    var Cycle = function (array) {
-        var self = this;
-        self.index = 0;
-        self.array = array;
-    }
 
-    Cycle.prototype.next = function () {
-        var self = this;
-        while (true) {
-            if (self.index >= self.array.length) {
-                self.index = 0;
+itertools.cycle = function(array) {
+    var index = 0;
+    return {
+        next: function(){
+            if (index === array.length) {
+                index = 0;
             }
-            return self.array[self.index++];
+            return array[index++]
         }
     }
-    return new Cycle(array);
 }
