@@ -5,6 +5,7 @@ Pacman.TileWalker = function (object) {
     self.object = object;
     self.game = object.game;
     self.map = object.map;
+    self.state = self._buildStateMachine();
     self.hasTarget = false;
     self.hasArrived = false;
     self.targetTile = null;
@@ -16,31 +17,49 @@ Pacman.TileWalker = function (object) {
     self.MAX_DISTANCE = 3;
 };
 
-Pacman.TileWalker.prototype.goToTile = function (targetTile, callback, callback_arg) {
+
+Pacman.TileWalker.prototype._buildStateMachine = function () {
     var self = this;
+    var state = new sm.StateMachine('m');
+    var stopped = new sm.State('stopped');
+    var moving = new sm.State('moving');
+    state.addState(stopped, true);
+    state.addState(moving);
+    state.addTransition(stopped, moving, ['go']);
+    state.addTransition(moving, stopped, ['arrived'], null, null, null, null, function(s, e) { /* after */ self.object.stateMachine.dispatch(new sm.Event('arrived')); } );
+    state.addTransition(moving, moving, ['go']);
+    state.initialize();
 
-    if (targetTile !== self.targetTile) {
-        self.hasArrived = false;
-        self.hasTarget = false;
+    moving.handlers = {
+        'enter': function(s, e) {
+            self.targetTile = e.cargo.sourceEvent.cargo.targetTile;
+            self.updateCheckPoints(self.targetTile);
+            self.currentCheckpoint = self.checkpoints.pop();
+            self.setDirection();
+        },
+        'go': function(s, e) {
+            self.setDirection();
+        },
+        'checkpointReached': function(s, e) {
+            self.setDirection();
+        },
+    };
+
+    stopped.handlers = {
+        'enter': function(s, e) {
+            self.object.body.velocity.setTo(0, 0);
+        }
+    };
+    return state;
+};
+
+// TODO: should it be a state?
+Pacman.TileWalker.prototype.isCheckPointReached = function () {
+    var self = this;
+    if(!self.currentCheckpoint){
+        return true;
     }
 
-    if (self.hasArrived) {
-        return;
-    }
-
-    // TODO: Hook methods?
-    // onStart
-    if (!self.hasTarget || !self.isMoving()) {
-        self.hasTarget = true;
-        self.hasArrived = false;
-        self.targetTile = targetTile;
-        self.updateCheckPoints(targetTile);
-        self.currentCheckpoint = self.checkpoints.pop();
-        //self.game.alignToTile(self.object);
-        self.setDirection();
-    }
-
-    // in the middle
     var checkpointX = self.currentCheckpoint.x * self.map.tileWidth;
     var checkpointY = self.currentCheckpoint.y * self.map.tileHeight;
     var distance = self.game.math.distance(
@@ -48,25 +67,28 @@ Pacman.TileWalker.prototype.goToTile = function (targetTile, callback, callback_
             checkpointX, checkpointY);
 
     if (distance <= self.MAX_DISTANCE) {
-        self.currentCheckpoint = self.checkpoints.pop();
-        self.game.alignToTile(self.object);
-
-        // on finished
-        if (!self.currentCheckpoint) {
-            self.hasArrived = true;
-            self.hasTarget = false;
-
-            if (callback) {
-                callback(callback_arg);
-            }
-
-            self.object.body.velocity.setTo(0, 0);
-        }
-        else {
-            self.setDirection();
-
-        }
+        return true;
     }
+    return false;
+};
+
+Pacman.TileWalker.prototype.update = function () {
+    var self = this;
+    if (self.isCheckPointReached())
+    {
+        self.game.alignToTile(self.object);
+        self.currentCheckpoint = self.checkpoints.pop();
+        if (!self.currentCheckpoint)
+        {
+            self.state.dispatch(new sm.Event('arrived'));
+        }
+        self.state.dispatch(new sm.Event('checkpointReached'));
+    }
+};
+
+Pacman.TileWalker.prototype.goToTile = function (targetTile, callback, callbackArgs) {
+    var self = this;
+    self.state.dispatch(new sm.Event('go', null, null, {'targetTile': targetTile, 'callback': callback, 'callbackArgs': callbackArgs }));
 };
 
 
@@ -102,26 +124,5 @@ Pacman.TileWalker.prototype.setDirection = function () {
     }
     else if (self.object.y > y) {
         self.object.body.velocity.y = -speed;
-    }
-};
-
-
-Pacman.TileWalker.prototype.isMoving = function () {
-    var self = this;
-    return !(self.object.body.deltaX() === 0 && self.object.body.deltaY() === 0)
-};
-
-
-Pacman.TileWalker.prototype.patrol = function (arrayOfTiles) {
-    var self = this;
-    if (!self.isPatroling) {
-        self.pathIterator = itertools.cycle(arrayOfTiles);
-        self.isPatroling = true;
-    }
-    if (!self.hasTarget) {
-        self.goToTile(self.pathIterator.next());
-    }
-    else {
-        self.goToTile(self.targetTile);
     }
 };
