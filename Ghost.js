@@ -157,7 +157,10 @@ Pacman.Ghost.prototype._buildStateMachine = function () {
     };
 
     eaten.handlers = {
-        'enter': function(s, e) {self.play('ghost_eaten')},
+        'enter': function(s, e) {
+            self.play('ghost_eaten');
+            self.speed = self.EATEN_SPEED;
+        },
         'exit': function(s, e) {self.play('ghost')},
     };
 
@@ -211,6 +214,11 @@ Pacman.Ghost.prototype._buildStateMachine = function () {
     stateMachine.initialize();
 
     return stateMachine
+}
+
+Pacman.Ghost.prototype.getState = function () {
+    var self = this;
+    return self.stateMachine.leafState().name;
 }
 
 Pacman.Ghost.prototype.toggleScatterChase = function () {
@@ -366,12 +374,7 @@ Pacman.Ghost.prototype.onBigDotEaten = function () {
 
 Pacman.Ghost.prototype.onGhostEaten = function () {
     var self = this;
-    self.tileWalker.targetTile = null;
-    self.play('ghost_eaten');
-    self.speed = self.EATEN_SPEED;
-    self.state = 'goHome';
-    self.counter = 0;
-    console.log('state updated: ' + self.state);
+    self.stateMachine.dispatch(new sm.Event('eatGhost'));
 };
 
 
@@ -408,13 +411,6 @@ Pacman.Ghost.prototype.goHome = function () {
     {
         self.tileWalker.goToTile(self.homeTile);
     }
-};
-
-
-Pacman.Ghost.prototype.walkRandomly = function () {
-    var self = this;
-    self.randomTile = random.choice(self.game.safeTiles);
-    self.tileWalker.goToTile(self.randomTile);
 };
 
 

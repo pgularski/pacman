@@ -268,10 +268,10 @@ Pacman.Game.prototype.onBigDotEat = function (pacman, dot) {
 Pacman.Game.prototype.onPacmanTouched = function (pacman, ghost) {
     var self = this;
 
-    if (arraytools.inArray(['goHome'], ghost.state)) {
+    if (arraytools.inArray(['eaten'], ghost.getState())) {
         return;
     }
-    if (arraytools.inArray(['walkRandomly', 'enterHome'], ghost.state)) {
+    if (arraytools.inArray(['notAtHomeFrightened'], ghost.getState())) {
         self.sfx.play('sfxEatGhost');
         ghost.onGhostEaten();
         return;
